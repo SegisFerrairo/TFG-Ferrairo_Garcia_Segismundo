@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <%- include('_partials/_head.ejs'); %>  
+    </head>
+    <body>      
+        <header id="header">
+            <%- include('_partials/_header.ejs'); -%>  
+        </header>
+        
+        <div class="area">
+        <div id="left-space">        
+            <div>
+            <button id="idiomas" class="visible" type="button" onclick="mostrarIdiomas()">Mostar idiomas</button>
+            </div>
+            <div>          
+            <h2>Espacio a la izquierda</h2>
+            <p>Este espacio es independiente de las pestañas a la derecha.</p>
+            <p>Es el ave más grande y de mayor peso del mundo. Cuando nacen los polluelos miden entre 25 y 30 cm de altura, pesando unos 900 g. Durante el primer año de vida los polluelos crecen unos 25 cm al mes. Los machos adultos pueden llegar a alcanzar los 2,75 o incluso 3 metros, y pesar alrededor de 180 kg.4​5​
+
+    Sus alas pequeñas no les permiten volar, aun así, les ayudan a impulsarse, equilibrarse al correr y como mecanismo de defensa, agitándolas para atacar a posibles depredadores.
+
+    Posee una cabeza pequeña en relación con el cuerpo, grandes ojos que miden cinco centímetros de diámetro y le proporcionan una vista excelente, pico plano y de punta roma, largo cuello desprovisto de plumas al igual que sus largas patas, que son potentes y musculadas, perfectamente adaptadas para correr, llegando a alcanzar más de 70 km/h durante unos treinta minutos. Si se ven acorralados atacan con fuertes patadas usando sus garras como armas. Mientras que la mayoría de las aves tienen cuatro dedos en cada pata, el avestruz presenta tan solo dos.</p>
+            </div>          
+        </div>
+
+        <div id="right-space" class="hidden">      
+            <div id="navigation">
+                <nav id="linkTabs">
+                    <a href="#" onclick="openTab('tab1')">Pestaña 1</a>
+                    <a href="#" onclick="openTab('tab2')">Pestaña 2</a>            
+                    <a href="#" onclick="openTab('tab3')">Pestaña 3</a>                
+                </nav>    
+                <input type="text" id="nombreNuevaPestaña" placeholder="Nombre de la nueva pestaña">
+                <button onclick="agregarPestana()">+</button>   
+                </div>
+
+                <div id="tab1" class="tab-content">
+                    <h2>Contenido de la Pestaña 1</h2>
+                    <p>Este es el contenido de la primera pestaña.</p>
+                    <p>El ñu común, ñu azul, ñu de cola negra, ñu listado o gorgón (Connochaetes taurinus) es una especie de mamífero artiodáctilo de la familia Bovidae. Es la especie más común y, a su vez, más conocida de ñu. Es propio de África oriental y austral.
+
+        Mide entre 1,85 y 2,15 m de longitud, además de 40 a 55 cm de la cola; su altura en la cruz es de entre 1,15 y 1,22 m, y su peso oscila entre los 150 y 200 kg.2​
+
+        Es un animal gregario que suele vivir en grandes rebaños en número desde varias docenas a millares de ejemplares.2​</p>
+                </div>
+
+                <div id="tab2" class="tab-content hidden">
+                    <h2>Contenido de la Pestaña 2</h2>          
+                    <p>Este es el contenido de la segunda pestaña.</p>
+                </div>
+
+                <div id="tab3" class="tab-content hidden">
+                    <h2>Contenido de la Pestaña 3</h2>               
+                    <p>Este es el contenido de la tercera pestaña.</p>
+                </div>
+            </div>
+        </div>
+        <%- include('_partials/_footer.ejs'); -%>
+        <script>
+            function openTab(tabId) {
+                // Ocultar todos los elementos con la clase 'tab-content'
+                var tabContents = document.querySelectorAll('.tab-content');
+                tabContents.forEach(function (tabContent) {
+                    tabContent.classList.add('hidden');
+                });
+
+                // Mostrar el contenido de la pestaña específica
+                document.getElementById(tabId).classList.remove('hidden');
+            }
+  
+            function agregarPestana() {
+                // Obtiene el nombre de la nueva pestaña
+                var nombreNuevaPestaña = document.getElementById('nombreNuevaPestaña').value;
+                document.getElementById('nombreNuevaPestaña').value='';
+                
+                var nextTab = 'tab' + (document.getElementsByClassName('tab-content').length + 1);
+
+                // Crea un nuevo elemento <a>
+                var nuevoEnlace = document.createElement('a');
+                nuevoEnlace.href = "#";
+                nuevoEnlace.textContent = nombreNuevaPestaña;
+                nuevoEnlace.onclick = function(){openTab(nextTab)};
+
+                // Crea un nuevo elemento <div> con el nuevo id
+                var nuevoDiv = document.createElement('div');
+                nuevoDiv.id = 'tab' + (document.getElementsByClassName('tab-content').length + 1);
+                nuevoDiv.classList.add('tab-content', 'hidden');
+
+                // Agrega el nuevo contenido del div
+                nuevoDiv.innerHTML = '<h2>Contenido de la ' + nombreNuevaPestaña + '</h2>' +
+                '<p>Este es el contenido de la ' + nombreNuevaPestaña.toLowerCase() + '.</p>';
+
+                // Agrega el nuevo enlace y el nuevo div al DOM
+                document.getElementById('linkTabs').appendChild(nuevoEnlace);
+                document.getElementById('right-space').appendChild(nuevoDiv);
+            }
+
+            function mostrarIdiomas() { 
+                if (document.getElementById('right-space').classList.contains('visible')) {
+                    document.getElementById('idiomas').innerHTML="Mostrar idiomas";
+                    
+                    document.getElementById('right-space').classList.remove('visible');
+                    document.getElementById('right-space').classList.add('hidden');  
+                }
+                else {    
+                    document.getElementById('idiomas').innerHTML="Ocultar idiomas";
+                    document.getElementById('right-space').classList.remove('hidden');
+                    document.getElementById('right-space').classList.add('visible');       
+                }
+            }  
+        </script>
+    </body>
+</html>

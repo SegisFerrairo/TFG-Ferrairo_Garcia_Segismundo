@@ -3,6 +3,7 @@ const path = require('path');
 
 var index = require('./routes/index');
 var about = require('./routes/about');
+var newQuestion = require('./routes/newQuestion');
 
 var app = express();
 
@@ -15,6 +16,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use('/', index);
 app.use('/about', about);
+app.use('/newQuestion', newQuestion);
 
 app.listen(app.get("port"), function(){
   var url = "http://localhost:"+app.get("port");

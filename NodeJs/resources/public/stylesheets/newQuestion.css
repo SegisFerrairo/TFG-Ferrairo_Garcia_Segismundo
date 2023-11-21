@@ -1,0 +1,78 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+    display: block;
+}
+
+.area {
+    display: flex;
+    height: 100vh;
+}
+
+#left-space,
+#right-space {
+    flex-grow: 1;
+    /* Ambos elementos crecerán en la misma proporción */
+    box-sizing: border-box;
+    padding: 20px;
+    width: 50%; /* Ajuste para que ambos tengan el mismo ancho total */
+}
+
+#left-space {
+    background-color: #5a5f73;  
+}
+
+#idiomas {
+  min-height: 80px;
+}
+
+#right-space {
+    background-color: #4a5db5;
+}
+
+#navigation {
+  display:flex;
+}
+
+#navigation input, button {
+  max-height: 30px;  
+}
+
+nav {
+    display: flex;
+    background-color: #eee;
+    padding: 10px;
+    overflow-x: auto; /* Agregado para permitir un scroll horizontal */
+    max-height: 100px; /* Establece la altura máxima para el nav */
+    min-width: 79px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #333;
+    padding: 10px;
+    margin-right: 10px;
+    border-radius: 5px;
+    background-color: #fff;
+    transition: background-color 0.3s ease;
+}
+
+nav a:hover {
+    background-color: #ddd;
+}
+
+.tab-content {
+    padding: 20px;
+}
+
+.hidden {
+    display: none;
+}
