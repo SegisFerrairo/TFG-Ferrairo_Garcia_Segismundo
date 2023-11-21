@@ -5,5 +5,10 @@ Google Drive: <https://drive.google.com/drive/folders/1OdA3-wrL49pMmlaggMY8vDwNJ
 
 Para desplegar la aplicación se ha de ejecutar el siguiente comando dentro del directorio NodeJs:
 ```bash
-TFG-Ferrairo_Garcia_Segismundo\NodeJs$ docker-compose up --build
+    TFG-Ferrairo_Garcia_Segismundo\NodeJs$ docker-compose up --build
+```
+
+Para borrar la aplicación después de deternerla Ctrl+C:
+```bash
+    TFG-Ferrairo_Garcia_Segismundo\NodeJs$ docker-compose down -v --rmi all
 ```

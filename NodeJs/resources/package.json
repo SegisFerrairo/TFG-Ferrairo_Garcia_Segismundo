@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon -L --watch /NodeApp -e js,ejs /NodeApp/app.js"
+    "dev": "nodemon -L --watch /NodeApp -e js,ejs,css,png /NodeApp/app.js"
   },
   "dependencies": {
     "express": "^4.17.1",
