@@ -30,7 +30,7 @@ function openTab(nextLinkTab, nextTab) {
         tabElement.removeAttribute('tabindex');
 
         // Eliminar la clase 'active' de todos los elementos <div> hijos de myTabContent
-        var tabContents = document.getElementById('myTabContent').getElementsByTagName('div');
+        var tabContents = document.getElementById('myTabContent').getElementsByTagName('form');
         for (var i = 0; i < tabContents.length; i++) {
             tabContents[i].classList.remove('active', 'show');
         }
@@ -87,21 +87,71 @@ function addTab() {
     linkContainer.appendChild(newLink);    
     document.getElementById('tabList').appendChild(linkContainer);
 
-    // Crea un nuevo elemento <div> con el nuevo id
-    var newDiv = document.createElement('div');
-    newDiv.id = nextTab;
-    newDiv.classList.add('tab-pane', 'fade');
-    newDiv.setAttribute('role', 'tabpanel');
+    // Crear el formulario de la nueva pestaña
+    addForm(nextTab);
 
-    // Agrega el nuevo contenido del div
-    newDiv.innerHTML = '<h2>Contenido de la ' + newTabName + '</h2>' +
-    '<p>Este es el contenido de la ' + newTabName.toLowerCase() + '.</p>';
+    openTab(nextLinkTab, nextTab);
+}
+
+function addForm(nextTab) {
+    // Crear el formulario
+    var formulario = document.createElement("form");
+    formulario.id = nextTab;
+    formulario.classList.add('tab-pane', 'fade');
+    formulario.setAttribute('role', 'tabpanel');
+
+    // Crear el fieldset
+    var fieldset = document.createElement("fieldset");
+
+    // Crear el div para el enunciado de la pregunta
+    var divEnunciado = document.createElement("div");
+    divEnunciado.className = "form-group";
+
+    var labelEnunciado = document.createElement("label");
+    labelEnunciado.className = "form-label mt-4";
+    labelEnunciado.setAttribute("for", nextTab+"_statement");
+    labelEnunciado.textContent = "Introduce el enunciado de tu pregunta:";
+
+    var textareaEnunciado = document.createElement("textarea");
+    textareaEnunciado.className = "form-control";
+    textareaEnunciado.setAttribute("id", nextTab+"_statement");
+    textareaEnunciado.setAttribute("rows", "3");
+
+    divEnunciado.appendChild(labelEnunciado);
+    divEnunciado.appendChild(textareaEnunciado);
+
+    // Agregar el div de enunciado y las opciones al fieldset
+    fieldset.appendChild(divEnunciado);
+
+    // Crear las opciones de respuesta
+    for (var i = 1; i <= 2; i++) {
+      var divOpcion = document.createElement("div");
+      divOpcion.className = "form-check";
+
+      var inputRadio = document.createElement("input");
+      inputRadio.className = "form-check-input";
+      inputRadio.setAttribute("type", "radio");
+      inputRadio.setAttribute("name", "optionsRadios");
+      inputRadio.setAttribute("id", "optionRadio" + i);
+      inputRadio.setAttribute("value", "option" + i);
+
+      var inputRespuesta = document.createElement("input");
+      inputRespuesta.className = "form-control form-control-sm";
+      inputRespuesta.setAttribute("type", "text");
+      inputRespuesta.setAttribute("placeholder", "Añade tu respuesta");
+      inputRespuesta.setAttribute("for", "optionRadio" + i);
+
+      divOpcion.appendChild(inputRadio);
+      divOpcion.appendChild(inputRespuesta);
+
+      fieldset.appendChild(divOpcion);
+    }
+
+    // Agregar el fieldset al formulario
+    formulario.appendChild(fieldset);
 
     // Agrega el nuevo div al DOM    
-    document.getElementById('myTabContent').appendChild(newDiv);
-
-    // Muestra la nueva pestaña
-    openTab(nextLinkTab, nextTab);
+    document.getElementById('myTabContent').appendChild(formulario);
 }
 
 function showLangs() { 

@@ -4,7 +4,7 @@
 
 #left-space,
 #right-space {
-    flex-grow: 1;
+    /*flex-grow: 1;*/
     /* Ambos elementos crecerán en la misma proporción */
     box-sizing: border-box;
     padding: 20px;
@@ -22,4 +22,8 @@
 #addTabBar #newTabName {
     width: 130px;
     text-align: center;
+}
+
+#mainform {
+    margin-top: 10px;
 }

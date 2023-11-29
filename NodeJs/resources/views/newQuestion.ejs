@@ -14,16 +14,22 @@
                 <div>
                     <button id="languages" class="visible" type="button">Mostrar idiomas</button>
                 </div>
-                <div>          
-                    <h2>Espacio a la izquierda</h2>
-                    <p>Este espacio es independiente de las pestañas a la derecha.</p>
-                    <p>Es el ave más grande y de mayor peso del mundo. Cuando nacen los polluelos miden entre 25 y 30 cm de altura, pesando unos 900 g. Durante el primer año de vida los polluelos crecen unos 25 cm al mes. Los machos adultos pueden llegar a alcanzar los 2,75 o incluso 3 metros, y pesar alrededor de 180 kg.4​5​
-
-            Sus alas pequeñas no les permiten volar, aun así, les ayudan a impulsarse, equilibrarse al correr y como mecanismo de defensa, agitándolas para atacar a posibles depredadores.
-
-            
-                    </p>
-                </div>          
+                <form id="mainform">
+                    <fieldset>
+                        <div class="form-group">
+                            <label for="main_statement" class="form-label mt-4">Introduce el enenunciado de tu pregunta:</label>
+                            <textarea class="form-control" id="main_statement" rows="3"></textarea>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="optionsRadios" id="optionRadio1" value="option1" checked="">
+                            <input type="text" class="form-control form-control-sm" placeholder="Añade tu respuesta" id="inputDefault" for="optionRadio1">
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="optionsRadios" id="optionRadio2" value="option2">
+                            <input type="text" class="form-control form-control-sm" placeholder="Añade tu respuesta" id="inputDefault" for="optionRadio2">
+                        </div>                  
+                    </fieldset>
+                </form> 
             </div>
 
             <div id="right-space" class="hidden">      
