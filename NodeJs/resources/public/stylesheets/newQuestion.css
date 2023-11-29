@@ -14,3 +14,12 @@
 .hidden {
     display: none;
 }
+
+#addTabBar {
+    margin-bottom: 10px;
+}
+
+#addTabBar #newTabName {
+    width: 130px;
+    text-align: center;
+}

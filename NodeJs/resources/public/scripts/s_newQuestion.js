@@ -1,35 +1,44 @@
+/***************
+ ** Constants **
+ ***************/
 let counter = 0;
+
+/***********
+ ** Utils **
+ ***********/
 
 function openTab(nextLinkTab, nextTab) {
     var tabList = document.getElementById('tabList');
 
     var tabElement = document.getElementById(nextLinkTab);
 
-    //Eliminar la clase 'active' de todos los elementos <a> hijos de tabList
-    var links = tabList.getElementsByTagName('a');
-    for (var i = 0; i < links.length; i++) {
-        links[i].classList.remove('active');
-        links[i].setAttribute('aria-selected', false);
-        links[i].setAttribute('tabindex', -1);
+    // si tabElement es null, es porque se ha hecho clic en el botón de cerrar pestaña
+    if (tabElement != null) {
+        //Eliminar la clase 'active' de todos los elementos <a> hijos de tabList
+        var links = tabList.getElementsByTagName('a');
+        for (var i = 0; i < links.length; i++) {
+            links[i].classList.remove('active');
+            links[i].setAttribute('aria-selected', false);
+            links[i].setAttribute('tabindex', -1);
+        }
+
+        // Agregar la clase 'active' al elemento <a> que se ha hecho clic
+        tabElement.classList.add('active');
+        // Cambiar la propiedad aria-selected a true
+        tabElement.setAttribute('aria-selected', true);
+        // Eliminal el atributo tabindex
+        tabElement.removeAttribute('tabindex');
+
+        // Eliminar la clase 'active' de todos los elementos <div> hijos de myTabContent
+        var tabContents = document.getElementById('myTabContent').getElementsByTagName('div');
+        for (var i = 0; i < tabContents.length; i++) {
+            tabContents[i].classList.remove('active', 'show');
+        }
+
+        // Agregar la clase 'active' al elemento <div> que se ha hecho clic
+        var tabContent = document.getElementById(nextTab);
+        tabContent.classList.add('active', 'show');
     }
-
-    // Agregar la clase 'active' al elemento <a> que se ha hecho clic
-    tabElement.classList.add('active');
-    // Cambiar la propiedad aria-selected a true
-    tabElement.setAttribute('aria-selected', true);
-    // Eliminal el atributo tabindex
-    tabElement.removeAttribute('tabindex');
-
-    // Eliminar la clase 'active' de todos los elementos <div> hijos de myTabContent
-    var tabContents = document.getElementById('myTabContent').getElementsByTagName('div');
-    for (var i = 0; i < tabContents.length; i++) {
-        tabContents[i].classList.remove('active', 'show');
-    }
-
-    // Agregar la clase 'active' al elemento <div> que se ha hecho clic
-    var tabContent = document.getElementById(nextTab);
-    tabContent.classList.add('active', 'show');
-
 }
 
 function closeTab(nextLinkTab, nextTab) {
@@ -59,12 +68,15 @@ function addTab() {
     newLink.href = "#";                
     newLink.textContent = newTabName;
     newLink.setAttribute('role', 'tab');
-    newLink.onclick = function(){openTab(nextLinkTab, nextTab)};     
+
+    // añadir un event listener al botón de añadir pestaña
+    newLink.addEventListener('click', function(){openTab(nextLinkTab, nextTab)});
+
     
     var newClose = document.createElement('button');
     newClose.classList.add('btn-close');
     newClose.setAttribute('type', 'button');
-    newClose.onclick = function(){closeTab(nextLinkTab, nextTab)};
+    newClose.addEventListener('click', function(){closeTab(nextLinkTab, nextTab)});
     
 
     var linkContainer = document.createElement('li');
@@ -106,20 +118,21 @@ function showLangs() {
     }
 }
     
-
+/****************
+ ** DOM Loaded **
+ ****************/
 
 document.addEventListener("DOMContentLoaded", function() {
-    var linkTabs = document.getElementById("linkTabs");
+    // añadir un event listener al botón de mostrar/ocultar idiomas
+    document.getElementById('languages').addEventListener('click', showLangs);
 
-    // Función para ocultar/mostrar el nav según si tiene hijos o no
-    function toggleNavDisplay() {
-        !linkTabs.hasChildNodes() ? linkTabs.classList.add("hidden") : linkTabs.classList.remove("hidden");
-    }
+    // añadir un event listener al botón de añadir pestaña
+    document.getElementById('newTabName').nextElementSibling.addEventListener('click', addTab);
+    // añadir un event listener al botón de añdir pestaña al pulsar enter
+    document.getElementById('newTabName').addEventListener('keyup', function(event) {
+        if (event.key === 'Enter') {
+            addTab();
+        }
+    });
 
-    // Configurar el MutationObserver con la función de retorno de llamada
-    var observer = new MutationObserver(toggleNavDisplay);
-
-    // Observar cambios en los hijos del nav
-    var observerConfig = { childList: true };
-    observer.observe(linkTabs, observerConfig);
 });
