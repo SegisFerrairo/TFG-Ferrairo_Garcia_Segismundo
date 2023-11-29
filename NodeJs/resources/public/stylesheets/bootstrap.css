@@ -132,6 +132,62 @@
   --bs-form-invalid-border-color: #d9534f;
 }
 
+[data-bs-theme=dark-light] {
+  color-scheme: light;
+  --bs-body-color: #ddd;
+  --bs-body-color-rgb: 221, 221, 221;
+  --bs-body-bg: #ffffff;
+  --bs-body-bg-rgb: 33, 37, 41;
+  --bs-emphasis-color: #fff;
+  --bs-emphasis-color-rgb: 255, 255, 255;
+  --bs-secondary-color: rgba(221, 221, 221, 0.75);
+  --bs-secondary-color-rgb: 221, 221, 221;
+  --bs-secondary-bg: #343a40;
+  --bs-secondary-bg-rgb: 52, 58, 64;
+  --bs-tertiary-color: rgba(221, 221, 221, 0.5);
+  --bs-tertiary-color-rgb: 221, 221, 221;
+  --bs-tertiary-bg: #f8f9fa;
+  --bs-tertiary-bg-rgb: 43, 48, 53;
+  --bs-primary-text-emphasis: #8fb4f4;
+  --bs-secondary-text-emphasis: #ced3d7;
+  --bs-success-text-emphasis: #67d4ac;
+  --bs-info-text-emphasis: #74c7d4;
+  --bs-warning-text-emphasis: #f6ce95;
+  --bs-danger-text-emphasis: #e89895;
+  --bs-light-text-emphasis: #f8f9fa;
+  --bs-dark-text-emphasis: #ddd;
+  --bs-primary-bg-subtle: #0e1a2f;
+  --bs-secondary-bg-subtle: #232426;
+  --bs-success-bg-subtle: #002517;
+  --bs-info-bg-subtle: #052025;
+  --bs-warning-bg-subtle: #302310;
+  --bs-danger-bg-subtle: #2b1110;
+  --bs-light-bg-subtle: #343a40;
+  --bs-dark-bg-subtle: #1a1d20;
+  --bs-primary-border-subtle: #294e8e;
+  --bs-secondary-border-subtle: #686d71;
+  --bs-success-border-subtle: #016e46;
+  --bs-info-border-subtle: #0e616e;
+  --bs-warning-border-subtle: #90682f;
+  --bs-danger-border-subtle: #82322f;
+  --bs-light-border-subtle: #495057;
+  --bs-dark-border-subtle: #343a40;
+  --bs-heading-color: inherit;
+  --bs-link-color: #8fb4f4;
+  --bs-link-hover-color: #a5c3f6;
+  --bs-link-color-rgb: 143, 180, 244;
+  --bs-link-hover-color-rgb: 165, 195, 246;
+  --bs-code-color: #f18bba;
+  --bs-highlight-color: #ddd;
+  --bs-highlight-bg: #60451f;
+  --bs-border-color: #495057;
+  --bs-border-color-translucent: rgba(255, 255, 255, 0.15);
+  --bs-form-valid-color: #67d4ac;
+  --bs-form-valid-border-color: #67d4ac;
+  --bs-form-invalid-color: #e89895;
+  --bs-form-invalid-border-color: #e89895;
+}
+
 [data-bs-theme=dark] {
   color-scheme: dark;
   --bs-body-color: #ddd;
@@ -201,7 +257,7 @@
 }
 
 body {
-  margin: 0;
+  margin-top: 5em;
   font-family: var(--bs-body-font-family);
   font-size: var(--bs-body-font-size);
   font-weight: var(--bs-body-font-weight);

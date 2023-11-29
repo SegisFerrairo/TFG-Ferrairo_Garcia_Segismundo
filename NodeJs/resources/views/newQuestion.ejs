@@ -9,7 +9,7 @@
             <%- include('_partials/_header.ejs'); -%>  
         </header>
         
-        <div id="area" class="container">
+        <div id="area" class="container-fluid">
             <div id="left-space">        
                 <div>
                     <button id="languages" class="visible" type="button" onclick="showLangs()">Mostrar idiomas</button>
@@ -21,19 +21,20 @@
 
             Sus alas pequeñas no les permiten volar, aun así, les ayudan a impulsarse, equilibrarse al correr y como mecanismo de defensa, agitándolas para atacar a posibles depredadores.
 
-            Posee una cabeza pequeña en relación con el cuerpo, grandes ojos que miden cinco centímetros de diámetro y le proporcionan una vista excelente, pico plano y de punta roma, largo cuello desprovisto de plumas al igual que sus largas patas, que son potentes y musculadas, perfectamente adaptadas para correr, llegando a alcanzar más de 70 km/h durante unos treinta minutos. Si se ven acorralados atacan con fuertes patadas usando sus garras como armas. Mientras que la mayoría de las aves tienen cuatro dedos en cada pata, el avestruz presenta tan solo dos.
+            
                     </p>
                 </div>          
             </div>
 
             <div id="right-space" class="hidden">      
-                <div id="navigation">                     
-                    <nav id="linkTabs" class="hidden"></nav>       
+                <div class="nav nav-tabs">
+                    <ul id="tabList" class="nav" role="tablist"></ul>
                     <div id="addTabBar">
                         <input type="text" id="newTabName" placeholder="Nueva pestaña">
                         <button onclick="addTab()">+</button>
-                    </div>               
+                    </div>   
                 </div>
+                <div id="myTabContent" class="tab-content"></div>
             </div>
         </div>
 

@@ -1,26 +1,43 @@
 let counter = 0;
 
-function openTab(tabId) {
-    // Ocultar todos los elementos con la clase 'tab-content'
-    var tabContents = document.querySelectorAll('.tab-content');
-    tabContents.forEach(function (tabContent) {
-        tabContent.classList.add('hidden');
-    });
+function openTab(nextLinkTab, nextTab) {
+    var tabList = document.getElementById('tabList');
 
-    // Mostrar el contenido de la pestaña específica
-    document.getElementById(tabId).classList.remove('hidden');
+    var tabElement = document.getElementById(nextLinkTab);
+
+    //Eliminar la clase 'active' de todos los elementos <a> hijos de tabList
+    var links = tabList.getElementsByTagName('a');
+    for (var i = 0; i < links.length; i++) {
+        links[i].classList.remove('active');
+        links[i].setAttribute('aria-selected', false);
+        links[i].setAttribute('tabindex', -1);
+    }
+
+    // Agregar la clase 'active' al elemento <a> que se ha hecho clic
+    tabElement.classList.add('active');
+    // Cambiar la propiedad aria-selected a true
+    tabElement.setAttribute('aria-selected', true);
+    // Eliminal el atributo tabindex
+    tabElement.removeAttribute('tabindex');
+
+    // Eliminar la clase 'active' de todos los elementos <div> hijos de myTabContent
+    var tabContents = document.getElementById('myTabContent').getElementsByTagName('div');
+    for (var i = 0; i < tabContents.length; i++) {
+        tabContents[i].classList.remove('active', 'show');
+    }
+
+    // Agregar la clase 'active' al elemento <div> que se ha hecho clic
+    var tabContent = document.getElementById(nextTab);
+    tabContent.classList.add('active', 'show');
+
 }
 
 function closeTab(nextLinkTab, nextTab) {
-    // Elimina el enlace de la pestaña
-    var linkTabs = document.getElementById('linkTabs');
-    var linkTab = document.getElementById(nextLinkTab);
-    linkTabs.removeChild(linkTab);
+    var tabLink = document.getElementById(nextLinkTab);
+    var tab = document.getElementById(nextTab);
 
-    // Elimina el contenido de la pestaña
-    var rightSpace = document.getElementById('right-space');
-    var tabContent = document.getElementById(nextTab);
-    rightSpace.removeChild(tabContent);
+    tabLink.remove();
+    tab.remove();
 }
 
 function addTab() {
@@ -37,41 +54,42 @@ function addTab() {
 
     // Crea un nuevo elemento <a>
     var newLink = document.createElement('a');
+    newLink.id = nextLinkTab;
+    newLink.classList.add('nav-link');
     newLink.href = "#";                
     newLink.textContent = newTabName;
-    newLink.onclick = function(){openTab(nextTab)};      
-
-        // Crea un nuevo elemento <span> para la "x"
-    var closeLink = document.createElement('span');
-        closeLink.textContent = "x";
-        closeLink.classList.add('close-link');
-        closeLink.onclick = function(event) {
-            event.preventDefault();
-            closeTab(nextLinkTab, nextTab);
-    };
-
-    var linkContainer = document.createElement('div');
-    linkContainer.id = nextLinkTab;
-    linkContainer.classList.add('link-container');
+    newLink.setAttribute('role', 'tab');
+    newLink.onclick = function(){openTab(nextLinkTab, nextTab)};     
     
-    linkContainer.appendChild(newLink);
-    linkContainer.appendChild(closeLink);
+    var newClose = document.createElement('button');
+    newClose.classList.add('btn-close');
+    newClose.setAttribute('type', 'button');
+    newClose.onclick = function(){closeTab(nextLinkTab, nextTab)};
+    
+
+    var linkContainer = document.createElement('li');
+    linkContainer.classList.add('nav-item');
+    linkContainer.setAttribute('role', 'presentation');
+    
+    newLink.appendChild(newClose);
+    linkContainer.appendChild(newLink);    
+    document.getElementById('tabList').appendChild(linkContainer);
 
     // Crea un nuevo elemento <div> con el nuevo id
     var newDiv = document.createElement('div');
     newDiv.id = nextTab;
-    newDiv.classList.add('tab-content', 'hidden');
+    newDiv.classList.add('tab-pane', 'fade');
+    newDiv.setAttribute('role', 'tabpanel');
 
     // Agrega el nuevo contenido del div
     newDiv.innerHTML = '<h2>Contenido de la ' + newTabName + '</h2>' +
     '<p>Este es el contenido de la ' + newTabName.toLowerCase() + '.</p>';
 
-    // Agrega el nuevo enlace y el nuevo div al DOM
-    document.getElementById('linkTabs').appendChild(linkContainer);
-    document.getElementById('right-space').appendChild(newDiv);
+    // Agrega el nuevo div al DOM    
+    document.getElementById('myTabContent').appendChild(newDiv);
 
     // Muestra la nueva pestaña
-    openTab(nextTab);
+    openTab(nextLinkTab, nextTab);
 }
 
 function showLangs() { 
@@ -88,6 +106,8 @@ function showLangs() {
     }
 }
     
+
+
 document.addEventListener("DOMContentLoaded", function() {
     var linkTabs = document.getElementById("linkTabs");
 
