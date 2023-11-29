@@ -12,7 +12,7 @@
         <div id="area" class="container">
             <div id="left-space">        
                 <div>
-                    <button id="idiomas" class="visible" type="button" onclick="mostrarIdiomas()">Mostrar idiomas</button>
+                    <button id="languages" class="visible" type="button" onclick="showLangs()">Mostrar idiomas</button>
                 </div>
                 <div>          
                     <h2>Espacio a la izquierda</h2>
@@ -27,90 +27,17 @@
             </div>
 
             <div id="right-space" class="hidden">      
-                <div id="navigation">
-                    <nav id="linkTabs">
-                        <a href="#" onclick="openTab('tab1')">Pestaña 1</a>
-                        <a href="#" onclick="openTab('tab2')">Pestaña 2</a>            
-                        <a href="#" onclick="openTab('tab3')">Pestaña 3</a>                
-                    </nav>    
-                    <input type="text" id="nombreNuevaPestaña" placeholder="Nombre de la nueva pestaña">
-                    <button onclick="agregarPestana()">+</button>   
-                </div>
-
-                <div id="tab1" class="tab-content">
-                    <h2>Contenido de la Pestaña 1</h2>
-                    <p>Este es el contenido de la primera pestaña.</p>
-                    <p>El ñu común, ñu azul, ñu de cola negra, ñu listado o gorgón (Connochaetes taurinus) es una especie de mamífero artiodáctilo de la familia Bovidae. Es la especie más común y, a su vez, más conocida de ñu. Es propio de África oriental y austral.
-                        Mide entre 1,85 y 2,15 m de longitud, además de 40 a 55 cm de la cola; su altura en la cruz es de entre 1,15 y 1,22 m, y su peso oscila entre los 150 y 200 kg.2​.
-                        Es un animal gregario que suele vivir en grandes rebaños en número desde varias docenas a millares de ejemplares.2
-                    </p>
-                </div>
-
-                <div id="tab2" class="tab-content hidden">
-                    <h2>Contenido de la Pestaña 2</h2>          
-                    <p>Este es el contenido de la segunda pestaña.</p>
-                </div>
-
-                <div id="tab3" class="tab-content hidden">
-                    <h2>Contenido de la Pestaña 3</h2>               
-                    <p>Este es el contenido de la tercera pestaña.</p>
+                <div id="navigation">                     
+                    <nav id="linkTabs" class="hidden"></nav>       
+                    <div id="addTabBar">
+                        <input type="text" id="newTabName" placeholder="Nueva pestaña">
+                        <button onclick="addTab()">+</button>
+                    </div>               
                 </div>
             </div>
         </div>
 
         <%- include('_partials/_footer.ejs'); -%>
-        <script>
-            function openTab(tabId) {
-                // Ocultar todos los elementos con la clase 'tab-content'
-                var tabContents = document.querySelectorAll('.tab-content');
-                tabContents.forEach(function (tabContent) {
-                    tabContent.classList.add('hidden');
-                });
-
-                // Mostrar el contenido de la pestaña específica
-                document.getElementById(tabId).classList.remove('hidden');
-            }
-  
-            function agregarPestana() {
-                // Obtiene el nombre de la nueva pestaña
-                var nombreNuevaPestaña = document.getElementById('nombreNuevaPestaña').value;
-                document.getElementById('nombreNuevaPestaña').value='';
-                
-                var nextTab = 'tab' + (document.getElementsByClassName('tab-content').length + 1);
-
-                // Crea un nuevo elemento <a>
-                var nuevoEnlace = document.createElement('a');
-                nuevoEnlace.href = "#";
-                nuevoEnlace.textContent = nombreNuevaPestaña;
-                nuevoEnlace.onclick = function(){openTab(nextTab)};
-
-                // Crea un nuevo elemento <div> con el nuevo id
-                var nuevoDiv = document.createElement('div');
-                nuevoDiv.id = 'tab' + (document.getElementsByClassName('tab-content').length + 1);
-                nuevoDiv.classList.add('tab-content', 'hidden');
-
-                // Agrega el nuevo contenido del div
-                nuevoDiv.innerHTML = '<h2>Contenido de la ' + nombreNuevaPestaña + '</h2>' +
-                '<p>Este es el contenido de la ' + nombreNuevaPestaña.toLowerCase() + '.</p>';
-
-                // Agrega el nuevo enlace y el nuevo div al DOM
-                document.getElementById('linkTabs').appendChild(nuevoEnlace);
-                document.getElementById('right-space').appendChild(nuevoDiv);
-            }
-
-            function mostrarIdiomas() { 
-                if (document.getElementById('right-space').classList.contains('visible')) {
-                    document.getElementById('idiomas').innerHTML="Mostrar idiomas";
-                    
-                    document.getElementById('right-space').classList.remove('visible');
-                    document.getElementById('right-space').classList.add('hidden');  
-                }
-                else {    
-                    document.getElementById('idiomas').innerHTML="Ocultar idiomas";
-                    document.getElementById('right-space').classList.remove('hidden');
-                    document.getElementById('right-space').classList.add('visible');       
-                }
-            }  
-        </script>
+        <script type="text/javascript" src="scripts/s_newQuestion.js"></script>
     </body>
 </html>
