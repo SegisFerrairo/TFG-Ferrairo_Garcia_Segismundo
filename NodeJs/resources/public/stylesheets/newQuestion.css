@@ -16,12 +16,13 @@
 }
 
 #addTabBar {
-    margin-bottom: 10px;
+    width: 30%;
 }
 
 #addTabBar #newTabName {
     width: 130px;
     text-align: center;
+    margin-left: 5px;
 }
 
 #mainform {

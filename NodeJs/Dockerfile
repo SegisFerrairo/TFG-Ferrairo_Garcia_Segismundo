@@ -5,7 +5,7 @@ FROM node:alpine
 WORKDIR /NodeApp
 
 # Copia el archivo package.json y package-lock.json al directorio de trabajo
-COPY ./resources/package.json /NodeApp/package.json
+COPY ./resources/package*.json /NodeApp/
 
 # Instala las dependencias
 RUN npm install -g nodemon

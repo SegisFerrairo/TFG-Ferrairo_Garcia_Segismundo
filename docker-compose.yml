@@ -1,0 +1,33 @@
+version: '3'
+services:
+  nodeapp:
+    container_name: NodeJs
+    build: ./NodeJs
+    ports:
+      - "3000:3000"
+    volumes:      
+      - "./NodeJs/resources:/NodeApp"
+      - /NodeApp/node_modules
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+    networks:
+      - "my-network"
+  
+  mongodb:
+    container_name: MongoDB
+    build: ./MongoDB
+    ports:
+      - "27017:27017"
+    restart: always
+    environment:
+      - MONGO_INITDB_DATABASE=my_database
+    volumes:
+      - "./MongoDB/db_data:/data/db"
+    networks:
+      - "my-network"
+
+networks:
+  my-network:
+    driver: bridge

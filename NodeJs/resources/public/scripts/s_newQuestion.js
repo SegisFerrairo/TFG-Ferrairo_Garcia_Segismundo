@@ -12,9 +12,9 @@ function openTab(nextLinkTab, nextTab) {
 
     var tabElement = document.getElementById(nextLinkTab);
 
-    // si tabElement es null, es porque se ha hecho clic en el botón de cerrar pestaña
+    // If tabElement is null, it is because the close tab button has been clicked
     if (tabElement != null) {
-        //Eliminar la clase 'active' de todos los elementos <a> hijos de tabList
+        // Delete the 'active' class from all <a> elements inside tabList
         var links = tabList.getElementsByTagName('a');
         for (var i = 0; i < links.length; i++) {
             links[i].classList.remove('active');
@@ -22,20 +22,20 @@ function openTab(nextLinkTab, nextTab) {
             links[i].setAttribute('tabindex', -1);
         }
 
-        // Agregar la clase 'active' al elemento <a> que se ha hecho clic
+        // Add the 'active' class to the clicked <a> element
         tabElement.classList.add('active');
-        // Cambiar la propiedad aria-selected a true
+        // Change the aria-selected property to true
         tabElement.setAttribute('aria-selected', true);
-        // Eliminal el atributo tabindex
+        // Remove the tabindex attribute
         tabElement.removeAttribute('tabindex');
 
-        // Eliminar la clase 'active' de todos los elementos <div> hijos de myTabContent
+        // Delete the 'active' class from all <div> elements inside myTabContent
         var tabContents = document.getElementById('myTabContent').getElementsByTagName('form');
         for (var i = 0; i < tabContents.length; i++) {
             tabContents[i].classList.remove('active', 'show');
         }
 
-        // Agregar la clase 'active' al elemento <div> que se ha hecho clic
+        // Add the 'active' class to the clicked <div> element
         var tabContent = document.getElementById(nextTab);
         tabContent.classList.add('active', 'show');
     }
@@ -49,61 +49,17 @@ function closeTab(nextLinkTab, nextTab) {
     tab.remove();
 }
 
-function addTab() {
-    // Obtiene el nombre de la nueva pestaña
-    var newTabName = document.getElementById('newTabName').value;
-    document.getElementById('newTabName').value='';
-
-    var nextNumTab = (counter + 1);
-    counter++;
-
-    var nextLinkTab = 'linkTab' + nextNumTab;
-    
-    var nextTab = 'tab' + nextNumTab;
-
-    // Crea un nuevo elemento <a>
-    var newLink = document.createElement('a');
-    newLink.id = nextLinkTab;
-    newLink.classList.add('nav-link');
-    newLink.href = "#";                
-    newLink.textContent = newTabName;
-    newLink.setAttribute('role', 'tab');
-
-    // añadir un event listener al botón de añadir pestaña
-    newLink.addEventListener('click', function(){openTab(nextLinkTab, nextTab)});
-
-    
-    var newClose = document.createElement('button');
-    newClose.classList.add('btn-close');
-    newClose.setAttribute('type', 'button');
-    newClose.addEventListener('click', function(){closeTab(nextLinkTab, nextTab)});
-    
-
-    var linkContainer = document.createElement('li');
-    linkContainer.classList.add('nav-item');
-    linkContainer.setAttribute('role', 'presentation');
-    
-    newLink.appendChild(newClose);
-    linkContainer.appendChild(newLink);    
-    document.getElementById('tabList').appendChild(linkContainer);
-
-    // Crear el formulario de la nueva pestaña
-    addForm(nextTab);
-
-    openTab(nextLinkTab, nextTab);
-}
-
 function addForm(nextTab) {
-    // Crear el formulario
+    // Create the form
     var formulario = document.createElement("form");
     formulario.id = nextTab;
     formulario.classList.add('tab-pane', 'fade');
     formulario.setAttribute('role', 'tabpanel');
 
-    // Crear el fieldset
+    // Create the fieldsetq
     var fieldset = document.createElement("fieldset");
 
-    // Crear el div para el enunciado de la pregunta
+    // Create the <div> for the question statement
     var divEnunciado = document.createElement("div");
     divEnunciado.className = "form-group";
 
@@ -120,10 +76,11 @@ function addForm(nextTab) {
     divEnunciado.appendChild(labelEnunciado);
     divEnunciado.appendChild(textareaEnunciado);
 
-    // Agregar el div de enunciado y las opciones al fieldset
+    // Add the div of the question statement and the options to the fieldset
     fieldset.appendChild(divEnunciado);
 
-    // Crear las opciones de respuesta
+    // TODO: Options must reflect main form options, but with different ids
+    // Create the asnwer options
     for (var i = 1; i <= 2; i++) {
       var divOpcion = document.createElement("div");
       divOpcion.className = "form-check";
@@ -147,11 +104,55 @@ function addForm(nextTab) {
       fieldset.appendChild(divOpcion);
     }
 
-    // Agregar el fieldset al formulario
+    // Add fieldset to form
     formulario.appendChild(fieldset);
 
-    // Agrega el nuevo div al DOM    
+    // Attach to the DOM
     document.getElementById('myTabContent').appendChild(formulario);
+}
+
+function addTab() {
+    // Obtain the name of the new tab
+    var newTabName = document.getElementById('newTabName').value;
+    document.getElementById('newTabName').value='';
+
+    var nextNumTab = (counter + 1);
+    counter++;
+
+    var nextLinkTab = 'linkTab' + nextNumTab;
+    
+    var nextTab = 'tab' + nextNumTab;
+
+    // Create a new <a> element
+    var newLink = document.createElement('a');
+    newLink.id = nextLinkTab;
+    newLink.classList.add('nav-link');
+    newLink.href = "#";                
+    newLink.textContent = newTabName;
+    newLink.setAttribute('role', 'tab');
+
+    // Attach the event listener to openTab button
+    newLink.addEventListener('click', function(){openTab(nextLinkTab, nextTab)});
+
+    
+    var newClose = document.createElement('button');
+    newClose.classList.add('btn-close');
+    newClose.setAttribute('type', 'button');
+    newClose.addEventListener('click', function(){closeTab(nextLinkTab, nextTab)});
+    
+
+    var linkContainer = document.createElement('li');
+    linkContainer.classList.add('nav-item');
+    linkContainer.setAttribute('role', 'presentation');
+    
+    newLink.appendChild(newClose);
+    linkContainer.appendChild(newLink);    
+    document.getElementById('tabList').appendChild(linkContainer);
+
+    // Create the form of the new tab
+    addForm(nextTab);
+
+    openTab(nextLinkTab, nextTab);
 }
 
 function showLangs() { 
@@ -167,22 +168,92 @@ function showLangs() {
         document.getElementById('right-space').classList.add('hidden'); 
     }
 }
+
+/***************
+ ** Cath data **
+ ***************/
+
+// var question = new Question({
+//     statement: '¿Cuál es la capital de España?',
+//     option1: 'Madrid',
+//     option2: 'Barcelona',
+//     option3: 'Sevilla',
+//     answer: 1
+// });
+
+function catchMainFormData() {
+    var form = document.getElementById('mainform');
+    var formData = new FormData(form);
+
+    // Create an object with the data
+    var data = {
+        statement: formData.get('main_statement'),
+        option1: formData.get('inputOption1'),
+        option2: formData.get('inputOption2'),
+
+        // The answer is the one with the checked attribute,
+        // and it will be stored as its option number, starting at 1
+        answer: parseInt(formData.get('optionsRadios').slice(-1))       
+    };
+
+    return data;
+}
+
+/***************
+ ** Send data **
+ ***************/
+
+ function sendMainFormData(data) {
+    fetch('/newQuestion/addQuestion', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error al enviar los datos del formulario');
+        }
+        return response.json();
+    })
+    .then(responseData => {
+        console.log('Respuesta del servidor:', responseData);
+        // Redirect to Home Page
+        //window.location.href = '/';        
+    })
+    .catch(error => {
+        console.error('Error en la solicitud:', error.message);
+    });
+}
     
 /****************
  ** DOM Loaded **
  ****************/
 
 document.addEventListener("DOMContentLoaded", function() {
-    // añadir un event listener al botón de mostrar/ocultar idiomas
+    // Add event listener to the "Mostrar/Ocultar idiomas" button
     document.getElementById('languages').addEventListener('click', showLangs);
 
-    // añadir un event listener al botón de añadir pestaña
+    // Add event listener to the "Añadir pestaña" button
     document.getElementById('newTabName').nextElementSibling.addEventListener('click', addTab);
-    // añadir un event listener al botón de añdir pestaña al pulsar enter
+    // Add event listener to the "Añadir pestaña" button but when the user presses enter key
     document.getElementById('newTabName').addEventListener('keyup', function(event) {
         if (event.key === 'Enter') {
             addTab();
         }
+    });
+
+    // Add event listener to the "Enviar" button, submit button of the main form
+    document.getElementById('mainform').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        var data = catchMainFormData();
+        sendMainFormData(data);
+        //console.log(data);
+
+        // After sending the main form, clear the form
+        document.getElementById('mainform').reset();
     });
 
 });
