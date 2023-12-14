@@ -1,0 +1,30 @@
+footer {
+    background-color: #f8f8f8; /* Color de fondo del footer */
+    border-top: 1px solid #e7e7e7;    
+}
+
+footer .footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 15px 10px;
+}
+
+footer .banner {
+    max-width: 150px; /* Establece el ancho máximo de la imagen */
+    height: auto; /* Hace que la altura se ajuste automáticamente para mantener la proporción */
+    vertical-align: baseline; /* Alinea verticalmente la imagen con el texto */
+}
+
+footer .logo {
+    max-width: 75px; /* Establece el ancho máximo de la imagen */
+    height: 40px; /* Hace que la altura se ajuste automáticamente para mantener la proporción */
+    vertical-align: text-bottom ; /* Alinea verticalmente la imagen con el texto */
+}
+
+footer span {
+    text-align: center;  
+    margin-left: 10px;
+    margin-right: 10px;    
+}
+  
