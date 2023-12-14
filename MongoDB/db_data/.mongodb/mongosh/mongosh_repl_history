@@ -1,5 +1,0 @@
-db.questions.find()
-use my_database
-db.questions.find()
-db.questions.deleteMany({});
-use my_database
