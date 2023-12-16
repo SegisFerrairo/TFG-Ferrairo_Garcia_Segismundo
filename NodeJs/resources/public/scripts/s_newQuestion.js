@@ -61,7 +61,40 @@ function howManyOptions(type) {
     return counter;
 }
 
-function addForm(nextTab, optionsRadio) {
+function createOptions(optionsName, fieldset) {
+    var numOptions = howManyOptions('radio');
+
+    // Create the asnwer options
+    for (var i = 1; i <= numOptions; i++) {
+        var divOpcion = document.createElement("div");
+        divOpcion.className = "form-check";
+
+        var inputRadio = document.createElement("input");
+        inputRadio.className = "form-check-input";
+        inputRadio.setAttribute("type", "radio");
+        inputRadio.setAttribute("id", "optionRadio" + i);
+        inputRadio.setAttribute("name", optionsName);
+        inputRadio.setAttribute("value", "option" + i);
+
+        // Checks if the option element with the same value field at the MainForm is checked
+        if (document.querySelector(`input[value="option${i}"]`).checked) {
+            inputRadio.setAttribute("checked", "");
+        }
+
+        var inputRespuesta = document.createElement("input");
+        inputRespuesta.className = "form-control form-control-sm";
+        inputRespuesta.setAttribute("type", "text");
+        inputRespuesta.setAttribute("placeholder", "Añade tu respuesta");
+        inputRespuesta.setAttribute("for", "optionRadio" + i);
+
+        divOpcion.appendChild(inputRadio);
+        divOpcion.appendChild(inputRespuesta);
+
+        fieldset.appendChild(divOpcion);
+    }
+}
+
+function addForm(nextTab, optionsName) {
     // Create the form
     var formulario = document.createElement("form");
     formulario.id = nextTab;
@@ -91,37 +124,8 @@ function addForm(nextTab, optionsRadio) {
     // Add the div of the question statement and the options to the fieldset
     fieldset.appendChild(divEnunciado);
 
-    // TODO: Options must reflect main form options, but with different ids
-    var numOptions = howManyOptions('radio');
-
-    // Create the asnwer options
-    for (var i = 1; i <= numOptions; i++) {
-        var divOpcion = document.createElement("div");
-        divOpcion.className = "form-check";
-
-        var inputRadio = document.createElement("input");
-        inputRadio.className = "form-check-input";
-        inputRadio.setAttribute("type", "radio");
-        inputRadio.setAttribute("id", "optionRadio" + i);
-        inputRadio.setAttribute("name", optionsRadio);
-        inputRadio.setAttribute("value", "option" + i);
-
-        // Checks if the option element with the same value field at the MainForm is checked
-        if (document.querySelector(`input[value="option${i}"]`).checked) {
-            inputRadio.setAttribute("checked", "");
-        }
-
-        var inputRespuesta = document.createElement("input");
-        inputRespuesta.className = "form-control form-control-sm";
-        inputRespuesta.setAttribute("type", "text");
-        inputRespuesta.setAttribute("placeholder", "Añade tu respuesta");
-        inputRespuesta.setAttribute("for", "optionRadio" + i);
-
-        divOpcion.appendChild(inputRadio);
-        divOpcion.appendChild(inputRespuesta);
-
-        fieldset.appendChild(divOpcion);
-    }
+    // Create and add the options
+    createOptions(optionsName, fieldset);
 
     // Add fieldset to form
     formulario.appendChild(fieldset);
@@ -137,7 +141,7 @@ function addTab() {
 
     var nextLinkTab = 'linkTab' + counterTab;    
     var nextTab = 'tab' + counterTab;
-    var optionsRadio = 'optionsRadio' + counterTab;
+    var optionsName = 'optionsRadio' + counterTab;
 
     counterTab++;
 
@@ -168,7 +172,7 @@ function addTab() {
     document.getElementById('tabList').appendChild(linkContainer);
 
     // Create the form of the new tab
-    addForm(nextTab, optionsRadio);
+    addForm(nextTab, optionsName);
 
     openTab(nextLinkTab, nextTab);
 
@@ -226,7 +230,7 @@ function catchMainFormData() {
 
         // The answer is the one with the checked attribute,
         // and it will be stored as its option number, starting at 1
-        answer: parseInt(formData.get('optionsRadios').slice(-1))       
+        answer: parseInt(formData.get('optionsMainRadio').slice(-1))       
     };
 
     return data;
