@@ -49,9 +49,16 @@ function closeTab(nextLinkTab, nextTab) {
     tab.remove();
 }
 
-// create a function called howManyOptions that returns the number of options in the main form, counting the type="radio" elements
 function howManyOptions(type) {
-    var options = document.getElementById('mainform').getElementsByTagName('input');
+    // If mainform has no childs yet, options will be 2 (the default number of options)
+    if (document.getElementById('myMainFormContent').hasChildNodes() == false) {
+        return 2;
+    }
+    else {
+        // If mainform has childs, options will be the number of type="radio" elements
+        var options = document.getElementById('mainform').getElementsByTagName('input');
+    }
+
     var counter = 0;
     for (var i = 0; i < options.length; i++) {
         if (options[i].type == type) {
@@ -76,15 +83,24 @@ function createOptions(optionsName, fieldset) {
         inputRadio.setAttribute("name", optionsName);
         inputRadio.setAttribute("value", "option" + i);
 
-        // Checks if the option element with the same value field at the MainForm is checked
-        if (document.querySelector(`input[value="option${i}"]`).checked) {
-            inputRadio.setAttribute("checked", "");
+        if (document.getElementById('myMainFormContent').hasChildNodes() == false) {
+            if (i == 1) {
+                inputRadio.setAttribute("checked", "");
+            }
+        }
+        else {
+            // Checks if the option element with the same value field at the MainForm is checked
+            if (document.querySelector(`input[value="option${i}"]`).checked) {
+                inputRadio.setAttribute("checked", "");
+            }
         }
 
         var inputRespuesta = document.createElement("input");
         inputRespuesta.className = "form-control form-control-sm";
         inputRespuesta.setAttribute("type", "text");
         inputRespuesta.setAttribute("placeholder", "Añade tu respuesta");
+        inputRespuesta.setAttribute("id", "inputOption" + i);
+        inputRespuesta.setAttribute("name", "inputOption" + i);
         inputRespuesta.setAttribute("for", "optionRadio" + i);
 
         divOpcion.appendChild(inputRadio);
@@ -98,8 +114,11 @@ function addForm(nextTab, optionsName) {
     // Create the form
     var formulario = document.createElement("form");
     formulario.id = nextTab;
-    formulario.classList.add('tab-pane', 'fade');
-    formulario.setAttribute('role', 'tabpanel');
+
+    if (document.getElementById('myMainFormContent').hasChildNodes() == true) {
+        formulario.classList.add('tab-pane', 'fade');
+        formulario.setAttribute('role', 'tabpanel');
+    }
 
     // Create the fieldsetq
     var fieldset = document.createElement("fieldset");
@@ -116,6 +135,7 @@ function addForm(nextTab, optionsName) {
     var textareaEnunciado = document.createElement("textarea");
     textareaEnunciado.className = "form-control";
     textareaEnunciado.setAttribute("id", nextTab+"_statement");
+    textareaEnunciado.setAttribute("name", nextTab+"_statement");
     textareaEnunciado.setAttribute("rows", "3");
 
     divEnunciado.appendChild(labelEnunciado);
@@ -131,7 +151,23 @@ function addForm(nextTab, optionsName) {
     formulario.appendChild(fieldset);
 
     // Attach to the DOM
-    document.getElementById('myTabContent').appendChild(formulario);
+    if (document.getElementById('myMainFormContent').hasChildNodes() == false) {
+        // Add the submit button
+        var submitButton = document.createElement("button");
+        submitButton.className = "btn btn-primary";
+        submitButton.setAttribute("type", "submit");
+        submitButton.setAttribute("value", "Enviar");
+        submitButton.textContent = "Enviar";
+
+        formulario.appendChild(submitButton);
+
+        // Adding the main form to the DOM
+        document.getElementById('myMainFormContent').appendChild(formulario);
+    }
+    else {
+        // Adding the new form to the DOM
+        document.getElementById('myTabContent').appendChild(formulario);
+    }
 }
 
 function addTab() {
@@ -218,20 +254,31 @@ function addOptionsListeners() {
 //     answer: 1
 // });
 
-function catchMainFormData() {
-    var form = document.getElementById('mainform');
+function catchMainFormData(mainFormName, optionsMainFormName) {
+    var form = document.getElementById(mainFormName);
     var formData = new FormData(form);
 
     // Create an object with the data
-    var data = {
-        statement: formData.get('main_statement'),
-        option1: formData.get('inputOption1'),
-        option2: formData.get('inputOption2'),
+    // var data = {
+    //     statement: formData.get(mainFormName+'_statement'),
+    //     option1: formData.get('inputOption1'),
+    //     option2: formData.get('inputOption2'),
 
-        // The answer is the one with the checked attribute,
-        // and it will be stored as its option number, starting at 1
-        answer: parseInt(formData.get('optionsMainRadio').slice(-1))       
-    };
+    //     // The answer is the one with the checked attribute,
+    //     // and it will be stored as its option number, starting at 1
+    //     answer: parseInt(formData.get('optionsMainRadio').slice(-1))       
+    // };
+    var data = {};
+    data.push
+    data.statement = formData.get(mainFormName+'_statement');
+    
+    var numOptions = howManyOptions('radio');
+    for (var i = 1; i <= numOptions; i++) {
+        var option = 'option'+i;
+        data[option] = formData.get('inputOption'+i);
+    }
+
+    data.answer = parseInt(formData.get(optionsMainFormName).slice(-1));
 
     return data;
 }
@@ -269,6 +316,11 @@ function catchMainFormData() {
  ****************/
 
 document.addEventListener("DOMContentLoaded", function() {
+    let mainFormName = 'mainform';
+    let optionsMainFormName = 'optionsMainRadio';
+
+    addForm(mainFormName, optionsMainFormName);
+
     // Add event listener to the "Mostrar/Ocultar idiomas" button
     document.getElementById('languages').addEventListener('click', showLangs);
 
@@ -282,15 +334,14 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // Add event listener to the "Enviar" button, submit button of the main form
-    document.getElementById('mainform').addEventListener('submit', function(event) {
+    document.getElementById(mainFormName).addEventListener('submit', function(event) {
         event.preventDefault();
 
-        var data = catchMainFormData();
+        var data = catchMainFormData(mainFormName, optionsMainFormName);
         sendMainFormData(data);
-        //console.log(data);
 
         // After sending the main form, clear the form
-        document.getElementById('mainform').reset();
+        document.getElementById(mainFormName).reset();
     });
 
     addOptionsListeners();
