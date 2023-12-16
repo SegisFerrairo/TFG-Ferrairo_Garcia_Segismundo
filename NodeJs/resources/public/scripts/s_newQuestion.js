@@ -1,7 +1,7 @@
 /***************
  ** Constants **
  ***************/
-let counter = 0;
+let counterTab = 1;
 
 /***********
  ** Utils **
@@ -49,7 +49,19 @@ function closeTab(nextLinkTab, nextTab) {
     tab.remove();
 }
 
-function addForm(nextTab) {
+// create a function called howManyOptions that returns the number of options in the main form, counting the type="radio" elements
+function howManyOptions(type) {
+    var options = document.getElementById('mainform').getElementsByTagName('input');
+    var counter = 0;
+    for (var i = 0; i < options.length; i++) {
+        if (options[i].type == type) {
+            counter++;
+        }
+    }
+    return counter;
+}
+
+function addForm(nextTab, optionsRadio) {
     // Create the form
     var formulario = document.createElement("form");
     formulario.id = nextTab;
@@ -80,28 +92,35 @@ function addForm(nextTab) {
     fieldset.appendChild(divEnunciado);
 
     // TODO: Options must reflect main form options, but with different ids
+    var numOptions = howManyOptions('radio');
+
     // Create the asnwer options
-    for (var i = 1; i <= 2; i++) {
-      var divOpcion = document.createElement("div");
-      divOpcion.className = "form-check";
+    for (var i = 1; i <= numOptions; i++) {
+        var divOpcion = document.createElement("div");
+        divOpcion.className = "form-check";
 
-      var inputRadio = document.createElement("input");
-      inputRadio.className = "form-check-input";
-      inputRadio.setAttribute("type", "radio");
-      inputRadio.setAttribute("name", "optionsRadios");
-      inputRadio.setAttribute("id", "optionRadio" + i);
-      inputRadio.setAttribute("value", "option" + i);
+        var inputRadio = document.createElement("input");
+        inputRadio.className = "form-check-input";
+        inputRadio.setAttribute("type", "radio");
+        inputRadio.setAttribute("id", "optionRadio" + i);
+        inputRadio.setAttribute("name", optionsRadio);
+        inputRadio.setAttribute("value", "option" + i);
 
-      var inputRespuesta = document.createElement("input");
-      inputRespuesta.className = "form-control form-control-sm";
-      inputRespuesta.setAttribute("type", "text");
-      inputRespuesta.setAttribute("placeholder", "Añade tu respuesta");
-      inputRespuesta.setAttribute("for", "optionRadio" + i);
+        // Checks if the option element with the same value field at the MainForm is checked
+        if (document.querySelector(`input[value="option${i}"]`).checked) {
+            inputRadio.setAttribute("checked", "");
+        }
 
-      divOpcion.appendChild(inputRadio);
-      divOpcion.appendChild(inputRespuesta);
+        var inputRespuesta = document.createElement("input");
+        inputRespuesta.className = "form-control form-control-sm";
+        inputRespuesta.setAttribute("type", "text");
+        inputRespuesta.setAttribute("placeholder", "Añade tu respuesta");
+        inputRespuesta.setAttribute("for", "optionRadio" + i);
 
-      fieldset.appendChild(divOpcion);
+        divOpcion.appendChild(inputRadio);
+        divOpcion.appendChild(inputRespuesta);
+
+        fieldset.appendChild(divOpcion);
     }
 
     // Add fieldset to form
@@ -116,12 +135,11 @@ function addTab() {
     var newTabName = document.getElementById('newTabName').value;
     document.getElementById('newTabName').value='';
 
-    var nextNumTab = (counter + 1);
-    counter++;
+    var nextLinkTab = 'linkTab' + counterTab;    
+    var nextTab = 'tab' + counterTab;
+    var optionsRadio = 'optionsRadio' + counterTab;
 
-    var nextLinkTab = 'linkTab' + nextNumTab;
-    
-    var nextTab = 'tab' + nextNumTab;
+    counterTab++;
 
     // Create a new <a> element
     var newLink = document.createElement('a');
@@ -150,9 +168,11 @@ function addTab() {
     document.getElementById('tabList').appendChild(linkContainer);
 
     // Create the form of the new tab
-    addForm(nextTab);
+    addForm(nextTab, optionsRadio);
 
     openTab(nextLinkTab, nextTab);
+
+    addOptionsListeners();
 }
 
 function showLangs() { 
@@ -167,6 +187,19 @@ function showLangs() {
 
         document.getElementById('right-space').classList.add('hidden'); 
     }
+}
+
+/*********************
+ ** Event Listeners **
+ *********************/
+
+function addOptionsListeners() {
+    document.querySelectorAll('.form-check-input').forEach(elem => elem.addEventListener('change', (event) => {
+        // Select all elements with the same value field of the changed element
+        document.querySelectorAll(`input[value="${event.target.value}"]`).forEach((input) => {
+            input.checked = true;
+        });
+    }));
 }
 
 /***************
@@ -256,4 +289,6 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('mainform').reset();
     });
 
+    addOptionsListeners();
 });
+
