@@ -74,7 +74,7 @@ function createOptions(optionsName, fieldset) {
     // Create the asnwer options
     for (var i = 1; i <= numOptions; i++) {
         var divOpcion = document.createElement("div");
-        divOpcion.className = "form-check";
+        divOpcion.className = "form-check mb-2";
 
         var inputRadio = document.createElement("input");
         inputRadio.className = "form-check-input";
@@ -125,7 +125,7 @@ function addForm(nextTab, optionsName) {
 
     // Create the <div> for the question statement
     var divEnunciado = document.createElement("div");
-    divEnunciado.className = "form-group";
+    divEnunciado.className = "form-group mb-4";
 
     var labelEnunciado = document.createElement("label");
     labelEnunciado.className = "form-label mt-4";
@@ -152,14 +152,15 @@ function addForm(nextTab, optionsName) {
 
     // Attach to the DOM
     if (document.getElementById('myMainFormContent').hasChildNodes() == false) {
-        // Add the submit button
-        var submitButton = document.createElement("button");
-        submitButton.className = "btn btn-primary";
-        submitButton.setAttribute("type", "submit");
-        submitButton.setAttribute("value", "Enviar");
-        submitButton.textContent = "Enviar";
+        // // Add the submit button
+        // var submitButton = document.createElement("button");
+        // submitButton.id = "submitButton";
+        // submitButton.className = "btn btn-primary";
+        // submitButton.setAttribute("type", "submit");
+        // submitButton.setAttribute("value", "Enviar");
+        // submitButton.textContent = "Enviar";
 
-        formulario.appendChild(submitButton);
+        // formulario.appendChild(submitButton);
 
         // Adding the main form to the DOM
         document.getElementById('myMainFormContent').appendChild(formulario);
@@ -254,7 +255,7 @@ function addOptionsListeners() {
 //     answer: 1
 // });
 
-function catchMainFormData(mainFormName, optionsMainFormName) {
+function catchFormData(mainFormName, optionsMainFormName) {
     var form = document.getElementById(mainFormName);
     var formData = new FormData(form);
 
@@ -321,7 +322,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     addForm(mainFormName, optionsMainFormName);
 
-    // Add event listener to the "Mostrar/Ocultar idiomas" button
+    // Add event listener to the "Mostrar /Ocultar idiomas" button
     document.getElementById('languages').addEventListener('click', showLangs);
 
     // Add event listener to the "Añadir pestaña" button
@@ -334,11 +335,25 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // Add event listener to the "Enviar" button, submit button of the main form
-    document.getElementById(mainFormName).addEventListener('submit', function(event) {
+    document.getElementById('submitButton').addEventListener('click', function(event) {
         event.preventDefault();
+        var data = catchFormData(mainFormName, optionsMainFormName);
+        //sendMainFormData(data);
 
-        var data = catchMainFormData(mainFormName, optionsMainFormName);
-        sendMainFormData(data);
+        // Get the number of tabs
+        var numTabs = document.getElementById('tabList').getElementsByTagName('li').length;
+        // Catch the data of each tab
+        for (var i = 1; i <= numTabs; i++) {
+            // Obtain the name of the tab (content of the <a> element)
+            var content = document.getElementById('linkTab' + i).textContent;
+            // TODO: add the language of the question to the data
+            var tabName = 'tab' + i;
+            var optionsName = 'optionsRadio' + i;
+            var data = catchFormData(tabName, optionsName);
+            //sendMainFormData(data);
+            // Reset the form
+            document.getElementById(tabName).reset();
+        }
 
         // After sending the main form, clear the form
         document.getElementById(mainFormName).reset();
