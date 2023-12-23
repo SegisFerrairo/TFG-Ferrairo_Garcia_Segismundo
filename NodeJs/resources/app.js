@@ -31,6 +31,56 @@ app.listen(app.get("port"), function(){
 });
 
 
+// const question_schema = new mongoose.Schema({
+//     question: {
+//         language0: {
+//             name: {
+//                 type: String,
+//                 required: 'This field is required'
+//             },
+//             statement: {
+//                 type: String,
+//                 required: 'This field is required'
+//             },
+//             options: [{
+//                 type: String,
+//                 required: 'This field is required'
+//             }],
+//             answer: {
+//                 type: Number,
+//                 required: 'This field is required'
+//             }
+//         }
+//     }
+// });
+
+// app.post('/newQuestion/addQuestion', function (req, res) {
+//   const { language, name, statement, options, answer } = req.body;
+//   var question = new Question({
+//       language: {
+//           name,
+//           statement,
+//           options,
+//           answer
+//       }
+//   });
+
+//   question.save(function (err, doc) {
+//       if (!err) {
+//           // console.log(doc);
+//           res.status(200).json({ message: 'Pregunta añadida exitosamente.' });          
+//       }
+//       else {
+//           // console.log(err);
+//           res.status(500).json({ error: 'Error al procesar la solicitud.' });
+//       }
+//   });  
+
+// });
+
+
+
+
 // Insert new question into database
 app.post('/newQuestion/addQuestion', function (req, res) {
   const { statement, option1, option2, answer } = req.body;

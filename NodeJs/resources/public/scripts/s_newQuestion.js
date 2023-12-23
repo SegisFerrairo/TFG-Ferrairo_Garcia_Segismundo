@@ -255,6 +255,24 @@ function addOptionsListeners() {
 //     answer: 1
 // });
 
+// function catchFormData(mainFormName, optionsMainFormName) {
+//     var form = document.getElementById(mainFormName);
+//     var formData = new FormData(form);
+//     var data = {};
+//     data.push
+//     data.statement = formData.get(mainFormName+'_statement');
+//    
+//     var numOptions = howManyOptions('radio');
+//     var options = [];
+//     for (var i = 1; i <= numOptions; i++) {
+//         options.push(formData.get('inputOption'+i));
+//     }
+//     data.options = options;
+//     data.answer = parseInt(formData.get(optionsMainFormName).slice(-1));
+//
+//     return data;
+// }
+
 function catchFormData(mainFormName, optionsMainFormName) {
     var form = document.getElementById(mainFormName);
     var formData = new FormData(form);

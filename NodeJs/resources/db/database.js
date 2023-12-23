@@ -49,6 +49,128 @@ const question_schema = new mongoose.Schema({
     }
 });
 
+// const question_schema = new mongoose.Schema({
+//     language0: {
+//         type: String,
+//         required: 'This field is required'
+//     },
+//     statement: {
+//         type: String,
+//         required: 'This field is required'
+//     },
+//     options0: [{
+//         type: String,
+//         required: 'This field is required'
+//     }],
+//     answer: {
+//         type: Number,
+//         required: 'This field is required'
+//     }
+// });
+
+// const question_schema = new mongoose.Schema({
+//     question: {
+//         language0: {
+//             name: {
+//                 type: String,
+//                 required: 'This field is required'
+//             },
+//             statement: {
+//                 type: String,
+//                 required: 'This field is required'
+//             },
+//             options: [{
+//                 type: String,
+//                 required: 'This field is required'
+//             }],
+//             answer: {
+//                 type: Number,
+//                 required: 'This field is required'
+//             }
+//         }
+//     }
+// });
+
+// const question_schema = new mongoose.Schema({
+//     question0: {
+//         language0: {
+//             name: {
+//                 type: String,
+//                 required: 'This field is required'
+//             },
+//             statement: {
+//                 type: String,
+//                 required: 'This field is required'
+//             },
+//             options: [{
+//                 type: String,
+//                 required: 'This field is required'
+//             }],
+//             answer: {
+//                 type: Number,
+//                 required: 'This field is required'
+//             }
+//         },
+//         language1: {
+//             name: {
+//                 type: String,
+//                 required: 'This field is required'
+//             },
+//             statement: {
+//                 type: String,
+//                 required: 'This field is required'
+//             },
+//             options: [{
+//                 type: String,
+//                 required: 'This field is required'
+//             }],
+//             answer: {
+//                 type: Number,
+//                 required: 'This field is required'
+//             }
+//         }
+//     },
+//     question1: {
+//         language0: {
+//             name: {
+//                 type: String,
+//                 required: 'This field is required'
+//             },
+//             statement: {
+//                 type: String,
+//                 required: 'This field is required'
+//             },
+//             options: [{
+//                 type: String,
+//                 required: 'This field is required'
+//             }],
+//             answer: {
+//                 type: Number,
+//                 required: 'This field is required'
+//             }
+//         },
+//         language1: {
+//             name: {
+//                 type: String,
+//                 required: 'This field is required'
+//             },
+//             statement: {
+//                 type: String,
+//                 required: 'This field is required'
+//             },
+//             options: [{
+//                 type: String,
+//                 required: 'This field is required'
+//             }],
+//             answer: {
+//                 type: Number,
+//                 required: 'This field is required'
+//             }
+//         }
+//     }
+// });
+
+
 var Question = mongoose.model('questions', question_schema);
 
 module.exports = Question;
