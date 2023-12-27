@@ -255,58 +255,59 @@ function addOptionsListeners() {
 //     answer: 1
 // });
 
-// function catchFormData(mainFormName, optionsMainFormName) {
-//     var form = document.getElementById(mainFormName);
-//     var formData = new FormData(form);
-//     var data = {};
-//     data.push
-//     data.statement = formData.get(mainFormName+'_statement');
-//    
-//     var numOptions = howManyOptions('radio');
-//     var options = [];
-//     for (var i = 1; i <= numOptions; i++) {
-//         options.push(formData.get('inputOption'+i));
-//     }
-//     data.options = options;
-//     data.answer = parseInt(formData.get(optionsMainFormName).slice(-1));
-//
-//     return data;
-// }
-
 function catchFormData(mainFormName, optionsMainFormName) {
     var form = document.getElementById(mainFormName);
     var formData = new FormData(form);
-
-    // Create an object with the data
-    // var data = {
-    //     statement: formData.get(mainFormName+'_statement'),
-    //     option1: formData.get('inputOption1'),
-    //     option2: formData.get('inputOption2'),
-
-    //     // The answer is the one with the checked attribute,
-    //     // and it will be stored as its option number, starting at 1
-    //     answer: parseInt(formData.get('optionsMainRadio').slice(-1))       
-    // };
     var data = {};
     data.push
+    data.name ="";
     data.statement = formData.get(mainFormName+'_statement');
-    
+   
     var numOptions = howManyOptions('radio');
+    var options = [];
     for (var i = 1; i <= numOptions; i++) {
-        var option = 'option'+i;
-        data[option] = formData.get('inputOption'+i);
+        options.push(formData.get('inputOption'+i));
     }
-
+    data.options = options;
     data.answer = parseInt(formData.get(optionsMainFormName).slice(-1));
 
     return data;
 }
 
+// function catchFormData(mainFormName, optionsMainFormName) {
+//     var form = document.getElementById(mainFormName);
+//     var formData = new FormData(form);
+
+//     // Create an object with the data
+//     // var data = {
+//     //     statement: formData.get(mainFormName+'_statement'),
+//     //     option1: formData.get('inputOption1'),
+//     //     option2: formData.get('inputOption2'),
+
+//     //     // The answer is the one with the checked attribute,
+//     //     // and it will be stored as its option number, starting at 1
+//     //     answer: parseInt(formData.get('optionsMainRadio').slice(-1))       
+//     // };
+//     var data = {};
+//     data.push
+//     data.statement = formData.get(mainFormName+'_statement');
+    
+//     var numOptions = howManyOptions('radio');
+//     for (var i = 1; i <= numOptions; i++) {
+//         var option = 'option'+i;
+//         data[option] = formData.get('inputOption'+i);
+//     }
+
+//     data.answer = parseInt(formData.get(optionsMainFormName).slice(-1));
+
+//     return data;
+// }
+
 /***************
  ** Send data **
  ***************/
 
- function sendMainFormData(data) {
+ function sendFormData(data) {
     fetch('/newQuestion/addQuestion', {
         method: 'POST',
         headers: {
@@ -337,6 +338,7 @@ function catchFormData(mainFormName, optionsMainFormName) {
 document.addEventListener("DOMContentLoaded", function() {
     let mainFormName = 'mainform';
     let optionsMainFormName = 'optionsMainRadio';
+    let mainFormLanguage = 'Español';
 
     addForm(mainFormName, optionsMainFormName);
 
@@ -355,8 +357,10 @@ document.addEventListener("DOMContentLoaded", function() {
     // Add event listener to the "Enviar" button, submit button of the main form
     document.getElementById('submitButton').addEventListener('click', function(event) {
         event.preventDefault();
+        var question = {};
         var data = catchFormData(mainFormName, optionsMainFormName);
-        //sendMainFormData(data);
+        data.name = mainFormLanguage;        
+        question['language_'+0] = data;
 
         // Get the number of tabs
         var numTabs = document.getElementById('tabList').getElementsByTagName('li').length;
@@ -364,14 +368,20 @@ document.addEventListener("DOMContentLoaded", function() {
         for (var i = 1; i <= numTabs; i++) {
             // Obtain the name of the tab (content of the <a> element)
             var content = document.getElementById('linkTab' + i).textContent;
-            // TODO: add the language of the question to the data
             var tabName = 'tab' + i;
             var optionsName = 'optionsRadio' + i;
             var data = catchFormData(tabName, optionsName);
-            //sendMainFormData(data);
+
+            // Add content to the data as a new property called name
+            data.name = content;
+            question['language_'+i] = data;
+            
             // Reset the form
             document.getElementById(tabName).reset();
         }
+
+        // Send the data
+        sendFormData(question);
 
         // After sending the main form, clear the form
         document.getElementById(mainFormName).reset();
