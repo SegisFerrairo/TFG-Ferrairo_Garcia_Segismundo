@@ -110,6 +110,41 @@ function createOptions(optionsName, fieldset) {
     }
 }
 
+function addMoreOptions(formId, optionsName, numOptions) {
+    //var numOptions = howManyOptions('radio')+1;
+    var fieldset = document.getElementById(formId).getElementsByTagName('fieldset')[0];
+
+    // Create the asnwer options
+    var divOpcion = document.createElement("div");
+    divOpcion.className = "form-check mb-2";
+
+    var inputRadio = document.createElement("input");
+    inputRadio.className = "form-check-input";
+    inputRadio.setAttribute("type", "radio");
+    inputRadio.setAttribute("id", "optionRadio" + numOptions);
+    inputRadio.setAttribute("name", optionsName);
+    inputRadio.setAttribute("value", "option" + numOptions);
+    //inputRadio.setAttribute("checked", "");
+    
+
+    var inputRespuesta = document.createElement("input");
+    inputRespuesta.className = "form-control form-control-sm";
+    inputRespuesta.setAttribute("type", "text");
+    inputRespuesta.setAttribute("placeholder", "Añade tu respuesta");
+    inputRespuesta.setAttribute("id", "inputOption" + numOptions);
+    inputRespuesta.setAttribute("name", "inputOption" + numOptions);
+    inputRespuesta.setAttribute("for", "optionRadio" + numOptions);
+
+    divOpcion.appendChild(inputRadio);
+    divOpcion.appendChild(inputRespuesta);
+
+    fieldset.appendChild(divOpcion);
+
+    addOptionsListeners();
+}
+
+
+
 function addForm(nextTab, optionsName) {
     // Create the form
     var formulario = document.createElement("form");
@@ -152,18 +187,18 @@ function addForm(nextTab, optionsName) {
 
     // Attach to the DOM
     if (document.getElementById('myMainFormContent').hasChildNodes() == false) {
-        // // Add the submit button
-        // var submitButton = document.createElement("button");
-        // submitButton.id = "submitButton";
-        // submitButton.className = "btn btn-primary";
-        // submitButton.setAttribute("type", "submit");
-        // submitButton.setAttribute("value", "Enviar");
-        // submitButton.textContent = "Enviar";
-
-        // formulario.appendChild(submitButton);
+        var moreOptions = document.createElement("button");
+        moreOptions.className = "btn btn-outline-secondary btn-sm";
+        moreOptions.setAttribute("type", "button");
+        moreOptions.setAttribute("id", "moreOptions");
+        moreOptions.textContent = "+ Añadir otra opción";
+    
+        // Add the "Añadir opción" button to the form
+        formulario.appendChild(moreOptions);
 
         // Adding the main form to the DOM
         document.getElementById('myMainFormContent').appendChild(formulario);
+        addMoreOptionsButtonListener();
     }
     else {
         // Adding the new form to the DOM
@@ -243,17 +278,29 @@ function addOptionsListeners() {
     }));
 }
 
+
+
+
+function addMoreOptionsButtonListener() {
+    document.querySelector('#moreOptions').addEventListener('click', (event) => {
+        // Add more options to the main form
+        var formId = 'mainform';
+        var optionsName = 'optionsMainRadio';
+        var numOptions = howManyOptions('radio')+1;
+        addMoreOptions(formId, optionsName, numOptions);
+        // For each tab, add more options
+        var numTabs = document.getElementById('tabList').getElementsByTagName('li').length;
+        for (var i = 1; i <= numTabs; i++) {
+            var formId = 'tab' + i;
+            var optionsName = 'optionsRadio' + i;
+            addMoreOptions(formId, optionsName, numOptions);
+        }
+    });
+}
+
 /***************
  ** Cath data **
  ***************/
-
-// var question = new Question({
-//     statement: '¿Cuál es la capital de España?',
-//     option1: 'Madrid',
-//     option2: 'Barcelona',
-//     option3: 'Sevilla',
-//     answer: 1
-// });
 
 function catchFormData(mainFormName, optionsMainFormName) {
     var form = document.getElementById(mainFormName);
@@ -273,35 +320,6 @@ function catchFormData(mainFormName, optionsMainFormName) {
 
     return data;
 }
-
-// function catchFormData(mainFormName, optionsMainFormName) {
-//     var form = document.getElementById(mainFormName);
-//     var formData = new FormData(form);
-
-//     // Create an object with the data
-//     // var data = {
-//     //     statement: formData.get(mainFormName+'_statement'),
-//     //     option1: formData.get('inputOption1'),
-//     //     option2: formData.get('inputOption2'),
-
-//     //     // The answer is the one with the checked attribute,
-//     //     // and it will be stored as its option number, starting at 1
-//     //     answer: parseInt(formData.get('optionsMainRadio').slice(-1))       
-//     // };
-//     var data = {};
-//     data.push
-//     data.statement = formData.get(mainFormName+'_statement');
-    
-//     var numOptions = howManyOptions('radio');
-//     for (var i = 1; i <= numOptions; i++) {
-//         var option = 'option'+i;
-//         data[option] = formData.get('inputOption'+i);
-//     }
-
-//     data.answer = parseInt(formData.get(optionsMainFormName).slice(-1));
-
-//     return data;
-// }
 
 /***************
  ** Send data **
