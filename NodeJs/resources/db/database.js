@@ -11,44 +11,6 @@ mongoose.connect("mongodb://mongodb:27017/my_database",
     .catch(err => console.log('Error al conectar a MongoDB:', err)
 );
 
-// const question_schema = new mongoose.Schema({
-//     statement: {
-//         type: String,
-//         required: 'This field is required'
-//     },
-//     option1: {
-//         type: String,
-//         required: 'This field is required'
-//     },
-//     option2: {
-//         type: String,
-//         required: 'This field is required'
-//     },
-//     answer: {
-//         type: Number,
-//         required: 'This field is required'
-//     }
-// });
-
-// const question_schema = new mongoose.Schema({
-//     language: {
-//         type: String,
-//         required: 'This field is required'
-//     },
-//     statement: {
-//         type: String,
-//         required: 'This field is required'
-//     },
-//     options: [{
-//         type: String,
-//         required: 'This field is required'
-//     }],
-//     answer: {
-//         type: Number,
-//         required: 'This field is required'
-//     }
-// });
-
 const question_schema = new mongoose.Schema({
     languages: [{
         name: {
