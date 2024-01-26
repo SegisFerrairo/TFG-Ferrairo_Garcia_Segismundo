@@ -12,12 +12,17 @@
         <div id="area" class="container-fluid">
             <div id="left-space">        
                 <div id="langs">
-                    <button id="languages" class="visible" type="button">Mostrar idiomas</button>
+                    <button id="languages" class="visible btn btn-secondary" type="button">Mostrar idiomas</button>
                 </div>
                 <div id="myMainFormContent" class="mb-1"></div>
-                <button id="submitButton" class="btn btn-primary" type="submit" value="Enviar">Enviar</button>
+                <div class="form-group d-flex align-items-center">
+                    <select class="form-select mt-3" id="optionType">
+                      <option>Radio</option>
+                      <option>Checkbox</option>
+                    </select>
+                </div>                
             </div>
-
+            
             <div id="right-space" class="hidden">      
                 <div class="nav nav-tabs">
                     <ul id="tabList" class="nav" role="tablist"></ul>
@@ -26,9 +31,10 @@
                         <button type="button" id="button-addon2" class="btn btn-primary">+</button>
                     </div>
                 </div>
-                <div id="myTabContent" class="tab-content"></div>
+                <div id="myTabContent" class="tab-content mt-2"></div>
             </div>
         </div>
+        <button id="submitButton" class="btn btn-primary ms-4" type="submit" value="Enviar">Enviar</button>
 
         <%- include('_partials/_footer.ejs'); -%>
         <script type="text/javascript" src="scripts/s_newQuestion.js"></script>

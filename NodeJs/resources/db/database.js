@@ -25,10 +25,10 @@ const question_schema = new mongoose.Schema({
             type: String,
             required: 'This field is required'
         }],
-        answer: {
+        answer: [{
             type: Number,
             required: 'This field is required'
-        }
+        }]
     }]    
 });
 

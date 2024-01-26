@@ -31,3 +31,7 @@
 #submitButton {
     margin-top: 20px;
 }
+
+select {
+    max-width: 150px;
+}

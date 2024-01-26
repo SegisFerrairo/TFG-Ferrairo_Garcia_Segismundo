@@ -4,9 +4,10 @@
 let COUNTER_TAB = 1;
 let DEFAULT_NUM_OPTIONS = 2;
 let MAIN_FORM_ID = 'mainform';
-let OPTIONS_MAIN_FORM_NAME_ID = 'optionsMainRadio';
-let OPTIONS_FORM_NAME_ID = 'optionsRadio';
+let OPTIONS_MAIN_FORM_NAME_ID = 'optionsMain';
+let OPTIONS_FORM_NAME_ID = 'option';
 let MAIN_FORM_LANGUAGE = 'Español';
+var OPTION_TYPE = 'radio';
 
 /***********
  ** Utils **
@@ -37,6 +38,7 @@ function addTab() {
     
     var newClose = document.createElement('button');
     newClose.classList.add('btn-close');
+    newClose.classList.add('ms-2');
     newClose.setAttribute('type', 'button');
     newClose.addEventListener('click', function(){closeTab(nextLinkTab, nextTabId)});
     
@@ -100,49 +102,45 @@ function closeTab(nextLinkTab, nextTabId) {
     tab.remove();
 }
 
-function howManyOptions(formId, type) {
+function howManyOptions(formId) {
     // If mainform has no childs yet, options will be 2 (the default number of options)
     if (document.getElementById(formId) == null) {
         return DEFAULT_NUM_OPTIONS;
     }
     else {
-        // If mainform has childs, options will be the number of type="radio" elements
+        // If mainform has childs, options will be the number of input elements
         var options = document.getElementById(formId).getElementsByTagName('input');
     }
 
-    var counter = 0;
-    for (var i = 0; i < options.length; i++) {
-        if (options[i].type == type) {
-            counter++;
-        }
-    }
+    var counter = Array.from(options).filter((elem) => elem.type == 'text').length;
+
     return counter;
 }
 
 function createOptions(formId, optionsName, fieldset) {
-    var numOptions = howManyOptions(formId, 'radio');
+    var numOptions = howManyOptions(formId);
 
     // Create the asnwer options
     for (var i = 1; i <= numOptions; i++) {
         var divOpcion = document.createElement("div");
         divOpcion.className = "form-check mb-2";
 
-        var inputRadio = document.createElement("input");
-        inputRadio.className = "form-check-input";
-        inputRadio.setAttribute("type", "radio");
-        inputRadio.setAttribute("id", "optionRadio" + i);
-        inputRadio.setAttribute("name", optionsName);
-        inputRadio.setAttribute("value", "option" + i);
+        var input = document.createElement("input");
+        input.className = "form-check-input";
+        input.setAttribute("type", OPTION_TYPE);
+        input.setAttribute("id", OPTIONS_FORM_NAME_ID + i);
+        input.setAttribute("name", optionsName);
+        input.setAttribute("value", OPTIONS_FORM_NAME_ID + i);
 
         if (document.getElementById('myMainFormContent').hasChildNodes() == false) {
             if (i == 1) {
-                inputRadio.setAttribute("checked", "");
+                input.setAttribute("checked", "");
             }
         }
         else {
             // Checks if the option element with the same value field at the MainForm is checked
             if (document.querySelector(`input[value="option${i}"]`).checked) {
-                inputRadio.setAttribute("checked", "");
+                input.setAttribute("checked", "");
             }
         }
 
@@ -152,9 +150,9 @@ function createOptions(formId, optionsName, fieldset) {
         inputRespuesta.setAttribute("placeholder", "Añade tu respuesta");
         inputRespuesta.setAttribute("id", "inputOption" + i);
         inputRespuesta.setAttribute("name", "inputOption" + i);
-        inputRespuesta.setAttribute("for", "optionRadio" + i);
+        inputRespuesta.setAttribute("for", OPTIONS_FORM_NAME_ID + i);
 
-        divOpcion.appendChild(inputRadio);
+        divOpcion.appendChild(input);
         divOpcion.appendChild(inputRespuesta);
 
         fieldset.appendChild(divOpcion);
@@ -171,13 +169,13 @@ function addMoreOptions(formId, optionsName, numOptions) {
     var divOpcion = document.createElement("div");
     divOpcion.className = "form-check mb-2";
 
-    var inputRadio = document.createElement("input");
-    inputRadio.className = "form-check-input";
-    inputRadio.setAttribute("type", "radio");
-    inputRadio.setAttribute("id", "optionRadio" + numOptions);
-    inputRadio.setAttribute("name", optionsName);
-    inputRadio.setAttribute("value", "option" + numOptions);
-    //inputRadio.setAttribute("checked", "");
+    var input = document.createElement("input");
+    input.className = "form-check-input";
+    input.setAttribute("type", OPTION_TYPE);
+    input.setAttribute("id", OPTIONS_FORM_NAME_ID + numOptions);
+    input.setAttribute("name", optionsName);
+    input.setAttribute("value", "option" + numOptions);
+    //input.setAttribute("checked", "");
     
 
     var inputRespuesta = document.createElement("input");
@@ -186,9 +184,9 @@ function addMoreOptions(formId, optionsName, numOptions) {
     inputRespuesta.setAttribute("placeholder", "Añade tu respuesta");
     inputRespuesta.setAttribute("id", "inputOption" + numOptions);
     inputRespuesta.setAttribute("name", "inputOption" + numOptions);
-    inputRespuesta.setAttribute("for", "optionRadio" + numOptions);
+    inputRespuesta.setAttribute("for", OPTIONS_FORM_NAME_ID + numOptions);
 
-    divOpcion.appendChild(inputRadio);
+    divOpcion.appendChild(input);
     divOpcion.appendChild(inputRespuesta);
 
     fieldset.appendChild(divOpcion);
@@ -204,10 +202,40 @@ function deleteLastOption(formId) {
     }
     var fieldset = document.getElementById(formId).getElementsByTagName('fieldset')[0];
     // But just if there are more than 2 options
-    if (howManyOptions(formId, 'radio') > DEFAULT_NUM_OPTIONS) {
+    if (howManyOptions(formId) > DEFAULT_NUM_OPTIONS) {
         fieldset.removeChild(fieldset.lastChild);
     }
 }
+
+function changeOptionType(value) {
+    var pre_optionType = OPTION_TYPE;
+    if (value == 'Radio') {
+        OPTION_TYPE = 'radio';
+    }
+    else {
+        OPTION_TYPE = 'checkbox';
+    }
+
+    // Change the type of the options of the main form
+    var options = document.getElementById(MAIN_FORM_ID).getElementsByTagName('input');
+    // Just the options that has the same type as pre_optionType
+    options = Array.from(options).filter((elem) => elem.type == pre_optionType);
+    for (var i = 0; i < options.length; i++) {
+        options[i].setAttribute('type', OPTION_TYPE);
+    }
+
+    // Change the type of the options of the tabs
+    var tabs = document.getElementById('tabList').getElementsByTagName('li');
+    for (var i = 0; i < tabs.length; i++) {
+        var tabId = 'tab' + tabs[i].getElementsByTagName('a')[0].id.slice(7);
+        var options = document.getElementById(tabId).getElementsByTagName('input');
+        options = Array.from(options).filter((elem) => elem.type == pre_optionType);
+        for (var j = 0; j < options.length; j++) {
+            options[j].setAttribute('type', OPTION_TYPE);
+        }
+    }
+}
+
 
 function addForm(formId, optionsName) {
     // Create the form
@@ -302,12 +330,28 @@ function showLangs() {
  ** Event Listeners **
  *********************/
 
+function changeOptionTypeListener() {
+    document.querySelector('#optionType').addEventListener('change', (event) => {        
+        changeOptionType(event.target.value);
+    });
+}
+
+// To synchronize the options of the main form with the options of the tabs
 function addOptionsListeners() {
     document.querySelectorAll('.form-check-input').forEach(elem => elem.addEventListener('change', (event) => {
         // Select all elements with the same value field of the changed element
-        document.querySelectorAll(`input[value="${event.target.value}"]`).forEach((input) => {
-            input.checked = true;
-        });
+        // If question type is radio, just one element will be selected
+        if (OPTION_TYPE == 'radio') {
+            document.querySelectorAll(`input[value="${event.target.value}"]`).forEach((input) => {
+                input.checked = true;
+            });
+        }
+        // If question type is checkbox, all elements will be selected
+        else {
+            document.querySelectorAll(`input[value="${event.target.value}"]`).forEach((input) => {
+                input.checked = event.target.checked;
+            });
+        }
     }));
 }
 
@@ -316,14 +360,14 @@ function addMoreOptionsButtonListener() {
         // Add more options to the main form
         var formId = MAIN_FORM_ID;
         var optionsName = OPTIONS_MAIN_FORM_NAME_ID;
-        var numOptions = howManyOptions(formId,'radio')+1;
-        addMoreOptions(formId, optionsName, numOptions);
+        var numOption = howManyOptions(formId)+1;  // +1 because we are going to add a new option
+        addMoreOptions(formId, optionsName, numOption);
         // For each tab, add more options
         var tabs = document.getElementById('tabList').hasChildNodes() == false ? 0 : document.getElementById('tabList').getElementsByTagName('li');
         for (var i = 0; i < tabs.length; i++) {
             var formId = 'tab' + tabs[i].getElementsByTagName('a')[0].id.slice(7);
-            var optionsName = 'optionsRadio' + tabs[i].getElementsByTagName('a')[0].id.slice(7);
-            addMoreOptions(formId, optionsName, numOptions);
+            var optionsName = OPTIONS_FORM_NAME_ID + tabs[i].getElementsByTagName('a')[0].id.slice(7);
+            addMoreOptions(formId, optionsName, numOption);
         }
     });
 }
@@ -354,15 +398,26 @@ function catchFormData(formId, optionsFormId) {
     data.name ="";
     data.statement = formData.get(formId+'_statement');
    
-    var numOptions = howManyOptions(formId,'radio');
+    var numOptions = howManyOptions(formId);
     var options = [];
     for (var i = 1; i <= numOptions; i++) {
         options.push(formData.get('inputOption'+i));
     }
     data.options = options;
-    data.answer = parseInt(formData.get(optionsFormId).slice(-1));
 
-    console.log(data);
+    if (OPTION_TYPE == 'radio') {
+        var radio = [];
+        radio.push(parseInt(formData.get(optionsFormId).slice(-1)));
+        data.answer = radio;
+    }
+    else {
+        var checkboxes = [];
+        var selectedOptions = formData.getAll(optionsFormId);
+        for (var i = 0; i < selectedOptions.length; i++) {
+            checkboxes.push(parseInt(selectedOptions[i].slice(-1)));
+        }
+        data.answer = checkboxes;
+    }
 
     return data;
 }
@@ -415,38 +470,45 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // Add event listener to the "Enviar" button, submit button of the main form
-    document.getElementById('submitButton').addEventListener('click', function(event) {
-        event.preventDefault();
-        var question = {};
-        var data = catchFormData(MAIN_FORM_ID, OPTIONS_MAIN_FORM_NAME_ID);
-        data.name = MAIN_FORM_LANGUAGE;        
-        question['language_'+0] = data;
-
-        // Get the number of tabs
-        var tabs = document.getElementById('tabList').getElementsByTagName('li');
-        // Catch the data of each tab
-        for (var i = 1; i <= tabs.length; i++) {
-            var id = tabs[i-1].getElementsByTagName('a')[0].id.slice(7);
-            var content = document.getElementById('linkTab' + id).textContent;
-            var tabId = 'tab' + id;
-            var optionsName = 'optionsRadio' + id;
-            var data = catchFormData(tabId, optionsName);
-
-            // Add content to the data as a new property called name
-            data.name = content;
-            question['language_'+i] = data;
-            
-            // Reset the form
-            document.getElementById(tabId).reset();
+    document.getElementById('submitButton').addEventListener('click', function(event) {        
+        var confirmSubmission = window.confirm("¿Está seguro de que desea enviar el formulario?");
+        if (!confirmSubmission) {
+            event.preventDefault();
+            return;
         }
+        else {            
+            var question = {};
+            var data = catchFormData(MAIN_FORM_ID, OPTIONS_MAIN_FORM_NAME_ID);
+            data.name = MAIN_FORM_LANGUAGE;        
+            question['language_'+0] = data;
 
-        // Send the data
-        sendFormData(question);
+            // Get the number of tabs
+            var tabs = document.getElementById('tabList').getElementsByTagName('li');
+            // Catch the data of each tab
+            for (var i = 1; i <= tabs.length; i++) {
+                var id = tabs[i-1].getElementsByTagName('a')[0].id.slice(7);
+                var content = document.getElementById('linkTab' + id).textContent;
+                var tabId = 'tab' + id;
+                var optionsName = OPTIONS_FORM_NAME_ID + id;
+                var data = catchFormData(tabId, optionsName);
 
-        // After sending the main form, clear the form
-        document.getElementById(MAIN_FORM_ID).reset();
+                // Add content to the data as a new property called name
+                data.name = content;
+                question['language_'+i] = data;
+                
+                // Reset the form
+                document.getElementById(tabId).reset();
+            }
+
+            // Send the data
+            sendFormData(question);
+
+            // After sending the main form, clear the form
+            document.getElementById(MAIN_FORM_ID).reset();
+        }
     });
 
     addOptionsListeners();
+    changeOptionTypeListener();
 });
 
