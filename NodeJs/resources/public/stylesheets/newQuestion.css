@@ -16,7 +16,7 @@
 }
 
 #addTabBar {
-    max-width: 200px;
+    max-width: 205px;
 }
 
 #addTabBar #newTabName {
@@ -34,4 +34,9 @@
 
 select {
     max-width: 150px;
+}
+
+#newTabName {
+    background-color: #f0f0f0; /* Gris muy tenue como fondo */
+    font-style: italic; /* Cursiva para el texto */
 }

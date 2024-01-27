@@ -15,7 +15,15 @@ var OPTION_TYPE = 'radio';
 
 function addTab() {
     // Obtain the name of the new tab
+    // If the input is empty, show an alert
+    if (document.getElementById('newTabName').value == '') {
+        alert('Debes especificar un nombre para la nueva pestaña');
+        return;
+    }
+
     var newTabName = document.getElementById('newTabName').value;
+
+    // Reset the input
     document.getElementById('newTabName').value='';
 
     var nextLinkTab = 'linkTab' + COUNTER_TAB;    
@@ -151,6 +159,7 @@ function createOptions(formId, optionsName, fieldset) {
         inputRespuesta.setAttribute("id", "inputOption" + i);
         inputRespuesta.setAttribute("name", "inputOption" + i);
         inputRespuesta.setAttribute("for", OPTIONS_FORM_NAME_ID + i);
+        inputRespuesta.setAttribute("required", "");
 
         divOpcion.appendChild(input);
         divOpcion.appendChild(inputRespuesta);
@@ -264,6 +273,7 @@ function addForm(formId, optionsName) {
     textareaEnunciado.setAttribute("id", formId+"_statement");
     textareaEnunciado.setAttribute("name", formId+"_statement");
     textareaEnunciado.setAttribute("rows", "3");
+    textareaEnunciado.setAttribute("required", "");
 
     divEnunciado.appendChild(labelEnunciado);
     divEnunciado.appendChild(textareaEnunciado);
@@ -390,6 +400,46 @@ function addLessOptionsButtonListener() {
  ** Cath data **
  ***************/
 
+function howManyEmpty(formId, elementType) {
+    var form = document.getElementById(formId);
+    var options = form.getElementsByTagName('input');
+    options = Array.from(options).filter((elem) => elem.type == elementType);
+
+    var counter = 0;
+    for (var i = 0; i < options.length; i++) {
+        if (options[i].checked == true || options[i].value == '') {
+            counter++;
+        }
+    }
+
+    return counter;
+}
+
+
+function checkEmptyFields(formId) {
+    var form = document.getElementById(formId);
+
+    // Check if the statement field is empty
+    if (form[formId+'_statement'].value == '') {
+        alert('Debes especificar un enunciado para la pregunta');
+        return true;
+    }
+
+    // Check if there is at least one option with a value
+    if (howManyEmpty(formId, OPTION_TYPE) == 0) {
+        alert('Debes marcar al menos una opción');
+        return true;
+    }
+
+    // Check if there is at least one option with a value
+    if (howManyEmpty(formId, 'text') > 0) {
+        alert('Debes completar todas las opciones');
+        return true;
+    }
+
+    return false;
+}
+
 function catchFormData(formId, optionsFormId) {
     var form = document.getElementById(formId);
     var formData = new FormData(form);
@@ -476,7 +526,12 @@ document.addEventListener("DOMContentLoaded", function() {
             event.preventDefault();
             return;
         }
-        else {            
+        else {    
+            if (checkEmptyFields(MAIN_FORM_ID)) {
+                event.preventDefault();
+                return;
+            }
+
             var question = {};
             var data = catchFormData(MAIN_FORM_ID, OPTIONS_MAIN_FORM_NAME_ID);
             data.name = MAIN_FORM_LANGUAGE;        
@@ -490,15 +545,22 @@ document.addEventListener("DOMContentLoaded", function() {
                 var content = document.getElementById('linkTab' + id).textContent;
                 var tabId = 'tab' + id;
                 var optionsName = OPTIONS_FORM_NAME_ID + id;
+                if (checkEmptyFields(tabId)) {
+                    event.preventDefault();
+                    return;
+                }
                 var data = catchFormData(tabId, optionsName);
 
                 // Add content to the data as a new property called name
                 data.name = content;
-                question['language_'+i] = data;
-                
-                // Reset the form
+                question['language_'+i] = data;                
+
+            }       
+            // Reset each tab
+            for (var i = 1; i <= tabs.length; i++) {
+                var tabId = 'tab' + tabs[i-1].getElementsByTagName('a')[0].id.slice(7);
                 document.getElementById(tabId).reset();
-            }
+            }     
 
             // Send the data
             sendFormData(question);
