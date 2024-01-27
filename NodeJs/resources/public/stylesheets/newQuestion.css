@@ -17,11 +17,18 @@
 
 #addTabBar {
     max-width: 205px;
+    margin-bottom: 2px;
 }
 
 #addTabBar #newTabName {
-    text-align: center;
-    margin-left: 5px;
+    text-align: center;   
+    background-color: #f0f0f0; /* Gris muy tenue como fondo */
+    font-style: italic; /* Cursiva para el texto */
+    height: 35px;    
+}
+
+#addTabBar #button-addon2 {
+    height: 35px;
 }
 
 #mainform {
@@ -36,7 +43,3 @@ select {
     max-width: 150px;
 }
 
-#newTabName {
-    background-color: #f0f0f0; /* Gris muy tenue como fondo */
-    font-style: italic; /* Cursiva para el texto */
-}
