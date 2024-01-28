@@ -15,9 +15,11 @@ var OPTION_TYPE = 'radio';
 
 function addTab() {
     // Obtain the name of the new tab
-    // If the input is empty, show an alert
-    if (document.getElementById('newTabName').value == '') {
+    // If the input just contains spaces, show an alert
+    if (document.getElementById('newTabName').value.trim() == '') {
         alert('Debes especificar un nombre para la nueva pestaña');
+        // Reset the input
+        document.getElementById('newTabName').value='';
         return;
     }
 
@@ -415,6 +417,15 @@ function howManyEmpty(formId, elementType) {
     return counter;
 }
 
+function checkEmptyTopic() {
+    var topic = document.getElementById('floatingTopic').value;
+    if (topic == '') {
+        alert('Debes especificar un tema para la pregunta');
+        return true;
+    }
+    return false;
+}
+
 
 function checkEmptyFields(formId) {
     var form = document.getElementById(formId);
@@ -527,12 +538,14 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
         else {    
-            if (checkEmptyFields(MAIN_FORM_ID)) {
+            if (checkEmptyTopic() || checkEmptyFields(MAIN_FORM_ID)) {
                 event.preventDefault();
                 return;
             }
 
             var question = {};
+            question.topic = document.getElementById('floatingTopic').value;
+
             var data = catchFormData(MAIN_FORM_ID, OPTIONS_MAIN_FORM_NAME_ID);
             data.name = MAIN_FORM_LANGUAGE;        
             question['language_'+0] = data;
@@ -562,6 +575,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 document.getElementById(tabId).reset();
             }     
 
+            console.log(question);
             // Send the data
             sendFormData(question);
 

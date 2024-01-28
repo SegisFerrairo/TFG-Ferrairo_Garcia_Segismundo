@@ -43,3 +43,11 @@ select {
     max-width: 150px;
 }
 
+#myTabContent {
+    margin-top: 33px;
+}
+
+#floatingTopic {
+    width: 150px;
+}
+

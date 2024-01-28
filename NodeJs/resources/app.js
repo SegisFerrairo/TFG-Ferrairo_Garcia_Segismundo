@@ -33,9 +33,13 @@ app.listen(app.get("port"), function(){
 app.post('/newQuestion/addQuestion', function (req, res) {
   const data = req.body;
 
-  var question = new Question({
+  var question = new Question ({
+    topic: data.topic,
     languages: []
   });
+
+  // Delete data.topic from data
+  delete data.topic;
 
   Object.values(data).forEach(language => {
     question.languages.push({
@@ -45,7 +49,7 @@ app.post('/newQuestion/addQuestion', function (req, res) {
       answer: language.answer
     });
   });
-
+ 
   question.save(function (err, doc) {
     if (!err) {
         // console.log(doc);

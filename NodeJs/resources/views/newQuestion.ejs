@@ -10,10 +10,16 @@
         </header>
         
         <div id="area" class="container-fluid">
-            <div id="left-space">        
-                <div id="langs">
-                    <button id="languages" class="visible btn btn-secondary" type="button">Mostrar idiomas</button>
-                </div>
+            <div id="left-space">   
+                <div style="display: flex; justify-content: space-between;">
+                    <div id="langs">
+                        <button id="languages" class="visible btn btn-secondary mt-2" type="button">Mostrar idiomas</button>
+                    </div>
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="floatingTopic" required>
+                        <label for="floatingTopic">Tema</label>
+                    </div>
+                </div>     
                 <div id="myMainFormContent" class="mb-1"></div>
                 <div class="form-group d-flex align-items-center">
                     <select class="form-select mt-3" id="optionType">
@@ -31,7 +37,7 @@
                         <button type="button" id="button-addon2" class="btn btn-primary">+</button>
                     </div>
                 </div>
-                <div id="myTabContent" class="tab-content mt-2"></div>
+                <div id="myTabContent" class="tab-content"></div>
             </div>
         </div>
         <button id="submitButton" class="btn btn-primary ms-4" type="submit" value="Enviar">Enviar</button>

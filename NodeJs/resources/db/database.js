@@ -12,6 +12,10 @@ mongoose.connect("mongodb://mongodb:27017/my_database",
 );
 
 const question_schema = new mongoose.Schema({
+    topic: {
+        type: String,
+        required: 'This field is required'
+    },
     languages: [{
         name: {
             type: String,
