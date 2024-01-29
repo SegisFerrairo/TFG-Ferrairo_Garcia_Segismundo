@@ -3,7 +3,7 @@ const path = require('path');
 var Question = require('./db/database');
 
 var index = require('./routes/index');
-var about = require('./routes/about');
+var questionary = require('./routes/questionary');
 var newQuestion = require('./routes/newQuestion');
 var error404 = require('./routes/404');
 
@@ -17,8 +17,8 @@ app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use('/', index);
-app.use('/about', about);
-app.use('/newQuestion', newQuestion);
+app.use('/', questionary);
+app.use('/', newQuestion);
 
 app.use(express.json());
 
