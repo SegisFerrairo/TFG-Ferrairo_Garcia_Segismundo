@@ -22,12 +22,15 @@ app.use('/', newQuestion);
 
 app.use(express.json());
 
-// Redirect to 404 page if no route is found
-app.use('*', error404);
 
-app.listen(app.get("port"), function(){
-  var url = "http://localhost:"+app.get("port");
-  console.log("La aplicación está escuchando en "+url);
+// Get the questions from the database
+app.get('/questionary/getQuestions', async(req, res) => {
+  try {
+    const questions = await Question.find({});
+    res.status(200).json(questions);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 app.post('/newQuestion/addQuestion', function (req, res) {
@@ -60,4 +63,12 @@ app.post('/newQuestion/addQuestion', function (req, res) {
         res.status(500).json({ error: 'Error al procesar la solicitud.' });
     }
   });
+});
+
+// Redirect to 404 page if no route is found
+app.use('*', error404);
+
+app.listen(app.get("port"), function(){
+  var url = "http://localhost:"+app.get("port");
+  console.log("La aplicación está escuchando en "+url);
 });

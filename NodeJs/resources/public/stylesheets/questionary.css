@@ -28,14 +28,27 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra del folio */
 }
 
-.btn-toggle[aria-expanded="true"]::before {
-    transform: rotate(90deg);
+/*.topic-container*/
+/*Make the class .topic-container vertical allign with its father*/
+.topic-container {
+    padding-left: 20px;
+
 }
 
-.btn-toggle::before {
-    width: 1.25em;
+.btn-toggle {
+    padding: 0;
+}
+
+.btn-toggle>.svg-container {
+    display: inline-block;
+    width: 1em;
     line-height: 0;
     content: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path fill='none' stroke='rgba%280,0,0,.5%29' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 14l6-6-6-6'/></svg>");
     transition: transform .35s ease;
     transform-origin: 0.5em 50%;
+    vertical-align: inherit;    
+}
+
+.btn-toggle[aria-expanded="true"]>.svg-container {
+    transform: rotate(90deg);
 }

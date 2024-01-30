@@ -487,7 +487,7 @@ function catchFormData(formId, optionsFormId) {
  ** Send data **
  ***************/
 
- function sendFormData(data) {
+function sendFormData(data) {
     fetch('/newQuestion/addQuestion', {
         method: 'POST',
         headers: {
