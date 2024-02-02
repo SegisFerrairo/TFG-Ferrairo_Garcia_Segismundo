@@ -24,7 +24,7 @@ app.use(express.json());
 
 
 // Get the questions from the database
-app.get('/questionary/getQuestions', async(req, res) => {
+app.get('/questionary/getAllQuestions', async(req, res) => {
   try {
     const questions = await Question.find({});
     res.status(200).json(questions);
