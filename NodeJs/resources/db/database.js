@@ -2,14 +2,18 @@ const mongoose = require('mongoose');
 
 mongoose.set('strictQuery', false);
 
-mongoose.connect("mongodb://mongodb:27017/my_database",
-    {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    })
-    .then(db => console.log('MongoDB Conectada', db.connection.host))
-    .catch(err => console.log('Error al conectar a MongoDB:', err)
-);
+function connectToDatabase() {
+    mongoose.connect("mongodb://mongodb:27017/my_database",
+        {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        })
+        .then(db => console.log('MongoDB Conectada', db.connection.host))
+        .catch(err => console.log('Error al conectar a MongoDB:', err)
+    );
+}
+
+connectToDatabase();
 
 const question_schema = new mongoose.Schema({
     topic: {
@@ -38,4 +42,14 @@ const question_schema = new mongoose.Schema({
 
 var Question = mongoose.model('questions', question_schema);
 
-module.exports = Question;
+//closeConnection();
+
+function closeConnection() {
+    mongoose.connection.close();
+}
+
+module.exports = {
+    Question,
+    connectToDatabase,
+    closeConnection
+}

@@ -31,12 +31,33 @@
 /*.topic-container*/
 /*Make the class .topic-container vertical allign with its father*/
 .topic-container {
-    padding-left: 20px;
+    padding-left: 28px;
+    padding-right: 10px;
+}
 
+.topic-container>a {
+    display: block;
+    padding: 10px 0;
+    color: #000000;
+    text-decoration: none;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.btn-link {
+    margin: 0;
+    padding: 0;
+    border: none;
+    text-align: left;
+    color: #000000;
 }
 
 .btn-toggle {
-    padding: 0;
+    padding: 5px;
+}
+
+/*when cursor hovers btn-toggle it glows in blue*/
+.btn-toggle:hover {
+    background-color: #87ceeb;
 }
 
 .btn-toggle>.svg-container {

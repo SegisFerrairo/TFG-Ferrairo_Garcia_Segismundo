@@ -1,6 +1,11 @@
 const express = require('express');
 const path = require('path');
-var Question = require('./db/database');
+//var Question = require('./db/database');
+// ./db/database.js has multiple exports, so we need to import the whole module
+var database = require('./db/database');
+var Question = database.Question;
+var connectToDatabase = database.connectToDatabase;
+var closeConnection = database.closeConnection;
 
 var index = require('./routes/index');
 var questionary = require('./routes/questionary');
@@ -22,10 +27,23 @@ app.use('/', newQuestion);
 
 app.use(express.json());
 
+// Connect to the database
+//connectToDatabase();
+
+app.get('/questionary/getQuestionById:questionId', async(req, res) => {
+  try {
+    var questionId = req.params.questionId.slice(1).toString();    
+    const question = await Question.findOne({ _id: questionId });    
+    res.status(200).json(question);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 
 // Get the questions from the database
 app.get('/questionary/getAllQuestions', async(req, res) => {
-  try {
+  try {   
     const questions = await Question.find({});
     res.status(200).json(questions);
   } catch (error) {
@@ -72,3 +90,10 @@ app.listen(app.get("port"), function(){
   var url = "http://localhost:"+app.get("port");
   console.log("La aplicación está escuchando en "+url);
 });
+
+
+
+// const question = await Question.findOne({ _id: ObjectId('65b95497cd0b61412dffbaea') })
+
+// const question = await Question.findOne({ _id: '65b95497cd0b61412dffbaea' })
+

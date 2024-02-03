@@ -7,6 +7,17 @@ let COUNTER_TOPIC = 0;
  ** Utils **
  ***********/
 
+function disableQuestion(button) {
+    button.classList.toggle("disabled");
+    var li = button.parentElement;
+    if (button.classList.contains("disabled")) {            
+        li.style.listStyleType = "circle";
+    }
+    else {
+        li.style.listStyleType = "disc";
+    }        
+}
+
 function createNoTopicsElement(sidebar) {
     var li = document.createElement("li");
     li.className = "no-topics";
@@ -26,7 +37,15 @@ function listData(data) {
         return;
     }
 
+    // if two questions have the same topic, they will be grouped together
+    var topics = [];
     data.forEach(function(question) {
+        if (!topics.includes(question.topic)) {
+            topics.push(question.topic);
+        }
+    });
+
+    topics.forEach(function(topic) {
         var li_topic = document.createElement("li");
         li_topic.id = "topic" + COUNTER_TOPIC;
         li_topic.className = "topic mb-1";
@@ -39,7 +58,7 @@ function listData(data) {
 
         var span = document.createElement("span");
         span.className = "svg-container me-1";
-        button.textContent = question.topic;
+        button.textContent = topic;
         button.insertBefore(span, button.firstChild);
 
         li_topic.appendChild(button);        
@@ -50,14 +69,23 @@ function listData(data) {
         var ul = document.createElement("ul");
         ul.className = "btn-toggle-nav list-unstyled fw-normal pb-1 small";
         
+        data.forEach(function(question) {
+            if (question.topic == topic) {
+                var li = document.createElement("li");
+                li.className = "mb-1"
+                // li must have bullet points
+                li.style.listStyleType = "disc";
+                var button = document.createElement("button");
+                button.type = "button";
+                button.id = "button-" + question._id;
+                button.className = "btn btn-link";
+                button.textContent = question.languages[0].statement; 
+                li.appendChild(button);
+                ul.appendChild(li);
 
-        var li = document.createElement("li");
-        var a = document.createElement("a");
-        a.href = "/TODO:linkToQuestion";
-        a.className = "link-dark rounded";
-        a.textContent = question.languages[0].statement; 
-        li.appendChild(a);
-        ul.appendChild(li);
+                selectQuestionListener(button);
+            }
+        });
 
         div.appendChild(ul);
         li_topic.appendChild(div);
@@ -68,6 +96,7 @@ function listData(data) {
 
         COUNTER_TOPIC++;
     });
+
 }
 
 /*************
@@ -113,9 +142,30 @@ function getAllDBData() {
         return response.json();
     })
     .then(responseData => {
-        //console.log('Respuesta del servidor:', responseData);
         console.debug('Respuesta del servidor:', responseData);
         listData(responseData);
+        return;
+    })
+    .catch(error => {
+        console.error('Error en la solicitud:', error.message);
+    });
+}
+
+function getQuestionById(questionId) {
+    fetch('/questionary/getQuestionById:' + questionId, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error al obtener los datos de la base de datos');
+        }
+        return response.json();
+    })
+    .then(responseData => {
+        console.debug('Respuesta del servidor:', responseData);
         return;
     })
     .catch(error => {
@@ -126,6 +176,14 @@ function getAllDBData() {
 /*********************
  ** Event Listeners **
  *********************/
+
+function selectQuestionListener(button) {   
+    button.addEventListener("click", function() {
+        disableQuestion(button);
+        var questionId = button.id.split("-")[1];
+        getQuestionById(questionId);        
+    });
+}
 
 function expandTopicListener(button, div) {
     button.addEventListener("click", function() {
@@ -142,6 +200,6 @@ function expandTopicListener(button, div) {
  ** DOM Loaded **
  ****************/
 
- document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function() {
     getAllDBData();
 });
