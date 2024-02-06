@@ -28,7 +28,14 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra del folio */
 }
 
-/*.topic-container*/
+.single-choice {
+    list-style-type: square;
+}
+
+.multiple-choice {
+    list-style-type: disclosure-closed;
+}
+
 /*Make the class .topic-container vertical allign with its father*/
 .topic-container {
     padding-left: 28px;

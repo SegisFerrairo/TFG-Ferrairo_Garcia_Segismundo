@@ -47,6 +47,7 @@ app.get('/questionary/getAllQuestions', async(req, res) => {
     const questions = await Question.find({});
     res.status(200).json(questions);
   } catch (error) {
+
     res.status(500).json({ message: error.message });
   }
 });

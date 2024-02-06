@@ -2,6 +2,7 @@
  ** Constants **
  ***************/
 let COUNTER_TOPIC = 0;
+var COUNTER_QUESTION = 1;
 
 /***********
  ** Utils **
@@ -166,11 +167,37 @@ function getQuestionById(questionId) {
     })
     .then(responseData => {
         console.debug('Respuesta del servidor:', responseData);
+        addQuestion(responseData);
         return;
     })
     .catch(error => {
         console.error('Error en la solicitud:', error.message);
     });
+}
+
+function addQuestion(question) {
+    // add question to Folio
+    var folioBody = document.getElementById("folio").getElementsByClassName("folio-body")[0];
+
+    var div = document.createElement("div");
+    div.id = "question" + COUNTER_QUESTION;
+    var label = document.createElement("label");
+    label.textContent = COUNTER_QUESTION + ". " + question.languages[0].statement;
+    div.appendChild(label);
+    var ul = document.createElement("ul");
+    // Distinct between single-choice and multiple-choice questions
+    question.languages[0].answer.length > 1 ? ul.className = "multiple-choice" : ul.className = "single-choice";
+    question.languages[0].options.forEach(function(option) {
+        var li = document.createElement("li");
+        var label = document.createElement("label");
+        label.textContent = option;
+        li.appendChild(label);
+        ul.appendChild(li);
+    });
+    div.appendChild(ul);
+    folioBody.appendChild(div);
+
+    COUNTER_QUESTION++;
 }
 
 /*********************
