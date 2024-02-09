@@ -30,6 +30,38 @@ app.use(express.json());
 // Connect to the database
 //connectToDatabase();
 
+// Get all the questions with the given language.name
+app.get('/questionary/getQuestionsByLanguage:languageName', async(req, res) => {
+  try {
+    var languageName = req.params.languageName.slice(1).toString();
+    const questions = await Question.find({ 'languages.name': languageName });
+    res.status(200).json(questions);
+  }
+  catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+// Get the languages from the database
+app.get('/newQuestion/getLanguagesNames', async(req, res) => {
+  try {
+    const languages = await Question.find({}).distinct('languages.name');
+    res.status(200).json(languages);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.get('/questionary/getTopics', async(req, res) => {
+  try {
+    const topics = await Question.find({}).distinct('topic');
+    res.status(200).json(topics);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 app.get('/questionary/getQuestionById:questionId', async(req, res) => {
   try {
     var questionId = req.params.questionId.slice(1).toString();    
@@ -66,6 +98,7 @@ app.post('/newQuestion/addQuestion', function (req, res) {
   Object.values(data).forEach(language => {
     question.languages.push({
       name: language.name,
+      languageId: language.languageId,
       statement: language.statement,
       options: language.options,
       answer: language.answer

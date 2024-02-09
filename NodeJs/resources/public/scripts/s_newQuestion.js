@@ -338,6 +338,46 @@ function showLangs() {
     }
 }
 
+
+function submitData() {
+    var question = {};
+    question.topic = document.getElementById('floatingTopic').value;
+
+    var data = catchFormData(MAIN_FORM_ID, OPTIONS_MAIN_FORM_NAME_ID);
+    data.name = MAIN_FORM_LANGUAGE;  
+    question['language_'+0] = data;
+
+    // Get the number of tabs
+    var tabs = document.getElementById('tabList').getElementsByTagName('li');
+    // Catch the data of each tab
+    for (var i = 1; i <= tabs.length; i++) {
+        var id = tabs[i-1].getElementsByTagName('a')[0].id.slice(7);
+        var content = document.getElementById('linkTab' + id).textContent;
+        var tabId = 'tab' + id;
+        var optionsName = OPTIONS_FORM_NAME_ID + id;
+        if (checkEmptyFields(tabId)) {
+            return;
+        }
+        var data = catchFormData(tabId, optionsName);
+
+        // Add content to the data as a new property called name
+        data.name = content;
+        question['language_'+i] = data;                
+    }       
+    // Reset each tab
+    for (var i = 1; i <= tabs.length; i++) {
+        var tabId = 'tab' + tabs[i-1].getElementsByTagName('a')[0].id.slice(7);
+        document.getElementById(tabId).reset();
+    }     
+
+    //console.log(question);
+    // Send the data
+    sendFormData(question);
+
+    // After sending the main form, clear the form
+    document.getElementById(MAIN_FORM_ID).reset();
+}
+
 /*********************
  ** Event Listeners **
  *********************/
@@ -542,45 +582,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 event.preventDefault();
                 return;
             }
-
-            var question = {};
-            question.topic = document.getElementById('floatingTopic').value;
-
-            var data = catchFormData(MAIN_FORM_ID, OPTIONS_MAIN_FORM_NAME_ID);
-            data.name = MAIN_FORM_LANGUAGE;        
-            question['language_'+0] = data;
-
-            // Get the number of tabs
-            var tabs = document.getElementById('tabList').getElementsByTagName('li');
-            // Catch the data of each tab
-            for (var i = 1; i <= tabs.length; i++) {
-                var id = tabs[i-1].getElementsByTagName('a')[0].id.slice(7);
-                var content = document.getElementById('linkTab' + id).textContent;
-                var tabId = 'tab' + id;
-                var optionsName = OPTIONS_FORM_NAME_ID + id;
-                if (checkEmptyFields(tabId)) {
-                    event.preventDefault();
-                    return;
-                }
-                var data = catchFormData(tabId, optionsName);
-
-                // Add content to the data as a new property called name
-                data.name = content;
-                question['language_'+i] = data;                
-
-            }       
-            // Reset each tab
-            for (var i = 1; i <= tabs.length; i++) {
-                var tabId = 'tab' + tabs[i-1].getElementsByTagName('a')[0].id.slice(7);
-                document.getElementById(tabId).reset();
-            }     
-
-            console.log(question);
-            // Send the data
-            sendFormData(question);
-
-            // After sending the main form, clear the form
-            document.getElementById(MAIN_FORM_ID).reset();
+            submitData();            
         }
     });
 

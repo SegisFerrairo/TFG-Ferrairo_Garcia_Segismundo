@@ -3,6 +3,8 @@
  ***************/
 let COUNTER_TOPIC = 0;
 var COUNTER_QUESTION = 1;
+var CHOOSEN_TOPIC = "Español";
+var CHOOSEN_TOPIC_ID = 0;
 
 /***********
  ** Utils **
@@ -30,21 +32,30 @@ function createNoTopicsElement(sidebar) {
     sidebar.appendChild(li);
 }
 
-function listData(data) {
+async function listData() {
     var sidebar = document.getElementById("sidebar");
+
+    // Get the questions from the DB
+    var data;
+    try {
+        data = await getAllDBData();
+    } catch (error) {
+        console.error('Error en la solicitud:', error.message);
+    }
+    
     // if data is empty, create a no-topics element
     if (data.length == 0) {        
         createNoTopicsElement(sidebar);
         return;
     }
 
-    // if two questions have the same topic, they will be grouped together
-    var topics = [];
-    data.forEach(function(question) {
-        if (!topics.includes(question.topic)) {
-            topics.push(question.topic);
-        }
-    });
+    // Get the topics from the DB
+    var topics;
+    try {
+        topics = await getTopics();
+    } catch (error) {
+        console.error('Error en la solicitud:', error.message);
+    }
 
     topics.forEach(function(topic) {
         var li_topic = document.createElement("li");
@@ -80,7 +91,7 @@ function listData(data) {
                 button.type = "button";
                 button.id = "button-" + question._id;
                 button.className = "btn btn-link";
-                button.textContent = question.languages[0].statement; 
+                button.textContent = question.languages[CHOOSEN_TOPIC_ID].statement; 
                 li.appendChild(button);
                 ul.appendChild(li);
 
@@ -100,14 +111,98 @@ function listData(data) {
 
 }
 
+// Add a new option for each language
+function addOptionNames(languages) {
+    var select = document.getElementById("choosenTopic");
+    languages.forEach(function(language) {
+        var option = document.createElement("option");
+        option.value = language;
+        option.textContent = language;
+        option.id = "option_" + language;
+        select.appendChild(option);
+    });
+}
+
+
+
 /*************
  ** Read DB **
  *************/
 
-// TODO: Optimize the following function
-// // Get just the topics and the first language of each topic
-// function getMainTopics() {
-//     fetch('/questionary/getMainQuestions', {
+// Get all the possible languages from the database
+function getLanguagesNames() {
+    fetch('/newQuestion/getLanguagesNames', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error al obtener los datos de la base de datos');
+        }
+        return response.json();
+    }
+    )
+    .then(responseData => {
+        console.debug('Respuesta del servidor:', responseData);
+        addOptionNames(responseData);
+        return responseData;
+    })
+    .catch(error => {
+        console.error('Error en la solicitud:', error.message);
+    }
+    );
+}
+
+
+async function getTopics() {
+    try {
+        const response = await fetch('/questionary/getTopics', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        
+        if (!response.ok) {
+            throw new Error('Error al obtener los datos de la base de datos');
+        }
+        
+        const responseData = await response.json();
+        console.debug('Respuesta del servidor:', responseData);
+        return responseData;
+    } catch (error) {
+        console.error('Error en la solicitud:', error.message);
+        throw error;
+    }
+}
+
+// Get the questions from the database
+async function getAllDBData() {
+    try {
+        const response = await fetch('/questionary/getAllQuestions', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al obtener los datos de la base de datos');
+        }
+
+        const responseData = await response.json();
+        console.debug('Respuesta del servidor:', responseData);
+        return responseData;
+    } catch (error) {
+        console.error('Error en la solicitud:', error.message);
+        throw error;
+    }
+}
+
+// function getAllDBData() {
+//     fetch('/questionary/getAllQuestions', {
 //         method: 'GET',
 //         headers: {
 //             'Content-Type': 'application/json'
@@ -120,37 +215,14 @@ function listData(data) {
 //         return response.json();
 //     })
 //     .then(responseData => {
-//         console.log('Respuesta del servidor:', responseData);
+//         console.debug('Respuesta del servidor:', responseData);
 //         listData(responseData);
+//         return;
 //     })
 //     .catch(error => {
 //         console.error('Error en la solicitud:', error.message);
 //     });
 // }
-
-// Get the questions from the database
-function getAllDBData() {
-    fetch('/questionary/getAllQuestions', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Error al obtener los datos de la base de datos');
-        }
-        return response.json();
-    })
-    .then(responseData => {
-        console.debug('Respuesta del servidor:', responseData);
-        listData(responseData);
-        return;
-    })
-    .catch(error => {
-        console.error('Error en la solicitud:', error.message);
-    });
-}
 
 function getQuestionById(questionId) {
     fetch('/questionary/getQuestionById:' + questionId, {
@@ -182,12 +254,12 @@ function addQuestion(question) {
     var div = document.createElement("div");
     div.id = "question" + COUNTER_QUESTION;
     var label = document.createElement("label");
-    label.textContent = COUNTER_QUESTION + ". " + question.languages[0].statement;
+    label.textContent = COUNTER_QUESTION + ". " + question.languages[CHOOSEN_TOPIC_ID].statement;
     div.appendChild(label);
     var ul = document.createElement("ul");
     // Distinct between single-choice and multiple-choice questions
-    question.languages[0].answer.length > 1 ? ul.className = "multiple-choice" : ul.className = "single-choice";
-    question.languages[0].options.forEach(function(option) {
+    question.languages[CHOOSEN_TOPIC_ID].answer.length > 1 ? ul.className = "multiple-choice" : ul.className = "single-choice";
+    question.languages[CHOOSEN_TOPIC_ID].options.forEach(function(option) {
         var li = document.createElement("li");
         var label = document.createElement("label");
         label.textContent = option;
@@ -200,9 +272,49 @@ function addQuestion(question) {
     COUNTER_QUESTION++;
 }
 
+// console.log() all the questions
+function printQuestions(questions) {
+    questions.forEach(function(question) {
+        console.log(question);
+    });
+}
+
+// Get all the questions with the given language.name
+function getQuestionsByLanguage(language) {
+    fetch('/questionary/getQuestionsByLanguage:' + language, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error al obtener los datos de la base de datos');
+        }
+        return response.json();
+    })
+    .then(responseData => {
+        console.debug('Respuesta del servidor:', responseData);
+        printQuestions(responseData);
+        return;
+    })
+    .catch(error => {
+        console.error('Error en la solicitud:', error.message);
+    });
+}
+
 /*********************
  ** Event Listeners **
  *********************/
+
+function changeTopicListener() {
+    document.getElementById("choosenTopic").addEventListener("change", function() {
+        CHOOSEN_TOPIC = this.value;
+        CHOOSEN_TOPIC_ID = this.selectedIndex;
+        console.log("CHOOSEN_TOPIC: " + CHOOSEN_TOPIC);
+        
+    });
+}
 
 function selectQuestionListener(button) {   
     button.addEventListener("click", function() {
@@ -228,5 +340,10 @@ function expandTopicListener(button, div) {
  ****************/
 
 document.addEventListener("DOMContentLoaded", function() {
-    getAllDBData();
+    getLanguagesNames();
+    //getAllDBData();
+    listData();
+    changeTopicListener();
+
+    getQuestionsByLanguage("Italiano");
 });

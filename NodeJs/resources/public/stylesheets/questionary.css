@@ -9,7 +9,7 @@
     border-right: 1px solid #dee2e6; /* Borde derecho de la barra lateral */
 }
 
-.sidebar>h5 {
+.sidebar>.sidebar-header {
     margin-top: 20px;
 }
 
