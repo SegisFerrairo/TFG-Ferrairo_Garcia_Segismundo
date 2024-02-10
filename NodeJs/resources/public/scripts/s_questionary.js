@@ -21,7 +21,7 @@ function disableQuestion(button) {
     }        
 }
 
-function createNoTopicsElement(sidebar) {
+function createNoTopicsElement(ul) {
     var li = document.createElement("li");
     li.className = "no-topics";
     var link = document.createElement("a");
@@ -29,30 +29,37 @@ function createNoTopicsElement(sidebar) {
     link.textContent = "No hay temas";
     li.appendChild(link);
     li.style.listStyleType = "none";
-    sidebar.appendChild(li);
+    ul.appendChild(li);
 }
 
 async function listData() {
     var sidebar = document.getElementById("sidebar");
 
+    // Remove all the topics from the sidebar except the first one
+    while (sidebar.getElementsByTagName("ul")[0].childElementCount > 1) {
+        sidebar.getElementsByTagName("ul")[0].removeChild(sidebar.getElementsByTagName("ul")[0].lastChild);
+    }
+
     // Get the questions from the DB
-    var data;
+    var data=[];
     try {
-        data = await getAllDBData();
+        data = await getQuestionsByLanguage(CHOOSEN_TOPIC);
     } catch (error) {
         console.error('Error en la solicitud:', error.message);
     }
-    
+
+    //console.log("data: ", data)
+
     // if data is empty, create a no-topics element
     if (data.length == 0) {        
-        createNoTopicsElement(sidebar);
+        createNoTopicsElement(sidebar.getElementsByTagName("ul")[0]);
         return;
     }
 
     // Get the topics from the DB
     var topics;
     try {
-        topics = await getTopics();
+        topics = await getTopicsByLanguage(CHOOSEN_TOPIC);
     } catch (error) {
         console.error('Error en la solicitud:', error.message);
     }
@@ -80,17 +87,18 @@ async function listData() {
         div.id = "topic" + COUNTER_TOPIC + "-collapse";
         var ul = document.createElement("ul");
         ul.className = "btn-toggle-nav list-unstyled fw-normal pb-1 small";
-        
+
         data.forEach(function(question) {
             if (question.topic == topic) {
                 var li = document.createElement("li");
                 li.className = "mb-1"
-                // li must have bullet points
                 li.style.listStyleType = "disc";
                 var button = document.createElement("button");
                 button.type = "button";
                 button.id = "button-" + question._id;
                 button.className = "btn btn-link";
+                // CHOOSEN_TOPIC_ID is the index of the language in the languages array
+                CHOOSEN_TOPIC_ID = question.languages.findIndex(language => language.name == CHOOSEN_TOPIC);
                 button.textContent = question.languages[CHOOSEN_TOPIC_ID].statement; 
                 li.appendChild(button);
                 ul.appendChild(li);
@@ -155,6 +163,28 @@ function getLanguagesNames() {
     );
 }
 
+async function getTopicsByLanguage(language) {
+    try {
+        const response = await fetch('/questionary/getTopicsByLanguage:' + encodeURIComponent(language), {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        
+        if (!response.ok) {
+            throw new Error('Error al obtener los datos de la base de datos');
+        }
+        
+        const responseData = await response.json();
+        console.debug('Respuesta del servidor:', responseData);
+        return responseData;
+    } catch (error) {
+        console.error('Error en la solicitud:', error.message);
+        throw error;
+    }
+}
+
 
 async function getTopics() {
     try {
@@ -200,29 +230,6 @@ async function getAllDBData() {
         throw error;
     }
 }
-
-// function getAllDBData() {
-//     fetch('/questionary/getAllQuestions', {
-//         method: 'GET',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         },
-//     })
-//     .then(response => {
-//         if (!response.ok) {
-//             throw new Error('Error al obtener los datos de la base de datos');
-//         }
-//         return response.json();
-//     })
-//     .then(responseData => {
-//         console.debug('Respuesta del servidor:', responseData);
-//         listData(responseData);
-//         return;
-//     })
-//     .catch(error => {
-//         console.error('Error en la solicitud:', error.message);
-//     });
-// }
 
 function getQuestionById(questionId) {
     fetch('/questionary/getQuestionById:' + questionId, {
@@ -280,27 +287,49 @@ function printQuestions(questions) {
 }
 
 // Get all the questions with the given language.name
-function getQuestionsByLanguage(language) {
-    fetch('/questionary/getQuestionsByLanguage:' + language, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
+// function getQuestionsByLanguage(language) {
+//     fetch('/questionary/getQuestionsByLanguage:' + language, {
+//         method: 'GET',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         }
+//     })
+//     .then(response => {
+//         if (!response.ok) {
+//             throw new Error('Error al obtener los datos de la base de datos');
+//         }
+//         return response.json();
+//     })
+//     .then(responseData => {
+//         console.debug('Respuesta del servidor:', responseData);
+//         printQuestions(responseData);
+//         return;
+//     })
+//     .catch(error => {
+//         console.error('Error en la solicitud:', error.message);
+//     });
+// }
+
+async function getQuestionsByLanguage(language) {
+    try {
+        const response = await fetch('/questionary/getQuestionsByLanguage:' + language, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
         if (!response.ok) {
             throw new Error('Error al obtener los datos de la base de datos');
         }
-        return response.json();
-    })
-    .then(responseData => {
+
+        const responseData = await response.json();
         console.debug('Respuesta del servidor:', responseData);
-        printQuestions(responseData);
-        return;
-    })
-    .catch(error => {
+        return responseData;
+    } catch (error) {
         console.error('Error en la solicitud:', error.message);
-    });
+        throw error;
+    }
 }
 
 /*********************
@@ -312,7 +341,7 @@ function changeTopicListener() {
         CHOOSEN_TOPIC = this.value;
         CHOOSEN_TOPIC_ID = this.selectedIndex;
         console.log("CHOOSEN_TOPIC: " + CHOOSEN_TOPIC);
-        
+        listData();        
     });
 }
 
@@ -345,5 +374,5 @@ document.addEventListener("DOMContentLoaded", function() {
     listData();
     changeTopicListener();
 
-    getQuestionsByLanguage("Italiano");
+    //getQuestionsByLanguage(CHOOSEN_TOPIC);
 });
