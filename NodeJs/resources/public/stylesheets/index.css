@@ -1,0 +1,46 @@
+body {
+    margin: 0;
+}
+
+.welcome {
+    position: relative;
+    padding-top: 90px; 
+}
+
+.welcome-bg {
+    position:absolute;
+    left:0;
+    right:0;
+    top:0;
+    bottom:0;
+    background:url("/images/TriangleLights_index.jpg");
+    background-size:cover;
+    z-index:1;
+    /* -webkit-filter: blur(10px);
+    -moz-filter: blur(10px);
+    -o-filter: blur(10px);
+    -ms-filter: blur(10px); */
+    filter: blur(4px);   
+}
+
+.welcome p {
+    margin-bottom: 40px;
+}
+
+.container {
+    position:relative;
+    z-index:2;
+    padding: 75px 0;
+}
+
+.container h1 {
+    margin-bottom: 40px;
+}
+
+.container h2 {
+    margin-bottom: 60px;
+}
+
+.reasons {
+    background-color: #f8f9fa;
+}

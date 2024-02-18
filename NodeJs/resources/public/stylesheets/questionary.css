@@ -80,3 +80,18 @@
 .btn-toggle[aria-expanded="true"]>.svg-container {
     transform: rotate(90deg);
 }
+
+.question {
+    position: relative;
+}
+
+/* .question:hover {
+    border: dotted #4582ec;
+} */
+
+.question-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+

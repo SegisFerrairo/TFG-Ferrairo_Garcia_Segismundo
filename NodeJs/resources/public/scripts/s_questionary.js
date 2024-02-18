@@ -11,13 +11,15 @@ var CHOOSEN_TOPIC_ID = 0;
  ***********/
 
 function disableQuestion(button) {
-    button.classList.toggle("disabled");
+    // button.classList.toggle("disabled");
     var li = button.parentElement;
-    if (button.classList.contains("disabled")) {            
-        li.style.listStyleType = "circle";
+    if (button.classList.contains("disabled")) {   
+        button.classList.remove("disabled");         
+        li.style.listStyleType = "disc";
     }
     else {
-        li.style.listStyleType = "disc";
+        button.classList.add("disabled");
+        li.style.listStyleType = "circle";
     }        
 }
 
@@ -131,6 +133,41 @@ function addOptionNames(languages) {
     });
 }
 
+
+function addQuestion(question) {
+    // add question to Folio
+    var folioBody = document.getElementById("folio").getElementsByClassName("folio-body")[0];
+
+    var div = document.createElement("div");
+    div.id = "question" + COUNTER_QUESTION;
+    div.className = "question";
+    var label = document.createElement("label");
+    label.textContent = COUNTER_QUESTION + ". " + question.languages[CHOOSEN_TOPIC_ID].statement;
+    div.appendChild(label);
+
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn-close question-close";
+    button.addEventListener("click", function() {     
+        removeQuestionListener(this.parentElement, question._id);
+    });
+    div.appendChild(button);
+
+    var ul = document.createElement("ul");
+    // Distinct between single-choice and multiple-choice questions
+    question.languages[CHOOSEN_TOPIC_ID].answer.length > 1 ? ul.className = "multiple-choice" : ul.className = "single-choice";
+    question.languages[CHOOSEN_TOPIC_ID].options.forEach(function(option) {
+        var li = document.createElement("li");
+        var label = document.createElement("label");
+        label.textContent = option;
+        li.appendChild(label);
+        ul.appendChild(li);
+    });
+    div.appendChild(ul);
+    folioBody.appendChild(div);
+
+    COUNTER_QUESTION++;
+}
 
 
 /*************
@@ -254,61 +291,6 @@ function getQuestionById(questionId) {
     });
 }
 
-function addQuestion(question) {
-    // add question to Folio
-    var folioBody = document.getElementById("folio").getElementsByClassName("folio-body")[0];
-
-    var div = document.createElement("div");
-    div.id = "question" + COUNTER_QUESTION;
-    var label = document.createElement("label");
-    label.textContent = COUNTER_QUESTION + ". " + question.languages[CHOOSEN_TOPIC_ID].statement;
-    div.appendChild(label);
-    var ul = document.createElement("ul");
-    // Distinct between single-choice and multiple-choice questions
-    question.languages[CHOOSEN_TOPIC_ID].answer.length > 1 ? ul.className = "multiple-choice" : ul.className = "single-choice";
-    question.languages[CHOOSEN_TOPIC_ID].options.forEach(function(option) {
-        var li = document.createElement("li");
-        var label = document.createElement("label");
-        label.textContent = option;
-        li.appendChild(label);
-        ul.appendChild(li);
-    });
-    div.appendChild(ul);
-    folioBody.appendChild(div);
-
-    COUNTER_QUESTION++;
-}
-
-// console.log() all the questions
-function printQuestions(questions) {
-    questions.forEach(function(question) {
-        console.log(question);
-    });
-}
-
-// Get all the questions with the given language.name
-// function getQuestionsByLanguage(language) {
-//     fetch('/questionary/getQuestionsByLanguage:' + language, {
-//         method: 'GET',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         }
-//     })
-//     .then(response => {
-//         if (!response.ok) {
-//             throw new Error('Error al obtener los datos de la base de datos');
-//         }
-//         return response.json();
-//     })
-//     .then(responseData => {
-//         console.debug('Respuesta del servidor:', responseData);
-//         printQuestions(responseData);
-//         return;
-//     })
-//     .catch(error => {
-//         console.error('Error en la solicitud:', error.message);
-//     });
-// }
 
 async function getQuestionsByLanguage(language) {
     try {
@@ -336,11 +318,15 @@ async function getQuestionsByLanguage(language) {
  ** Event Listeners **
  *********************/
 
+function removeQuestionListener(newQuestion, questionId) {
+    newQuestion.parentElement.removeChild(newQuestion);        
+    disableQuestion(document.getElementById("button-" + questionId));
+}
+
 function changeTopicListener() {
     document.getElementById("choosenTopic").addEventListener("change", function() {
         CHOOSEN_TOPIC = this.value;
         CHOOSEN_TOPIC_ID = this.selectedIndex;
-        console.log("CHOOSEN_TOPIC: " + CHOOSEN_TOPIC);
         listData();        
     });
 }
