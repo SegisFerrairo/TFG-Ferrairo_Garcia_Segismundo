@@ -1,3 +1,7 @@
+body {
+    margin-bottom: 70px; /* Añade un margen en la parte inferior del cuerpo para que el footer no se superponga al contenido */
+}
+
 footer {
     background-color: #f8f8f8; /* Color de fondo del footer */
     border-top: 1px solid #e7e7e7;    

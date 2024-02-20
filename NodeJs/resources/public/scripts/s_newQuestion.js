@@ -378,6 +378,36 @@ function submitData() {
     document.getElementById(MAIN_FORM_ID).reset();
 }
 
+function missingFieldsAlert(message) {
+    var alert = document.createElement('div');
+    alert.className = 'alert alert-dismissible alert-danger';
+    var button = document.createElement('button');
+    button.className = 'btn-close';
+    button.setAttribute('type', 'button');
+    button.setAttribute('data-bs-dismiss', 'alert');
+    alert.appendChild(button);
+    var strong = document.createElement('strong');
+    strong.textContent = 'Oh snap! ';
+    alert.appendChild(strong);
+    var u = document.createElement('u');
+    u.textContent = 'Rellena los campos vacíos';
+    alert.appendChild(u);
+    alert.appendChild(document.createTextNode(' y envia de nuevo el formulario.'));
+    // add the message to the alert
+    if (message != undefined) {
+        alert.appendChild(document.createElement('br'));
+        alert.appendChild(document.createTextNode(message));
+    }
+    // Insert as the first child of the body
+    document.body.insertBefore(alert, document.body.firstChild);
+
+
+    // Add the event listener to the button
+    button.addEventListener('click', function() {
+        alert.remove();
+    });
+}
+
 /*********************
  ** Event Listeners **
  *********************/
@@ -451,6 +481,12 @@ function howManyEmpty(formId, elementType) {
     for (var i = 0; i < options.length; i++) {
         if (options[i].checked == true || options[i].value == '') {
             counter++;
+            if (elementType == 'text') {
+                options[i].classList.add('is-invalid');
+            }
+        }
+        else {
+            options[i].classList.remove('is-invalid');
         }
     }
 
@@ -460,8 +496,14 @@ function howManyEmpty(formId, elementType) {
 function checkEmptyTopic() {
     var topic = document.getElementById('floatingTopic').value;
     if (topic == '') {
-        alert('Debes especificar un tema para la pregunta');
+        missingFieldsAlert('Debes especificar un tema para la pregunta.');
+        document.getElementById('floatingTopic').focus();
+        // Make field invalid to show the user that it is required
+        document.getElementById('floatingTopic').classList.add('is-invalid');
         return true;
+    }
+    else {
+        document.getElementById('floatingTopic').classList.remove('is-invalid');
     }
     return false;
 }
@@ -472,19 +514,25 @@ function checkEmptyFields(formId) {
 
     // Check if the statement field is empty
     if (form[formId+'_statement'].value == '') {
-        alert('Debes especificar un enunciado para la pregunta');
-        return true;
+        missingFieldsAlert('Debes especificar un enunciado para la pregunta.');
+        // Set the focus on the statement field
+        form[formId+'_statement'].focus();
+        // Make field invalid to show the user that it is required
+        form[formId+'_statement'].classList.add('is-invalid');
+    }
+    else {
+        form[formId+'_statement'].classList.remove('is-invalid');
     }
 
     // Check if there is at least one option with a value
     if (howManyEmpty(formId, OPTION_TYPE) == 0) {
-        alert('Debes marcar al menos una opción');
+        missingFieldsAlert('Debes marcar al menos una opción.');
         return true;
     }
 
     // Check if there is at least one option with a value
     if (howManyEmpty(formId, 'text') > 0) {
-        alert('Debes completar todas las opciones');
+        missingFieldsAlert('Debes completar todas las opciones.');
         return true;
     }
 
