@@ -10,6 +10,45 @@ var CHOOSEN_TOPIC_ID = 0;
  ** Utils **
  ***********/
 
+//  <li class="nav-item" role="presentation">
+//     <a id="linkTab2" class="nav-link" href="#" role="tab" aria-selected="false" tabindex="-1">
+//         Inglés
+//     </a>
+// </li>
+
+function addTopicsTab(topic) {
+    var topicsTabList = document.getElementById("topicsTabList");
+    // Get the inputs checked from the form choosenTopics and add them to the tabs
+    var inputs = document.getElementById("choosenTopics").getElementsByTagName("fieldset")[0].getElementsByTagName("input");
+    // Iterate over the inputs and add the tabs
+    // Console log type of inputs
+    console.log("Type ", typeof inputs);
+    console.log("Inputs ", inputs);
+    console.log("Inputs ", inputs.length);
+
+    for (var i = 0; i < inputs.length; i++) {
+        console.log("patatat");
+        console.log("Input ", inputs[i]);
+        if (inputs[i].checked) {
+            console.log("Id ", inputs[i].id);
+            var li = document.createElement("li");
+            li.className = "nav-item";
+            li.role = "presentation";
+            var a = document.createElement("a");
+            a.id = "linkTab" + COUNTER_TOPIC;
+            a.className = "nav-link";
+            a.href = "#";
+            a.role = "tab";
+            a.setAttribute("aria-selected", "false");
+            a.tabIndex = "-1";
+            a.textContent = topic;
+            li.appendChild(a);
+            topicsTabList.appendChild(li);
+            COUNTER_TOPIC++;
+        }
+    }
+}
+
 function disableQuestion(button) {
     // button.classList.toggle("disabled");
     var li = button.parentElement;
@@ -68,13 +107,13 @@ async function listData() {
 
     topics.forEach(function(topic) {
         var li_topic = document.createElement("li");
-        li_topic.id = "topic" + COUNTER_TOPIC;
+        li_topic.id = "topic-" + topic
         li_topic.className = "topic mb-1";
 
         var button = document.createElement("button");
         button.className = "btn btn-toggle align-items-center rounded collapsed";
         button.setAttribute("data-bs-toggle", "collapse");
-        button.setAttribute("data-bs-target", "#topic" + COUNTER_TOPIC + "-collapse");
+        button.setAttribute("data-bs-target", "#topic-" + topic + "-collapse");
         button.setAttribute("aria-expanded", "false");
 
         var span = document.createElement("span");
@@ -86,7 +125,7 @@ async function listData() {
 
         var div = document.createElement("div");
         div.className = "collapse topic-container";
-        div.id = "topic" + COUNTER_TOPIC + "-collapse";
+        div.id = "topic-" + topic + "-collapse";
         var ul = document.createElement("ul");
         ul.className = "btn-toggle-nav list-unstyled fw-normal pb-1 small";
 
@@ -115,24 +154,58 @@ async function listData() {
         sidebar.getElementsByTagName("ul")[0].appendChild(li_topic);
 
         expandTopicListener(button,div);
-
-        COUNTER_TOPIC++;
     });
 
 }
 
-// Add a new option for each language
+/* <div class="form-check form-switch">
+    <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
+    <label class="form-check-label" for="flexSwitchCheckDefault">Inglés</label>
+</div> */
+
 function addOptionNames(languages) {
-    var select = document.getElementById("choosenTopic");
+    var fieldset = document.getElementById("choosenTopics").getElementsByTagName("fieldset")[0];
+    // If Español is in the array, remove it
+    if (languages.includes("Español")) {
+        languages.splice(languages.indexOf("Español"), 1);
+
+        var div = document.createElement("div");
+        div.className = "form-check form-switch";
+        var input = document.createElement("input");
+        input.className = "form-check-input";
+        input.type = "checkbox";
+        input.id = "flexSwitchCheck-Español";
+        input.disabled = true;
+        input.checked = true;
+        addTopicsTab("Español");
+        div.appendChild(input);
+        var label = document.createElement("label");
+        label.className = "form-check-label";
+        label.htmlFor = "flexSwitchCheck-Español";
+        label.textContent = "Español";
+        div.appendChild(label);
+        fieldset.appendChild(div);
+
+        var div = document.createElement("div");
+        div.className = "dropdown-divider";
+        fieldset.appendChild(div);
+    }
     languages.forEach(function(language) {
-        var option = document.createElement("option");
-        option.value = language;
-        option.textContent = language;
-        option.id = "option_" + language;
-        select.appendChild(option);
+        var div = document.createElement("div");
+        div.className = "form-check form-switch";
+        var input = document.createElement("input");
+        input.className = "form-check-input";
+        input.type = "checkbox";
+        input.id = "flexSwitchCheck-" + language;
+        div.appendChild(input);
+        var label = document.createElement("label");
+        label.className = "form-check-label";
+        label.htmlFor = "flexSwitchCheck-" + language;
+        label.textContent = language;
+        div.appendChild(label);
+        fieldset.appendChild(div);
     });
 }
-
 
 function addQuestion(question) {
     // add question to Folio
@@ -323,11 +396,24 @@ function removeQuestionListener(newQuestion, questionId) {
     disableQuestion(document.getElementById("button-" + questionId));
 }
 
-function changeTopicListener() {
-    document.getElementById("choosenTopic").addEventListener("change", function() {
-        CHOOSEN_TOPIC = this.value;
-        CHOOSEN_TOPIC_ID = this.selectedIndex;
-        listData();        
+function dropdownTopicsListener() {
+    var li = document.getElementById("topicsDropdown");
+    li.addEventListener("click", function() {
+        var a = li.getElementsByClassName("dropdown-toggle")[0];
+        // Toggle the value of aria-expanded between true and false when clicked
+        a.setAttribute("aria-expanded", a.getAttribute("aria-expanded") === "false" ? "true" : "false");
+        // Toggle class show from a
+        a.classList.toggle("show");
+        var div = li.getElementsByClassName("dropdown-menu")[0];
+        // Toggle class show from the div element
+        div.classList.toggle("show");
+
+        // Prevent the dropdown from closing when clicking on the div
+        if (div.classList.contains("show")) {
+            div.addEventListener("click", function(event) {
+                event.stopPropagation();
+            });
+        }
     });
 }
 
@@ -349,6 +435,14 @@ function expandTopicListener(button, div) {
     });
 }
 
+function switchedTopicsListener(switchInput, topic) {
+    switchInput.addEventListener("change", function() {
+        // If the input is checked, add the tab
+        if (this.checked) {
+            addTopicsTab(topic);
+        }
+    });
+}
 
 /****************
  ** DOM Loaded **
@@ -358,7 +452,5 @@ document.addEventListener("DOMContentLoaded", function() {
     getLanguagesNames();
     //getAllDBData();
     listData();
-    changeTopicListener();
-
-    //getQuestionsByLanguage(CHOOSEN_TOPIC);
+    dropdownTopicsListener();
 });

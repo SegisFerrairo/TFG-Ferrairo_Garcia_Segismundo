@@ -387,7 +387,7 @@ function missingFieldsAlert(message) {
     button.setAttribute('data-bs-dismiss', 'alert');
     alert.appendChild(button);
     var strong = document.createElement('strong');
-    strong.textContent = 'Oh snap! ';
+    strong.textContent = 'Error! ';
     alert.appendChild(strong);
     var u = document.createElement('u');
     u.textContent = 'Rellena los campos vacíos';

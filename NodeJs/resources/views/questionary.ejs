@@ -15,8 +15,6 @@
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h5>Cuestiones</h5>
-                <select class="form-select" id="choosenTopic" aria-label="Choose available questionary language">
-                </select>
             </div>
             <div class="sidebar-content">
                 <ul class="list-unstyled ps-0">
@@ -28,24 +26,48 @@
 
         <!-- Contenido principal -->
         <div class="main-content">
-            <div class="folio-container" id="folio">
-                <div class="folio-header">
-                    <h3>Cuestionario</h1>
-                    <p>Criterios de correción: ----</p>
-                    <ul class="single-choice">
-                        <li>
-                            <label>Preguntas con solo una opción posible</label>
-                        </li>
-                    </ul>
-                    <ul class="multiple-choice">
-                        <li>
-                            <label>Preguntas con varias opciones posibles</label>
-                        </li>
-                    </ul>
+            <div class="nav nav-tabs">
+                <ul id="topicsTabList" class="nav" role="tablist">
+                    <li id="topicsDropdown" class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Idiomas</a>
+                        <div class="dropdown-menu">
+                          <h6 class="dropdown-header">Exportar a:</h6>
+                          <form id="choosenTopics">
+                              <fieldset class="form-group ms-3">
+                              </fieldset>
+                          </form>
+                        </div>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a id="linkTab1" class="nav-link active" href="#" role="tab" aria-selected="true">
+                            Español
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a id="linkTab2" class="nav-link" href="#" role="tab" aria-selected="false" tabindex="-1">
+                            Inglés
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div id="myTabContent" class="tab-content mt-2">
+                <div class="folio-container" id="folio">
+                    <div class="folio-header">
+                        <h3>Cuestionario</h1>
+                        <p>Criterios de correción: ----</p>
+                        <ul class="single-choice">
+                            <li>
+                                <label>Preguntas con solo una opción posible</label>
+                            </li>
+                        </ul>
+                        <ul class="multiple-choice">
+                            <li>
+                                <label>Preguntas con varias opciones posibles</label>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="folio-body"></div>
                 </div>
-
-
-                <div class="folio-body"></div>
             </div>
         </div>
 
