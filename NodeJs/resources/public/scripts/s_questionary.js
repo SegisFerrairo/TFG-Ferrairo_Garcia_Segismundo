@@ -1,52 +1,146 @@
 /***************
  ** Constants **
  ***************/
-let COUNTER_TOPIC = 0;
 var COUNTER_QUESTION = 1;
-var CHOOSEN_TOPIC = "Español";
-var CHOOSEN_TOPIC_ID = 0;
+var COUNTER_LANGUAGE = 0;
+var CHOOSEN_LANGUAGE = "Español";
+var CHOOSEN_LANGUAGE_ID = 0;
 
 /***********
  ** Utils **
  ***********/
 
-//  <li class="nav-item" role="presentation">
-//     <a id="linkTab2" class="nav-link" href="#" role="tab" aria-selected="false" tabindex="-1">
-//         Inglés
-//     </a>
-// </li>
+function openTab(linkTabId, folioId) {
+    var tabList = document.getElementById('languagesTabList');
 
-function addTopicsTab(topic) {
-    var topicsTabList = document.getElementById("topicsTabList");
-    // Get the inputs checked from the form choosenTopics and add them to the tabs
-    var inputs = document.getElementById("choosenTopics").getElementsByTagName("fieldset")[0].getElementsByTagName("input");
-    // Iterate over the inputs and add the tabs
-    // Console log type of inputs
-    console.log("Type ", typeof inputs);
-    console.log("Inputs ", inputs);
-    console.log("Inputs ", inputs.length);
+    var tabElement = document.getElementById(linkTabId);
 
-    for (var i = 0; i < inputs.length; i++) {
-        console.log("patatat");
-        console.log("Input ", inputs[i]);
-        if (inputs[i].checked) {
-            console.log("Id ", inputs[i].id);
-            var li = document.createElement("li");
-            li.className = "nav-item";
-            li.role = "presentation";
-            var a = document.createElement("a");
-            a.id = "linkTab" + COUNTER_TOPIC;
-            a.className = "nav-link";
-            a.href = "#";
-            a.role = "tab";
-            a.setAttribute("aria-selected", "false");
-            a.tabIndex = "-1";
-            a.textContent = topic;
-            li.appendChild(a);
-            topicsTabList.appendChild(li);
-            COUNTER_TOPIC++;
+    // If tabElement is null, it is because the close tab button has been clicked
+    if (tabElement != null) {
+        // Delete the 'active' class from all <a> elements inside tabList
+        var links = tabList.getElementsByTagName('a');
+        for (var i = 0; i < links.length; i++) {
+            links[i].classList.remove('active');
+            links[i].setAttribute('aria-selected', false);
+            links[i].setAttribute('tabindex', -1);
+        }
+
+        // Add the 'active' class to the clicked <a> element
+        tabElement.classList.add('active');
+        // Change the aria-selected property to true
+        tabElement.setAttribute('aria-selected', true);
+        // Remove the tabindex attribute
+        tabElement.removeAttribute('tabindex');
+
+        // Delete the 'active' class from all <div> elements inside myTabContent
+        var tabContents = document.getElementById('myTabContent').getElementsByClassName('tab-pane');
+        for (var i = 0; i < tabContents.length; i++) {
+            tabContents[i].classList.remove('active', 'show');
+        }
+
+        // Add the 'active' class to the clicked <div> element
+        var tabContent = document.getElementById(folioId);
+        tabContent.classList.add('active', 'show');
+
+
+    }
+}
+
+function removeLanguagesTab(topic) {
+    var languagesTabList = document.getElementById("languagesTabList");
+    var links = languagesTabList.getElementsByTagName("a");
+    for (var i = 0; i < links.length; i++) {
+        if (links[i].textContent == topic) {
+            var folioId = "folio_" + links[i].id.split("_")[1];
+            languagesTabList.removeChild(links[i].parentElement);
+
+            var folio = document.getElementById(folioId);
+            folio.parentElement.removeChild(folio);
         }
     }
+
+    // If the removed tab is the active one, set the first tab as active
+    if (links[1] != undefined) {
+        // From linkTab_0, just the number is needed for the folioId
+        var folioId = "folio_" + links[1].id.split("_")[1];
+        openTab(links[1].id, folioId);
+    }
+}
+
+function addLanguagesTab(topic) {
+    var languagesTabList = document.getElementById("languagesTabList");
+
+    var li = document.createElement("li");
+    li.className = "nav-item";
+    li.role = "presentation";
+    var a = document.createElement("a");
+    a.id = "linkTab_" + COUNTER_LANGUAGE;
+    a.className = "nav-link";
+    a.href = "#";
+    a.role = "tab";
+    a.setAttribute("aria-selected", "false");
+    a.tabIndex = "-1";
+    a.textContent = topic;
+
+    var folioId = "folio_" + COUNTER_LANGUAGE;
+
+    a.addEventListener("click", function() {openTab(a.id, folioId)});
+
+    li.appendChild(a);
+    languagesTabList.appendChild(li);
+
+    addFolio(folioId);
+
+    COUNTER_LANGUAGE++;
+}
+
+function addFolioHeader(folioHeaderId) {
+    var folioHeader = document.getElementById(folioHeaderId);
+
+    var h3 = document.createElement("h3");
+    h3.textContent = "Cuestionario";
+    folioHeader.appendChild(h3);
+
+    var p = document.createElement("p");
+    p.textContent = "Criterios de correción: ----";
+    folioHeader.appendChild(p);
+
+    var ul = document.createElement("ul");
+    ul.className = "single-choice";
+    var li = document.createElement("li");
+    var label = document.createElement("label");
+    label.textContent = "Preguntas con solo una opción posible";
+    li.appendChild(label);
+    ul.appendChild(li);
+    folioHeader.appendChild(ul);
+
+    var ul = document.createElement("ul");
+    ul.className = "multiple-choice";
+    var li = document.createElement("li");
+    var label = document.createElement("label");
+    label.textContent = "Preguntas con varias opciones posibles";
+    li.appendChild(label);
+    ul.appendChild(li);
+    folioHeader.appendChild(ul);
+}
+
+function addFolio(folioId) {
+    var myTabContent = document.getElementById("myTabContent");
+
+    var div = document.createElement("div");
+    div.id = folioId;
+    div.className = "tab-pane fade folio-container";
+    var divHeader = document.createElement("div");
+    divHeader.className = "folio-header";
+    divHeader.id = "header-" + folioId;    
+    div.appendChild(divHeader);
+
+    var divBody = document.createElement("div");
+    divBody.className = "folio-body";
+    div.appendChild(divBody);
+    myTabContent.appendChild(div);
+
+    addFolioHeader(divHeader.id);
 }
 
 function disableQuestion(button) {
@@ -73,7 +167,7 @@ function createNoTopicsElement(ul) {
     ul.appendChild(li);
 }
 
-async function listData() {
+async function listSidebarData() {
     var sidebar = document.getElementById("sidebar");
 
     // Remove all the topics from the sidebar except the first one
@@ -84,12 +178,10 @@ async function listData() {
     // Get the questions from the DB
     var data=[];
     try {
-        data = await getQuestionsByLanguage(CHOOSEN_TOPIC);
+        data = await getQuestionsByLanguage(CHOOSEN_LANGUAGE);
     } catch (error) {
         console.error('Error en la solicitud:', error.message);
     }
-
-    //console.log("data: ", data)
 
     // if data is empty, create a no-topics element
     if (data.length == 0) {        
@@ -100,7 +192,7 @@ async function listData() {
     // Get the topics from the DB
     var topics;
     try {
-        topics = await getTopicsByLanguage(CHOOSEN_TOPIC);
+        topics = await getTopicsByLanguage(CHOOSEN_LANGUAGE);
     } catch (error) {
         console.error('Error en la solicitud:', error.message);
     }
@@ -138,9 +230,9 @@ async function listData() {
                 button.type = "button";
                 button.id = "button-" + question._id;
                 button.className = "btn btn-link";
-                // CHOOSEN_TOPIC_ID is the index of the language in the languages array
-                CHOOSEN_TOPIC_ID = question.languages.findIndex(language => language.name == CHOOSEN_TOPIC);
-                button.textContent = question.languages[CHOOSEN_TOPIC_ID].statement; 
+                // CHOOSEN_LANGUAGE_ID is the index of the language in the languages array
+                CHOOSEN_LANGUAGE_ID = question.languages.findIndex(language => language.name == CHOOSEN_LANGUAGE);
+                button.textContent = question.languages[CHOOSEN_LANGUAGE_ID].statement; 
                 li.appendChild(button);
                 ul.appendChild(li);
 
@@ -158,13 +250,8 @@ async function listData() {
 
 }
 
-/* <div class="form-check form-switch">
-    <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
-    <label class="form-check-label" for="flexSwitchCheckDefault">Inglés</label>
-</div> */
-
 function addOptionNames(languages) {
-    var fieldset = document.getElementById("choosenTopics").getElementsByTagName("fieldset")[0];
+    var fieldset = document.getElementById("choosenLanguages").getElementsByTagName("fieldset")[0];
     // If Español is in the array, remove it
     if (languages.includes("Español")) {
         languages.splice(languages.indexOf("Español"), 1);
@@ -177,14 +264,17 @@ function addOptionNames(languages) {
         input.id = "flexSwitchCheck-Español";
         input.disabled = true;
         input.checked = true;
-        addTopicsTab("Español");
         div.appendChild(input);
+        
         var label = document.createElement("label");
         label.className = "form-check-label";
         label.htmlFor = "flexSwitchCheck-Español";
         label.textContent = "Español";
         div.appendChild(label);
         fieldset.appendChild(div);
+
+        addLanguagesTab("Español");
+        openTab("linkTab_0", "folio_0");
 
         var div = document.createElement("div");
         div.className = "dropdown-divider";
@@ -204,32 +294,33 @@ function addOptionNames(languages) {
         label.textContent = language;
         div.appendChild(label);
         fieldset.appendChild(div);
+        switchedLanguagesListener(input, language);
     });
 }
 
-function addQuestion(question) {
+function addQuestion(folioId, question) {
     // add question to Folio
-    var folioBody = document.getElementById("folio").getElementsByClassName("folio-body")[0];
+    var folioBody = document.getElementById(folioId).getElementsByClassName("folio-body")[0];
 
     var div = document.createElement("div");
-    div.id = "question" + COUNTER_QUESTION;
+    div.id = "question-" + question._id;
     div.className = "question";
     var label = document.createElement("label");
-    label.textContent = COUNTER_QUESTION + ". " + question.languages[CHOOSEN_TOPIC_ID].statement;
+    label.textContent = COUNTER_QUESTION + ". " + question.languages[CHOOSEN_LANGUAGE_ID].statement;
     div.appendChild(label);
 
     var button = document.createElement("button");
     button.type = "button";
     button.className = "btn-close question-close";
     button.addEventListener("click", function() {     
-        removeQuestionListener(this.parentElement, question._id);
+        removeQuestionListener(question._id);
     });
     div.appendChild(button);
 
     var ul = document.createElement("ul");
     // Distinct between single-choice and multiple-choice questions
-    question.languages[CHOOSEN_TOPIC_ID].answer.length > 1 ? ul.className = "multiple-choice" : ul.className = "single-choice";
-    question.languages[CHOOSEN_TOPIC_ID].options.forEach(function(option) {
+    question.languages[CHOOSEN_LANGUAGE_ID].answer.length > 1 ? ul.className = "multiple-choice" : ul.className = "single-choice";
+    question.languages[CHOOSEN_LANGUAGE_ID].options.forEach(function(option) {
         var li = document.createElement("li");
         var label = document.createElement("label");
         label.textContent = option;
@@ -241,6 +332,19 @@ function addQuestion(question) {
 
     COUNTER_QUESTION++;
 }
+
+function getSwitchedLanguages() {
+    var fieldset = document.getElementById("choosenLanguages").getElementsByTagName("fieldset")[0];
+    var inputs = fieldset.getElementsByTagName("input");
+    var languages = [];
+    for (var i = 0; i < inputs.length; i++) {
+        if (inputs[i].checked) {
+            languages.push(inputs[i].id.split("-")[1]);
+        }
+    }
+    return languages;
+}
+
 
 
 /*************
@@ -356,7 +460,21 @@ function getQuestionById(questionId) {
     })
     .then(responseData => {
         console.debug('Respuesta del servidor:', responseData);
-        addQuestion(responseData);
+        var switchedLanguages = getSwitchedLanguages();
+        // For each switched language, add the question to its corresponding folio. And if the question hasn't the language, don't add it
+        switchedLanguages.forEach(function(language) {
+            var languageId = responseData.languages.findIndex(lang => lang.name == language);
+            if (languageId != -1) {
+                CHOOSEN_LANGUAGE_ID = languageId;
+                // If the language is already in the tab list, add the question to the corresponding folio
+                var folioId = "folio_" + Array.from(document.getElementById("languagesTabList").getElementsByTagName("a")).find(link => link.textContent == language).id.split("_")[1];
+                addQuestion(folioId, responseData);
+            }
+            else {
+                console.log("La pregunta no está en el idioma " + language);
+                // TODO: Create an empty question
+            }
+        });
         return;
     })
     .catch(error => {
@@ -391,13 +509,8 @@ async function getQuestionsByLanguage(language) {
  ** Event Listeners **
  *********************/
 
-function removeQuestionListener(newQuestion, questionId) {
-    newQuestion.parentElement.removeChild(newQuestion);        
-    disableQuestion(document.getElementById("button-" + questionId));
-}
-
-function dropdownTopicsListener() {
-    var li = document.getElementById("topicsDropdown");
+function dropdownLanguagesListener() {
+    var li = document.getElementById("languagesDropdown");
     li.addEventListener("click", function() {
         var a = li.getElementsByClassName("dropdown-toggle")[0];
         // Toggle the value of aria-expanded between true and false when clicked
@@ -414,6 +527,38 @@ function dropdownTopicsListener() {
                 event.stopPropagation();
             });
         }
+
+        // Close the dropdown when clicking outside of it
+        document.addEventListener("click", function(event) {
+            if (!li.contains(event.target)) {
+                a.setAttribute("aria-expanded", "false");
+                a.classList.remove("show");
+                div.classList.remove("show");
+            }
+        });
+    });
+}
+
+function switchedLanguagesListener(switchInput, language) {
+    switchInput.addEventListener("change", function() {
+        // If the input is checked, add the tab
+        if (this.checked) {
+            addLanguagesTab(language);
+        }
+        // If the input is not checked, remove the tab
+        else {
+            removeLanguagesTab(language);
+        }
+    });
+}
+
+function expandTopicListener(button, div) {
+    button.addEventListener("click", function() {
+        // Toggle the value of aria-expanded between true and false when clicked
+        this.setAttribute("aria-expanded", this.getAttribute("aria-expanded") === "true" ? "false" : "true");            
+        
+        // Toggle class collapse from the div element, the next sibling of the button
+        div.classList.toggle("collapse");
     });
 }
 
@@ -425,23 +570,19 @@ function selectQuestionListener(button) {
     });
 }
 
-function expandTopicListener(button, div) {
-    button.addEventListener("click", function() {
-        // Toggle the value of aria-expanded between true and false when clicked
-        this.setAttribute("aria-expanded", this.getAttribute("aria-expanded") === "true" ? "false" : "true");            
-
-        // Toggle class collapse from the div element, the next sibling of the button
-        div.classList.toggle("collapse");
-    });
-}
-
-function switchedTopicsListener(switchInput, topic) {
-    switchInput.addEventListener("change", function() {
-        // If the input is checked, add the tab
-        if (this.checked) {
-            addTopicsTab(topic);
+function removeQuestionListener(questionId) {
+    // newQuestion.parentElement.removeChild(newQuestion);   
+    // Remove the question from each folio
+    var folios = document.getElementById("myTabContent").getElementsByClassName("folio-container");
+    for (var i = 0; i < folios.length; i++) {
+        var questions = folios[i].getElementsByClassName("question");
+        for (var j = 0; j < questions.length; j++) {
+            if (questions[j].id.split("-")[1] == questionId) {
+                questions[j].parentElement.removeChild(questions[j]);
+            }
         }
-    });
+    }     
+    disableQuestion(document.getElementById("button-" + questionId));
 }
 
 /****************
@@ -451,6 +592,6 @@ function switchedTopicsListener(switchInput, topic) {
 document.addEventListener("DOMContentLoaded", function() {
     getLanguagesNames();
     //getAllDBData();
-    listData();
-    dropdownTopicsListener();
+    listSidebarData();
+    dropdownLanguagesListener();
 });
