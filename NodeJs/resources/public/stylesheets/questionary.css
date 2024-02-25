@@ -37,11 +37,13 @@
 }
 
 .single-choice li {
-    list-style-image: url("/images/single-option.svg");
+    /* list-style-image: url("/images/single-option.svg"); */
+    list-style-image: url("/images/dash.svg");
 }
 
 .multiple-choice {
-    list-style-image: url("/images/multiple-option.svg");
+    /* list-style-image: url("/images/multiple-option.svg"); */
+    list-style-image: url("/images/empty_multiple-option.svg");
 }
 
 /*Make the class .topic-container vertical allign with its father*/
