@@ -11,7 +11,6 @@
             <%- include('_partials/_header.ejs'); -%>
         </header>     
 
-        <!-- Usando propiedades de Bootstrap, modifica el elemnto section para que todo su contenido tenga las letras de color blanco -->
         <div class="welcome">
             <div class="welcome-bg"></div>
             <div class="container text-center">
@@ -31,23 +30,56 @@
         </div>
 
         <div class="reasons">
-            <div class="container">
+          <div class="container-elements">
+            <div class="container-title">
               <h2 class="text-center">¿Por qué Crear Cuestionarios?</h2>
-              <div class="container-fluid row">
-                <div class="reason-image col-md-6">
-                  <img src="/images/Reason01_index.svg" alt="powerful builder" loading="lazy">
-                </div>
-                <div class="reason-content col-md-6">
-                  <h4>Herramienta Clave para Decisiones y Mejora</h4>
-                  <p>Crear cuestionarios es una herramienta poderosa para la toma de decisiones y la mejora continua.</p>
-                  <ul>
-                    <li>Los cuestionarios permiten obtener datos precisos y cuantificables que pueden ser utilizados para informar decisiones estratégicas y mejorar productos o servicios.</li>
-                    <li>Los resultados de las encuestas pueden empujar a los responsables de la toma de decisiones a realizar cambios significativos, basándose en datos concretos y respaldados por la experiencia del usuario.</li>
-                    <li>La facilidad para ser distribuidos fácilmente y a gran escala, los convierte en una herramienta eficiente y económica para la investigación y el feedback.</li>
-                  </ul>
-                </div>
-              </div>          
             </div>
+
+            <div class="container-fluid row">
+              <div class="reason-image col-md-6">
+                <img src="/images/Reason01_index.svg" alt="powerful builder">
+              </div>
+              <div class="reason-content col-md-6">
+                <h4>Herramienta Clave para Decisiones y Mejora</h4>
+                <p>La creación de cuestionarios aumenta la capacidad para la toma de decisiones y la mejora continua.</p>
+                <ul>
+                  <li>Los cuestionarios permiten obtener datos precisos y cuantificables que pueden ser utilizados para informar decisiones estratégicas y mejorar productos o servicios.</li>
+                  <li>Los resultados de las encuestas pueden empujar a los responsables de la toma de decisiones a realizar cambios significativos, basándose en datos concretos y respaldados por la experiencia del usuario.</li>
+                  <li>La facilidad para ser distribuidos fácilmente y a gran escala, los convierte en una herramienta eficiente y económica para la investigación y el feedback.</li>
+                </ul>
+              </div>
+            </div> 
+
+            <div class="container-fluid row reverse-flex-direction">
+              <div class="reason-image col-md-6">
+                <img src="/images/Reason02_index.svg" alt="improve understanding and retention">
+              </div>
+              <div class="reason-content col-md-6">
+                <h4>Comprensión y Retención</h4>
+                <p>Los cuestionarios son una herramienta efectiva para mejorar la comprensión y retención de la información.</p>
+                <ul>
+                  <li>Permiten a los estudiantes evaluar su comprensión de un tema y recordar la información de manera más efectiva.</li>
+                  <li>Los cuestionarios pueden ser utilizados para reforzar la memoria y mejorar la retención de la información, ya que los estudiantes deben recordar y aplicar lo que han aprendido.</li>
+                  <li>Ayudan a evaluar el progreso y el aprendizaje de los estudiantes, permitiendo a los profesores identificar áreas de mejora y proporcionar retroalimentación.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="container-fluid row">
+              <div class="reason-image col-md-6">
+                <img src="/images/Reason03_index.svg" alt="flexible and customizable">
+              </div>
+              <div class="reason-content col-md-6">
+                <h4>Flexible y Personalizable</h4>          
+                <p>Como una solución adaptable y configurable, los cuestionarios se ajustan a las necesidades particulares de los usuarios.</p>
+                <ul>
+                  <li>Pueden ser personalizados para adaptarse a las necesidades específicas de los usuarios, permitiendo a los profesores y estudiantes crear contenido que se adapte a sus necesidades.</li>
+                  <li>Ofrecer la oportunidad de evaluar una amplia gama de habilidades y conocimientos, desde la comprensión de un tema hasta la resolución de problemas y la toma de decisiones.</li>
+                  <li>Entre sus propósitos de uso, evalúan el progreso y el aprendizaje de los estudiantes, permitiendo a los profesores identificar áreas de mejora y proporcionar retroalimentación.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
 
         <%- include('_partials/_footer.ejs'); -%>

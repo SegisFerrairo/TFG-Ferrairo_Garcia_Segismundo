@@ -5,6 +5,7 @@ body {
 .welcome {
     position: relative;
     padding-top: 90px; 
+    min-height: 80vh;
 }
 
 .welcome-bg {
@@ -30,17 +31,33 @@ body {
 .container {
     position:relative;
     z-index:2;
-    padding: 75px 0;
+
+    max-width: 80%;
+    margin: 150px auto;
+}
+
+.container-title {
+    padding: 50px 0;
+    margin-bottom: 40px;
 }
 
 .container h1 {
     margin-bottom: 40px;
 }
 
-.container h2 {
-    margin-bottom: 60px;
+.reasons {
+    background-color: #f8f9fa;    
 }
 
-.reasons {
-    background-color: #f8f9fa;
+.container-elements {
+    max-width: 80%;
+    margin: 0 auto;
+}
+
+.row {
+   margin-bottom: 80px;
+}
+
+.reverse-flex-direction {
+    flex-direction: row-reverse;
 }
