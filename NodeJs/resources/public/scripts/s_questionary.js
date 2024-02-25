@@ -110,7 +110,9 @@ function addFolioHeader(folioHeaderId) {
     var li = document.createElement("li");
     var label = document.createElement("label");
     label.textContent = "Preguntas con solo una opción posible";
-    li.appendChild(label);
+    var small = document.createElement("small");
+    small.appendChild(label);
+    li.appendChild(small);
     ul.appendChild(li);
     folioHeader.appendChild(ul);
 
@@ -119,7 +121,9 @@ function addFolioHeader(folioHeaderId) {
     var li = document.createElement("li");
     var label = document.createElement("label");
     label.textContent = "Preguntas con varias opciones posibles";
-    li.appendChild(label);
+    var small = document.createElement("small");
+    small.appendChild(label);
+    li.appendChild(small);
     ul.appendChild(li);
     folioHeader.appendChild(ul);
 }
@@ -137,6 +141,10 @@ function addFolio(folioId) {
 
     var divBody = document.createElement("div");
     divBody.className = "folio-body";
+    var ol = document.createElement("ol");
+    ol.className = "list-group ms-3";
+    ol.id = "list-" + folioId;
+    divBody.appendChild(ol);
     div.appendChild(divBody);
     myTabContent.appendChild(div);
 
@@ -298,16 +306,37 @@ function addOptionNames(languages) {
     });
 }
 
-function addQuestion(folioId, question) {
-    // add question to Folio
-    var folioBody = document.getElementById(folioId).getElementsByClassName("folio-body")[0];
+function addEmptyQuestion(folioId, question, language) {
+    var folioList = document.getElementById("list-" + folioId);
 
-    var div = document.createElement("div");
-    div.id = "question-" + question._id;
-    div.className = "question";
+    var li_q = document.createElement("li");
+    li_q.id = "question-" + question._id;
+    li_q.className = "empty-question";
     var label = document.createElement("label");
-    label.textContent = COUNTER_QUESTION + ". " + question.languages[CHOOSEN_LANGUAGE_ID].statement;
-    div.appendChild(label);
+    label.textContent = "La pregunta no está en el idioma " + language;
+    li_q.appendChild(label);
+
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn-close question-close";
+    button.addEventListener("click", function() {
+        removeQuestionListener(question._id);
+    });
+    li_q.appendChild(button);
+
+    folioList.appendChild(li_q);
+}
+
+
+function addQuestion(folioId, question) {
+    var folioList = document.getElementById("list-" + folioId);
+
+    var li_q = document.createElement("li");
+    li_q.id = "question-" + question._id;
+    li_q.className = "question";
+    var label = document.createElement("label");
+    label.textContent = question.languages[CHOOSEN_LANGUAGE_ID].statement;
+    li_q.appendChild(label);
 
     var button = document.createElement("button");
     button.type = "button";
@@ -315,7 +344,7 @@ function addQuestion(folioId, question) {
     button.addEventListener("click", function() {     
         removeQuestionListener(question._id);
     });
-    div.appendChild(button);
+    li_q.appendChild(button);
 
     var ul = document.createElement("ul");
     // Distinct between single-choice and multiple-choice questions
@@ -327,10 +356,8 @@ function addQuestion(folioId, question) {
         li.appendChild(label);
         ul.appendChild(li);
     });
-    div.appendChild(ul);
-    folioBody.appendChild(div);
-
-    COUNTER_QUESTION++;
+    li_q.appendChild(ul);
+    folioList.appendChild(li_q);
 }
 
 function getSwitchedLanguages() {
@@ -464,15 +491,19 @@ function getQuestionById(questionId) {
         // For each switched language, add the question to its corresponding folio. And if the question hasn't the language, don't add it
         switchedLanguages.forEach(function(language) {
             var languageId = responseData.languages.findIndex(lang => lang.name == language);
+            var folioId = "folio_" + Array.from(document.getElementById("languagesTabList").getElementsByTagName("a")).find(link => link.textContent == language).id.split("_")[1];
             if (languageId != -1) {
                 CHOOSEN_LANGUAGE_ID = languageId;
                 // If the language is already in the tab list, add the question to the corresponding folio
-                var folioId = "folio_" + Array.from(document.getElementById("languagesTabList").getElementsByTagName("a")).find(link => link.textContent == language).id.split("_")[1];
-                addQuestion(folioId, responseData);
+                if (document.getElementById(folioId) != null) {
+                    addQuestion(folioId, responseData);
+                }
             }
             else {
                 console.log("La pregunta no está en el idioma " + language);
-                // TODO: Create an empty question
+                if (document.getElementById(folioId) != null) {
+                    addEmptyQuestion(folioId, responseData, language);
+                }
             }
         });
         return;
@@ -579,6 +610,13 @@ function removeQuestionListener(questionId) {
         for (var j = 0; j < questions.length; j++) {
             if (questions[j].id.split("-")[1] == questionId) {
                 questions[j].parentElement.removeChild(questions[j]);
+            }
+        }
+        // The same for empty questions
+        var emptyQuestions = folios[i].getElementsByClassName("empty-question");
+        for (var j = 0; j < emptyQuestions.length; j++) {
+            if (emptyQuestions[j].id.split("-")[1] == questionId) {
+                emptyQuestions[j].parentElement.removeChild(emptyQuestions[j]);
             }
         }
     }     

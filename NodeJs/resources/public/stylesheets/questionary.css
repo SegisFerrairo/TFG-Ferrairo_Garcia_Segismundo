@@ -29,11 +29,19 @@
 }
 
 .single-choice {
-    list-style-type: square;
+    list-style-type: none;
 }
 
 .multiple-choice {
-    list-style-type: disclosure-closed;
+    list-style-type: none;
+}
+
+.single-choice li {
+    list-style-image: url("/images/single-option.svg");
+}
+
+.multiple-choice {
+    list-style-image: url("/images/multiple-option.svg");
 }
 
 /*Make the class .topic-container vertical allign with its father*/
@@ -85,9 +93,10 @@
     position: relative;
 }
 
-/* .question:hover {
-    border: dotted #4582ec;
-} */
+.empty-question {
+    position: relative;
+    color: red;
+}
 
 .question-close {
     position: absolute;
