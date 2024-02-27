@@ -46,11 +46,11 @@ function openTab(linkTabId, folioId) {
     }
 }
 
-function removeLanguagesTab(topic) {
+function removeLanguagesTab(language) {
     var languagesTabList = document.getElementById("languagesTabList");
     var links = languagesTabList.getElementsByTagName("a");
     for (var i = 0; i < links.length; i++) {
-        if (links[i].textContent == topic) {
+        if (links[i].textContent == language) {
             var folioId = "folio_" + links[i].id.split("_")[1];
             languagesTabList.removeChild(links[i].parentElement);
 
@@ -67,7 +67,7 @@ function removeLanguagesTab(topic) {
     }
 }
 
-function addLanguagesTab(topic) {
+function addLanguagesTab(language) {
     var languagesTabList = document.getElementById("languagesTabList");
 
     var li = document.createElement("li");
@@ -80,7 +80,7 @@ function addLanguagesTab(topic) {
     a.role = "tab";
     a.setAttribute("aria-selected", "false");
     a.tabIndex = "-1";
-    a.textContent = topic;
+    a.textContent = language;
 
     var folioId = "folio_" + COUNTER_LANGUAGE;
 
@@ -89,7 +89,7 @@ function addLanguagesTab(topic) {
     li.appendChild(a);
     languagesTabList.appendChild(li);
 
-    addFolio(folioId);
+    addFolio(folioId, language);
 
     COUNTER_LANGUAGE++;
 }
@@ -128,12 +128,14 @@ function addFolioHeader(folioHeaderId) {
     folioHeader.appendChild(ul);
 }
 
-function addFolio(folioId) {
+function addFolio(folioId, language) {
     var myTabContent = document.getElementById("myTabContent");
 
     var div = document.createElement("div");
     div.id = folioId;
     div.className = "tab-pane fade folio-container";
+    // Add language as a class to the div
+    div.classList.add("language-"+language);
     var divHeader = document.createElement("div");
     divHeader.className = "folio-header";
     divHeader.id = "header-" + folioId;    
@@ -311,7 +313,7 @@ function addEmptyQuestion(folioId, question, language) {
 
     var li_q = document.createElement("li");
     li_q.id = "question-" + question._id;
-    li_q.className = "empty-question";
+    li_q.className = "question empty-question";
     var label = document.createElement("label");
     label.textContent = "La pregunta no está en el idioma " + language;
     li_q.appendChild(label);
@@ -326,7 +328,6 @@ function addEmptyQuestion(folioId, question, language) {
 
     folioList.appendChild(li_q);
 }
-
 
 function addQuestion(folioId, question) {
     var folioList = document.getElementById("list-" + folioId);
@@ -370,6 +371,148 @@ function getSwitchedLanguages() {
         }
     }
     return languages;
+}
+
+async function distributeQuestionInFolios(questionId) {
+    var question = {};
+    try {
+        question = await getQuestionById(questionId);
+    }
+    catch (error) {
+        console.error('Error en la solicitud:', error.message);
+    }
+
+    var switchedLanguages = getSwitchedLanguages();
+    // For each switched language, add the question to its corresponding folio. And if the question hasn't the language, don't add it
+    switchedLanguages.forEach(function(language) {
+        var languageId = question.languages.findIndex(lang => lang.name == language);
+        var folioId = "folio_" + Array.from(document.getElementById("languagesTabList").getElementsByTagName("a")).find(link => link.textContent == language).id.split("_")[1];
+        if (languageId != -1) {
+            CHOOSEN_LANGUAGE_ID = languageId;
+            // If the language is already in the tab list, add the question to the corresponding folio
+            if (document.getElementById(folioId) != null) {
+                addQuestion(folioId, question);
+            }
+        }
+        else {
+            console.log("La pregunta no está en el idioma " + language);
+            if (document.getElementById(folioId) != null) {
+                addEmptyQuestion(folioId, question, language);
+            }
+        }
+    });
+}
+
+function getNotEmptyFoliosIds() {
+    var languages = getSwitchedLanguages();
+    var folios = [];
+    languages.forEach(function(language) {
+        folios.push(document.getElementById("myTabContent").getElementsByClassName("language-" + language)[0].id);
+    });
+
+    return folios;
+}
+
+function catchQuestionary(folioId) {
+    var questions = document.getElementById("list-" + folioId).getElementsByClassName("question");
+    // Get the language-<language> class from the folio
+    var languageName = Array.from(document.getElementById(folioId).classList).find(cl => cl.startsWith("language-")).split("-")[1];
+        
+    var questionsData = [];
+
+    for (var i = 0; i < questions.length; i++) {
+        var question = {};
+        
+        if (questions[i].classList.contains("empty-question")) {
+            // Create an empty question
+            question[languageName] = {
+                statement: "La pregunta no está en el idioma " + languageName,
+                options: [],
+                answer: []
+            };
+            questionsData.push(question);
+        }
+        else {
+            var questionId = questions[i].id.split("-")[1];
+
+            question[languageName] = {
+                statement: "process-"+questionId,
+                options: [],
+                answer: []
+            };
+            questionsData.push(question);
+        }
+    }
+
+    return questionsData;
+}
+
+async function processData(questionsData) {
+    for (var i = 0; i < questionsData.length; i++) {
+        var languageName = Object.keys(questionsData[i])[0];
+        if (questionsData[i][languageName].statement.startsWith("process-")) {
+            var question = {};
+            var questionId = questionsData[i][languageName].statement.split("-")[1];
+            try {
+                question = await getQuestionById(questionId);
+            }
+            catch (error) {
+                console.error('Error en la solicitud:', error.message);
+            }
+
+            CHOOSEN_LANGUAGE_ID = question.languages.findIndex(language => language.name == languageName);
+            // Add the processed question to the questionsData in the same position
+            questionsData[i][languageName].statement = question.languages[CHOOSEN_LANGUAGE_ID].statement;
+            questionsData[i][languageName].options = question.languages[CHOOSEN_LANGUAGE_ID].options;
+            questionsData[i][languageName].answer = question.languages[CHOOSEN_LANGUAGE_ID].answer;
+        }
+    }
+    return questionsData;
+}
+
+// function exportQuestionary(questions) {
+//     // var data = new Blob([questions], {type: 'application/json'});
+//     var data = new Blob([JSON.stringify(questions, null, 2)], {type: 'application/json'});
+//     var url = window.URL.createObjectURL(data);
+//     var a = document.createElement("a");
+//     a.href = url;
+//     // Get the name of the language from the first question
+//     var language = Object.keys(questions[0])[0];
+//     a.download = language+"_cuestionario.json";
+//     a.click();
+//     window.URL.revokeObjectURL(url);
+// }
+
+function exportQuestionaryLaTex(questions) {
+    var texContent = generateLaTexContent(questions);
+    var data = new Blob([texContent], {type: 'application/x-latex'});
+    var url = window.URL.createObjectURL(data);
+    var a = document.createElement("a");
+    a.href = url;
+    var language = Object.keys(questions[0])[0];
+    a.download = language + "_cuestionario.tex";
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+function generateLaTexContent(questions) {
+    var texCode = "\\documentclass{article}\n";
+    texCode += "\\begin{document}\n\n";
+    texCode += "\\section*{Preguntas}\n\n";
+    texCode += "\\begin{tabular}{|p{6cm}|p{6cm}|p{4cm}|}\n";
+    texCode += "\\hline\n";
+    texCode += "\\textbf{Pregunta} & \\textbf{Opciones} & \\textbf{Respuesta} \\\\ \n";
+    texCode += "\\hline\n";
+    questions.forEach(function(question) {
+        var statement = question[Object.keys(question)[0]].statement;
+        var options = question[Object.keys(question)[0]].options.join(", ");
+        var answer = question[Object.keys(question)[0]].answer.join(", ");
+        texCode += statement + " & " + options + " & " + answer + " \\\\ \n";
+        texCode += "\\hline\n";
+    });
+    texCode += "\\end{tabular}\n\n";
+    texCode += "\\end{document}\n";
+    return texCode;
 }
 
 
@@ -426,7 +569,6 @@ async function getTopicsByLanguage(language) {
     }
 }
 
-
 async function getTopics() {
     try {
         const response = await fetch('/questionary/getTopics', {
@@ -472,47 +614,52 @@ async function getAllDBData() {
     }
 }
 
-function getQuestionById(questionId) {
-    fetch('/questionary/getQuestionById:' + questionId, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
+
+
+// function getQuestionById(questionId) {
+//     fetch('/questionary/getQuestionById:' + questionId, {
+//         method: 'GET',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         }
+//     })
+//     .then(response => {
+//         if (!response.ok) {
+//             throw new Error('Error al obtener los datos de la base de datos');
+//         }
+//         return response.json();
+//     })
+//     .then(responseData => {
+//         console.debug('Respuesta del servidor:', responseData);
+//         distributeQuestionInFolios(responseData);
+//         return;
+//     })
+//     .catch(error => {
+//         console.error('Error en la solicitud:', error.message);
+//     });
+// }
+
+async function getQuestionById(questionId) {
+    try {
+        const response = await fetch('/questionary/getQuestionById:' + questionId, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
         if (!response.ok) {
             throw new Error('Error al obtener los datos de la base de datos');
         }
-        return response.json();
-    })
-    .then(responseData => {
-        console.debug('Respuesta del servidor:', responseData);
-        var switchedLanguages = getSwitchedLanguages();
-        // For each switched language, add the question to its corresponding folio. And if the question hasn't the language, don't add it
-        switchedLanguages.forEach(function(language) {
-            var languageId = responseData.languages.findIndex(lang => lang.name == language);
-            var folioId = "folio_" + Array.from(document.getElementById("languagesTabList").getElementsByTagName("a")).find(link => link.textContent == language).id.split("_")[1];
-            if (languageId != -1) {
-                CHOOSEN_LANGUAGE_ID = languageId;
-                // If the language is already in the tab list, add the question to the corresponding folio
-                if (document.getElementById(folioId) != null) {
-                    addQuestion(folioId, responseData);
-                }
-            }
-            else {
-                console.log("La pregunta no está en el idioma " + language);
-                if (document.getElementById(folioId) != null) {
-                    addEmptyQuestion(folioId, responseData, language);
-                }
-            }
-        });
-        return;
-    })
-    .catch(error => {
-        console.error('Error en la solicitud:', error.message);
-    });
-}
 
+        const responseData = await response.json();
+        console.debug('Respuesta del servidor:', responseData);
+        return responseData;
+    } catch (error) {
+        console.error('Error en la solicitud:', error.message);
+        throw error;
+    }
+}
 
 async function getQuestionsByLanguage(language) {
     try {
@@ -596,8 +743,8 @@ function expandTopicListener(button, div) {
 function selectQuestionListener(button) {   
     button.addEventListener("click", function() {
         disableQuestion(button);
-        var questionId = button.id.split("-")[1];
-        getQuestionById(questionId);        
+        var questionId = button.id.split("-")[1];      
+        distributeQuestionInFolios(questionId);
     });
 }
 
@@ -623,6 +770,24 @@ function removeQuestionListener(questionId) {
     disableQuestion(document.getElementById("button-" + questionId));
 }
 
+
+function exportQuestionaryListener() {
+    var button = document.getElementById("exportQuestionary");
+    button.addEventListener("click", function() {
+        var notEmptyFolios = getNotEmptyFoliosIds();
+        notEmptyFolios.forEach(async function(folioId) {
+            var questions = {};
+            try {
+                questions = await processData(catchQuestionary(folioId));
+            }
+            catch (error) {
+                console.error('Error en la solicitud:', error.message);
+            }
+            exportQuestionaryLaTex(questions);
+        });
+    });
+}
+
 /****************
  ** DOM Loaded **
  ****************/
@@ -632,4 +797,5 @@ document.addEventListener("DOMContentLoaded", function() {
     //getAllDBData();
     listSidebarData();
     dropdownLanguagesListener();
+    exportQuestionaryListener();
 });
