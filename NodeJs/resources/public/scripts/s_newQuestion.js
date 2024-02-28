@@ -17,7 +17,7 @@ function addTab() {
     // Obtain the name of the new tab
     // If the input just contains spaces, show an alert
     if (document.getElementById('newTabName').value.trim() == '') {
-        alert('Debes especificar un nombre para la nueva pestaña');
+        missingFieldsAlert('Debes especificar un nombre para la nueva pestaña');
         // Reset the input
         document.getElementById('newTabName').value='';
         return;

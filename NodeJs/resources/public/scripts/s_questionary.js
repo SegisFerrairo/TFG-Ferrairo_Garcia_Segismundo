@@ -239,7 +239,7 @@ async function listSidebarData() {
                 var button = document.createElement("button");
                 button.type = "button";
                 button.id = "button-" + question._id;
-                button.className = "btn btn-link";
+                button.className = "btn btn-link cut-text";
                 // CHOOSEN_LANGUAGE_ID is the index of the language in the languages array
                 CHOOSEN_LANGUAGE_ID = question.languages.findIndex(language => language.name == CHOOSEN_LANGUAGE);
                 button.textContent = question.languages[CHOOSEN_LANGUAGE_ID].statement; 
@@ -407,7 +407,10 @@ function getNotEmptyFoliosIds() {
     var languages = getSwitchedLanguages();
     var folios = [];
     languages.forEach(function(language) {
-        folios.push(document.getElementById("myTabContent").getElementsByClassName("language-" + language)[0].id);
+        var folio = document.getElementById("myTabContent").getElementsByClassName("language-" + language)[0];
+        if (folio.getElementsByClassName("question").length > 0) {
+            folios.push(folio.id);
+        }
     });
 
     return folios;
@@ -469,19 +472,6 @@ async function processData(questionsData) {
     }
     return questionsData;
 }
-
-// function exportQuestionary(questions) {
-//     // var data = new Blob([questions], {type: 'application/json'});
-//     var data = new Blob([JSON.stringify(questions, null, 2)], {type: 'application/json'});
-//     var url = window.URL.createObjectURL(data);
-//     var a = document.createElement("a");
-//     a.href = url;
-//     // Get the name of the language from the first question
-//     var language = Object.keys(questions[0])[0];
-//     a.download = language+"_cuestionario.json";
-//     a.click();
-//     window.URL.revokeObjectURL(url);
-// }
 
 function exportQuestionaryLaTex(questions) {
     var texContent = generateLaTexContent(questions);

@@ -1,38 +1,15 @@
 function lastClicked() {
     var navLinks = document.getElementById('navbarColor01').getElementsByClassName('nav-link');
 
-    for (var i = 0; i < navLinks.length; i++) {
-        navLinks[i].addEventListener('click', function() {
-            var current = document.getElementsByClassName('active');
-            if (current.length > 0) {
-                current[0].classList.remove('active');
-            }
-            this.classList.add('active');
-            // Maintain active class when changing pages
-            localStorage.setItem('activeLink', this.getAttribute('href'));
-        });
-    }
-
-    // When the user refreshes the page, maintain active class on a nav-link
-    var activeLink = localStorage.getItem('activeLink');
+    // Check if the url matches a nav-link and add active class
     var currentPage = window.location.pathname;
-    if (activeLink) {
-        if (currentPage == '/' || currentPage == '/index.html') {
+    for (var i = 0; i < navLinks.length; i++) {
+        if (navLinks[i].getAttribute('href') == currentPage) {
             var current = document.getElementsByClassName('active');
             if (current.length > 0) {
                 current[0].classList.remove('active');
             }
-        }
-        else {
-            for (var i = 0; i < navLinks.length; i++) {
-                if (navLinks[i].getAttribute('href') == activeLink) {
-                    var current = document.getElementsByClassName('active');
-                    if (current.length > 0) {
-                        current[0].classList.remove('active');
-                    }
-                    navLinks[i].classList.add('active');
-                }
-            }
+            navLinks[i].classList.add('active');
         }
     }
 }

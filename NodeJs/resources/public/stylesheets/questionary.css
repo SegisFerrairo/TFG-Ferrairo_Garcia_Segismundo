@@ -111,4 +111,15 @@
     margin: 0 auto;
 }
 
+.cut-text { 
+    text-overflow: ellipsis;
+    overflow: hidden; 
+    width: 160px; 
+    white-space: nowrap;
+    padding: 2px;
+}
 
+.cut-text:hover {
+    white-space: unset;
+    text-overflow: unset;
+}
