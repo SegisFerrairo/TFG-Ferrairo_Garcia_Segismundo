@@ -1,15 +1,18 @@
 const express = require('express');
 const path = require('path');
+const translate = require('@iamtraction/google-translate');
+
 //var Question = require('./db/database');
 // ./db/database.js has multiple exports, so we need to import the whole module
 var database = require('./db/database');
 var Question = database.Question;
-var connectToDatabase = database.connectToDatabase;
-var closeConnection = database.closeConnection;
+// var connectToDatabase = database.connectToDatabase;
+// var closeConnection = database.closeConnection;
 
 var index = require('./routes/index');
 var questionary = require('./routes/questionary');
 var newQuestion = require('./routes/newQuestion');
+var test = require('./routes/test');
 var error404 = require('./routes/404');
 
 var app = express();
@@ -24,11 +27,9 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use('/', index);
 app.use('/', questionary);
 app.use('/', newQuestion);
+app.use('/', test);
 
 app.use(express.json());
-
-// Connect to the database
-//connectToDatabase();
 
 // Get all the questions with the given language.name
 app.get('/questionary/getQuestionsByLanguage:languageName', async(req, res) => {
@@ -127,6 +128,16 @@ app.post('/newQuestion/addQuestion', function (req, res) {
   });
 });
 
+app.post('/translate', async(req, res) => {
+  try {
+    const data = req.body;
+    const translation = await translate(data.text, { from: data.from, to: data.to });
+    res.status(200).json(translation);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Redirect to 404 page if no route is found
 app.use('*', error404);
 
@@ -134,10 +145,3 @@ app.listen(app.get("port"), function(){
   var url = "http://localhost:"+app.get("port");
   console.log("La aplicación está escuchando en "+url);
 });
-
-
-
-// const question = await Question.findOne({ _id: ObjectId('65b95497cd0b61412dffbaea') })
-
-// const question = await Question.findOne({ _id: '65b95497cd0b61412dffbaea' })
-

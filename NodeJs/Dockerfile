@@ -9,6 +9,8 @@ COPY ./resources/package*.json /NodeApp/
 
 # Instala las dependencias
 RUN npm install -g nodemon
+RUN npm install --save @iamtraction/google-translate
+
 RUN npm install
 
 # Expone el puerto 3000

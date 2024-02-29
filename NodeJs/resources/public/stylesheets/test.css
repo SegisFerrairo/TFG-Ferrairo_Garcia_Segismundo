@@ -1,0 +1,13 @@
+.translate {
+    width: 37px;
+    height: 37px;
+    border: none;
+    cursor: pointer;
+  }
+  
+.translate::before {
+    content: url("/images/translate.svg");
+    display: flex; /* make the div a flex container */
+    justify-content: center; /* horizontally center */
+    filter: invert(100%);
+}
