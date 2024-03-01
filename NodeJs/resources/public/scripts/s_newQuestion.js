@@ -1,6 +1,9 @@
 /***************
  ** Constants **
  ***************/
+var langs_supported;
+var FROM = 'es';
+
 let COUNTER_TAB = 1;
 let DEFAULT_NUM_OPTIONS = 2;
 let MAIN_FORM_ID = 'mainform';
@@ -13,17 +16,66 @@ var OPTION_TYPE = 'radio';
  ** Utils **
  ***********/
 
-function addTab() {
+function getTabLinks() {
+    var tabs = document.getElementById('tabList').getElementsByTagName('li');
+    return tabs;
+}
+
+
+function addTab() {    
     // Obtain the name of the new tab
     // If the input just contains spaces, show an alert
     if (document.getElementById('newTabName').value.trim() == '') {
-        missingFieldsAlert('Debes especificar un nombre para la nueva pestaña');
+        missingFieldsAlert('Idioma inválido. Debes especificar un idioma para la pestaña.');
         // Reset the input
         document.getElementById('newTabName').value='';
         return;
     }
 
     var newTabName = document.getElementById('newTabName').value;
+    // Reset the input
+    document.getElementById('newTabName').value='';
+    
+    var isSupported = false;
+    var langCode = '';
+    for (var key in langs_supported) {
+        if (langs_supported[key] == newTabName) {
+            langCode = key;
+            isSupported = true;
+            break;
+        }
+    }
+
+    // Check if the newTabName is in the supported languages
+    if (langs_supported[newTabName] == undefined) {
+        if (!isSupported) {            
+            missingFieldsAlert('El idioma no está soportado.');
+            return;
+        }
+    }
+    else {
+        // Replace the newTabName with the language code
+        newTabName = langs_supported[newTabName];        
+    }
+
+    // Check if the tab name already exists in the tab list
+    var tabs = getTabLinks();
+    for (var i = 0; i < tabs.length; i++) {
+        if (tabs[i].getElementsByTagName('a')[0].textContent == newTabName) {
+            missingFieldsAlert('El idioma ya existe.');
+            return;
+        }
+    }
+    
+    if (document.getElementById('myTabContent').hasChildNodes() == false) {
+        var translate_container = document.getElementsByClassName("translate-container")[0];
+        var children = translate_container.children;
+        for (var i = 0; i < children.length; i++) {
+            if (children[i].id != 'middle-space') {
+                children[i].classList.toggle('hidden');
+            }
+        }
+    }
 
     // Reset the input
     document.getElementById('newTabName').value='';
@@ -37,8 +89,8 @@ function addTab() {
     // Create a new <a> element
     var newLink = document.createElement('a');
     newLink.id = nextLinkTab;
-    newLink.classList.add('nav-link');
-    newLink.href = "#";                
+    // newLink.classList.add('nav-link');
+    newLink.className = "nav-link";
     newLink.textContent = newTabName;
     newLink.setAttribute('role', 'tab');
 
@@ -54,7 +106,8 @@ function addTab() {
     
 
     var linkContainer = document.createElement('li');
-    linkContainer.classList.add('nav-item');
+    linkContainer.id = langCode;
+    linkContainer.className = 'nav-item';
     linkContainer.setAttribute('role', 'presentation');
     
     newLink.appendChild(newClose);
@@ -110,6 +163,16 @@ function closeTab(nextLinkTab, nextTabId) {
 
     tabLink.remove();
     tab.remove();
+
+    if (document.getElementById('myTabContent').hasChildNodes() == false) {
+        var translate_container = document.getElementsByClassName("translate-container")[0];
+        var children = translate_container.children;
+        for (var i = 0; i < children.length; i++) {
+            if (children[i].id != 'middle-space') {
+                children[i].classList.toggle('hidden');
+            }
+        }
+    }
 }
 
 function howManyOptions(formId) {
@@ -236,7 +299,7 @@ function changeOptionType(value) {
     }
 
     // Change the type of the options of the tabs
-    var tabs = document.getElementById('tabList').getElementsByTagName('li');
+    var tabs = getTabLinks();
     for (var i = 0; i < tabs.length; i++) {
         var tabId = 'tab' + tabs[i].getElementsByTagName('a')[0].id.slice(7);
         var options = document.getElementById(tabId).getElementsByTagName('input');
@@ -327,14 +390,23 @@ function addForm(formId, optionsName) {
 function showLangs() { 
     if (document.getElementById('right-space').classList.contains('hidden')) {
         document.getElementById('languages').innerHTML="Ocultar idiomas";
-
         document.getElementById('right-space').classList.remove('hidden');
 
     }
     else {                
         document.getElementById('languages').innerHTML="Mostrar idiomas";                    
-
         document.getElementById('right-space').classList.add('hidden'); 
+    }
+
+    // Only if there are children in id="myTabContent"
+    if (document.getElementById('myTabContent').hasChildNodes() == true) {
+        var translate_container = document.getElementsByClassName("translate-container")[0];
+        var children = translate_container.children;
+        for (var i = 0; i < children.length; i++) {
+            if (children[i].id != 'middle-space') {
+                children[i].classList.toggle('hidden');
+            }
+        }
     }
 }
 
@@ -348,14 +420,14 @@ function submitData() {
     question['language_'+0] = data;
 
     // Get the number of tabs
-    var tabs = document.getElementById('tabList').getElementsByTagName('li');
+    var tabs = getTabLinks();
     // Catch the data of each tab
     for (var i = 1; i <= tabs.length; i++) {
         var id = tabs[i-1].getElementsByTagName('a')[0].id.slice(7);
         var content = document.getElementById('linkTab' + id).textContent;
         var tabId = 'tab' + id;
         var optionsName = OPTIONS_FORM_NAME_ID + id;
-        if (checkEmptyFields(tabId)) {
+        if (emptyFields(tabId)) {
             return;
         }
         var data = catchFormData(tabId, optionsName);
@@ -378,6 +450,7 @@ function submitData() {
     document.getElementById(MAIN_FORM_ID).reset();
 }
 
+
 function missingFieldsAlert(message) {
     var alert = document.createElement('div');
     alert.className = 'alert alert-dismissible alert-danger';
@@ -390,9 +463,8 @@ function missingFieldsAlert(message) {
     strong.textContent = 'Error! ';
     alert.appendChild(strong);
     var u = document.createElement('u');
-    u.textContent = 'Rellena los campos vacíos';
+    u.textContent = 'Rellena los campos vacíos.';
     alert.appendChild(u);
-    alert.appendChild(document.createTextNode(' y envia de nuevo el formulario.'));
     // add the message to the alert
     if (message != undefined) {
         alert.appendChild(document.createElement('br'));
@@ -407,6 +479,9 @@ function missingFieldsAlert(message) {
         alert.remove();
     });
 }
+
+
+
 
 /*********************
  ** Event Listeners **
@@ -445,7 +520,7 @@ function addMoreOptionsButtonListener() {
         var numOption = howManyOptions(formId)+1;  // +1 because we are going to add a new option
         addMoreOptions(formId, optionsName, numOption);
         // For each tab, add more options
-        var tabs = document.getElementById('tabList').hasChildNodes() == false ? 0 : document.getElementById('tabList').getElementsByTagName('li');
+        var tabs = document.getElementById('tabList').hasChildNodes() == false ? 0 : getTabLinks();
         for (var i = 0; i < tabs.length; i++) {
             var formId = 'tab' + tabs[i].getElementsByTagName('a')[0].id.slice(7);
             var optionsName = OPTIONS_FORM_NAME_ID + tabs[i].getElementsByTagName('a')[0].id.slice(7);
@@ -460,7 +535,7 @@ function addLessOptionsButtonListener() {
         var formId = MAIN_FORM_ID;
         deleteLastOption(formId);
         // For each tab, delete last option
-        var tabs = document.getElementById('tabList').hasChildNodes() == false ? 0 : document.getElementById('tabList').getElementsByTagName('li');
+        var tabs = document.getElementById('tabList').hasChildNodes() == false ? 0 : getTabLinks();
         for (var i = 0; i < tabs.length; i++) {
             var tabId = 'tab' + tabs[i].getElementsByTagName('a')[0].id.slice(7);
             deleteLastOption(tabId);
@@ -468,11 +543,107 @@ function addLessOptionsButtonListener() {
     });
 }
 
+function translateButtonListener() {
+    document.getElementById("translate").addEventListener("click", async function() {
+        // Check if the mainform has empty fields
+        if (emptyFields(MAIN_FORM_ID, true)) {
+            missingFieldsAlert('Debes completar todos los campos para usar la traducción automática.');
+            return;
+        }
+        var mainformData = catchFormData(MAIN_FORM_ID, OPTIONS_MAIN_FORM_NAME_ID);
+
+        // Get the id of the active tab
+        var tabs = getTabLinks();
+        var activeLinkTab = '';
+        var activeLinkLangCode = '';
+        for (var i = 0; i < tabs.length; i++) {
+            if (tabs[i].getElementsByTagName('a')[0].classList.contains('active')) {
+                activeLinkTab = tabs[i].getElementsByTagName('a')[0].id.slice(7);
+                activeLinkLangCode = tabs[i].id;
+                break;
+            }
+        }
+
+        var tabId = 'tab' + activeLinkTab;
+
+        // // Check if the active tab has not empty fields
+        // if (!emptyFields(tabId, false, false)) {
+        //     missingFieldsAlert('Los campos de destino deben estar vacíos para usar la traducción automática.');
+        //     return;
+        // }
+
+        // Replace the statement of the tab with the statement of the main form translated to the language of the tab
+        var to = activeLinkLangCode;
+
+        try {
+            var translation = await translate(mainformData.statement, FROM, to);
+            document.getElementById(tabId+'_statement').value = translation;
+        }
+        catch (error) {
+            console.error(error);
+        }
+
+        // Replace the options of the tab with the options of the main form translated to the language of the tab
+        var numOptions = howManyOptions(tabId);
+        for (var i = 1; i <= numOptions; i++) {
+            try {
+                var translation = await translate(mainformData.options[i-1], FROM, to);
+                document.getElementById(tabId).querySelector(`input[name="inputOption${i}"]`).value = translation;
+            }
+            catch (error) {
+                console.error(error);
+            }
+        }
+    });
+}
+
+/**************
+ ** Get data **
+ **************/
+
+async function getSupportedLanguages() {
+    const response = await fetch('/getSupportedLanguages');
+    langs_supported = await response.json();
+
+    // Add the supported languages
+    var datalist = document.getElementById('languages-list');
+    for (var key in langs_supported) {
+        var option = document.createElement('option');
+        option.value = langs_supported[key];
+        option.textContent = key;
+        datalist.appendChild(option);
+    }
+
+}
+
+async function translate(text, from, to) {
+    try {
+        const response = await fetch('/translate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ text: text, from: from, to: to })        
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al enviar los datos del formulario');
+        }
+
+        const responseData = await response.json();
+        console.debug('Respuesta del servidor:', responseData);
+        return responseData.text;
+    } catch (error) {
+        console.error('Error en la solicitud:', error.message);
+        throw error;
+    }
+}
+
 /***************
  ** Cath data **
  ***************/
 
-function howManyEmpty(formId, elementType) {
+function howManyEmpty(formId, elementType, showInvalid = true) {
     var form = document.getElementById(formId);
     var options = form.getElementsByTagName('input');
     options = Array.from(options).filter((elem) => elem.type == elementType);
@@ -481,7 +652,7 @@ function howManyEmpty(formId, elementType) {
     for (var i = 0; i < options.length; i++) {
         if (options[i].checked == true || options[i].value == '') {
             counter++;
-            if (elementType == 'text') {
+            if (elementType == 'text' && showInvalid) {
                 options[i].classList.add('is-invalid');
             }
         }
@@ -509,34 +680,44 @@ function checkEmptyTopic() {
 }
 
 
-function checkEmptyFields(formId) {
+function emptyFields(formId, showAlerts = true, showInvalid = true) {
+    var empty = true;
     var form = document.getElementById(formId);
 
     // Check if the statement field is empty
     if (form[formId+'_statement'].value == '') {
-        missingFieldsAlert('Debes especificar un enunciado para la pregunta.');
-        // Set the focus on the statement field
-        form[formId+'_statement'].focus();
-        // Make field invalid to show the user that it is required
-        form[formId+'_statement'].classList.add('is-invalid');
+        if (showAlerts) {
+            missingFieldsAlert('Debes especificar un enunciado para la pregunta.');
+        }
+        if (showInvalid) {
+            // Set the focus on the statement field
+            form[formId+'_statement'].focus();
+            // Make field invalid to show the user that it is required
+            form[formId+'_statement'].classList.add('is-invalid');
+        }
     }
     else {
         form[formId+'_statement'].classList.remove('is-invalid');
+        empty = false;
     }
 
     // Check if there is at least one option with a value
-    if (howManyEmpty(formId, OPTION_TYPE) == 0) {
-        missingFieldsAlert('Debes marcar al menos una opción.');
+    if (howManyEmpty(formId, OPTION_TYPE, showInvalid) == 0) {
+        if (showAlerts) {
+            missingFieldsAlert('Debes marcar al menos una opción.');
+        }
         return true;
     }
 
-    // Check if there is at least one option with a value
-    if (howManyEmpty(formId, 'text') > 0) {
-        missingFieldsAlert('Debes completar todas las opciones.');
+    // Check if there is at least one option without a value
+    if (howManyEmpty(formId, 'text', showInvalid) > 0) {
+        if (showAlerts) {
+            missingFieldsAlert('Debes completar todas las opciones.');
+        }
         return true;
     }
 
-    return false;
+    return empty;
 }
 
 function catchFormData(formId, optionsFormId) {
@@ -606,11 +787,13 @@ function sendFormData(data) {
 document.addEventListener("DOMContentLoaded", function() {
     addForm(MAIN_FORM_ID, OPTIONS_MAIN_FORM_NAME_ID);
 
+    getSupportedLanguages();
+
     // Add event listener to the "Mostrar /Ocultar idiomas" button
     document.getElementById('languages').addEventListener('click', showLangs);
 
     // Add event listener to the "Añadir pestaña" button
-    document.getElementById('newTabName').nextElementSibling.addEventListener('click', addTab);
+    document.getElementById('button-addon2').addEventListener('click', addTab);
     // Add event listener to the "Añadir pestaña" button but when the user presses enter key
     document.getElementById('newTabName').addEventListener('keyup', function(event) {
         if (event.key === 'Enter') {
@@ -626,7 +809,7 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
         else {    
-            if (checkEmptyTopic() || checkEmptyFields(MAIN_FORM_ID)) {
+            if (checkEmptyTopic() || emptyFields(MAIN_FORM_ID)) {
                 event.preventDefault();
                 return;
             }
@@ -636,5 +819,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     addOptionsListeners();
     changeOptionTypeListener();
+    translateButtonListener();
 });
 

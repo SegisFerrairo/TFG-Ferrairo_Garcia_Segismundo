@@ -1,3 +1,7 @@
+.hidden {
+    display: none;
+}
+
 #area {
     display: flex;
 }
@@ -11,12 +15,31 @@
     width: 50%; /* Ajuste para que ambos tengan el mismo ancho total */
 }
 
-.hidden {
-    display: none;
+/* centralo verticalmente con la página */
+.centered {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.translate-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#arrow-top {
+    content: url("/images/arrow-90deg-right.svg");
+    transform: rotate(90deg);
+}
+
+#arrow-down {
+    content: url("/images/arrow-90deg-down.svg");
+    transform: rotate(-90deg);
 }
 
 #addTabBar {
-    max-width: 205px;
+    max-width: 222px;
     margin-bottom: 2px;
 }
 

@@ -8,15 +8,12 @@
         <header id="header">
             <%- include('_partials/_header.ejs'); -%>  
         </header>
-        
+                
         <div id="area" class="container-fluid">
             <div id="left-space">   
                 <div style="display: flex; justify-content: space-between;">
                     <div id="langs">
                         <button id="languages" class="visible btn btn-secondary mt-2" type="button">Mostrar idiomas</button>
-                    </div>
-                    <div>
-                        <button id="translate" class="visible btn btn-primary translate mt-2" type="button"></button>
                     </div>
                     <div class="form-floating">
                         <input type="text" class="form-control" id="floatingTopic" required>
@@ -31,12 +28,22 @@
                     </select>
                 </div>                
             </div>
-            
+
+            <div id="middle-space" class="centered">
+                <div class="translate-container">
+                    <span id="arrow-top" class="hidden"></span>
+                    <button id="translate" class="btn btn-primary translate mt-1 mb-2 hidden" type="button"></button>
+                    <span id="arrow-down" class="hidden"></span>
+                </div>
+            </div>
+           
             <div id="right-space" class="hidden">      
                 <div class="nav nav-tabs">
                     <ul id="tabList" class="nav" role="tablist"></ul>
                     <div id="addTabBar" class="input-group ">
-                        <input type="text"  id="newTabName" class="form-control ms-3" placeholder="Nuevo idioma">
+                        <input type="search" id="newTabName" class="form-control ms-3" name="search" list="languages-list" placeholder="Nuevo idioma">
+                        <datalist id="languages-list">
+                        </datalist>
                         <button type="button" id="button-addon2" class="btn btn-primary">+</button>
                     </div>
                 </div>

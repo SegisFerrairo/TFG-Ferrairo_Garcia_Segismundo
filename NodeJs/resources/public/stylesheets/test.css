@@ -11,3 +11,10 @@
     justify-content: center; /* horizontally center */
     filter: invert(100%);
 }
+
+#newTabName {
+  text-align: center;   
+  background-color: #f0f0f0; /* Gris muy tenue como fondo */
+  font-style: italic; /* Cursiva para el texto */
+  height: 35px;    
+}

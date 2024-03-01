@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const translate = require('@iamtraction/google-translate');
+const langs_supported = require('./public/other/langs.json');
 
 //var Question = require('./db/database');
 // ./db/database.js has multiple exports, so we need to import the whole module
@@ -30,6 +31,16 @@ app.use('/', newQuestion);
 app.use('/', test);
 
 app.use(express.json());
+
+// Get the supported languages
+app.get('/getSupportedLanguages', async(req, res) => {
+  try {
+    res.status(200).json(langs_supported);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 
 // Get all the questions with the given language.name
 app.get('/questionary/getQuestionsByLanguage:languageName', async(req, res) => {

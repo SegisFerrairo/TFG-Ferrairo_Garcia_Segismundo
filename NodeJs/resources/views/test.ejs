@@ -12,6 +12,19 @@
         <button id="translate" class="btn btn-primary translate"></button>
         <textarea id="output" rows="5" cols="50" placeholder="Salida"></textarea>
 
+
+        <div id="addTabBar" class="input-group ">
+            <input type="search" id="newTabName" class="form-control ms-3" name="search" list="languages" placeholder="Nuevo idioma">
+            <datalist id="languages">
+                <option value="English">
+                <option value="Spanish">
+                <option value="French">
+                <option value="German">
+                <!-- Add more language options as needed -->
+            </datalist>
+            <button type="button" id="button-addon2" class="btn btn-primary">+</button>
+        </div>
+
         <%- include('_partials/_footer.ejs'); -%>
         
         <script type="text/javascript" src="scripts/s_test.js"></script>
