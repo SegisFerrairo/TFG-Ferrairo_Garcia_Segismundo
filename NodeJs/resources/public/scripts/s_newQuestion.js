@@ -639,6 +639,30 @@ async function translate(text, from, to) {
     }
 }
 
+function getTopics() {
+    fetch('/getTopics')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error al obtener los temas');
+        }
+        return response.json();
+    })
+    .then(responseData => {
+        console.log('Respuesta del servidor:', responseData);
+        // Add the topics to the select
+        var select = document.getElementById('topics-list');
+        for (var i = 0; i < responseData.length; i++) {
+            var option = document.createElement('option');
+            option.value = responseData[i];
+            option.textContent = responseData[i];
+            select.appendChild(option);
+        }
+    })
+    .catch(error => {
+        console.error('Error en la solicitud:', error.message);
+    });
+}
+
 /***************
  ** Cath data **
  ***************/
@@ -785,6 +809,7 @@ function sendFormData(data) {
  ****************/
 
 document.addEventListener("DOMContentLoaded", function() {
+    getTopics();
     addForm(MAIN_FORM_ID, OPTIONS_MAIN_FORM_NAME_ID);
 
     getSupportedLanguages();

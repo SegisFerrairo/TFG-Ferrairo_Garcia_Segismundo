@@ -16,8 +16,9 @@
                         <button id="languages" class="visible btn btn-secondary mt-2" type="button">Mostrar idiomas</button>
                     </div>
                     <div class="form-floating">
-                        <input type="text" class="form-control" id="floatingTopic" required>
+                        <input type="search" class="form-control" id="floatingTopic" name="search" list="topics-list" required>
                         <label for="floatingTopic">Tema</label>
+                        <datalist id="topics-list"></datalist>
                     </div> 
                 </div>     
                 <div id="myMainFormContent" class="mb-1"></div>

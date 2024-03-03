@@ -45,6 +45,15 @@ app.get('/getSupportedLanguages', async(req, res) => {
   }
 });
 
+app.get('/getTopics', async(req, res) => {
+  try {
+    const topics = await Question.find({}).distinct('topic');
+    res.status(200).json(topics);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 app.post('/translate', async(req, res) => {
   try {
     const data = req.body;
@@ -54,6 +63,7 @@ app.post('/translate', async(req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
 
 
 /*****************
@@ -111,15 +121,6 @@ app.get('/questionary/getTopicsByLanguage:language', async(req, res) => {
   try {
     var language = decodeURIComponent(req.params.language).slice(1).toString();
     const topics = await Question.distinct("topic", {"languages.name": language});
-    res.status(200).json(topics);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-app.get('/questionary/getTopics', async(req, res) => {
-  try {
-    const topics = await Question.find({}).distinct('topic');
     res.status(200).json(topics);
   } catch (error) {
     res.status(500).json({ message: error.message });

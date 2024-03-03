@@ -587,7 +587,7 @@ async function getTopicsByLanguage(language) {
 
 async function getTopics() {
     try {
-        const response = await fetch('/questionary/getTopics', {
+        const response = await fetch('/getTopics', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
