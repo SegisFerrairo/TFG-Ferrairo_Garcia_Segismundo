@@ -213,6 +213,7 @@ async function listSidebarData() {
         li_topic.className = "topic mb-1";
 
         var button = document.createElement("button");
+        button.type = "button";
         button.className = "btn btn-toggle align-items-center rounded collapsed";
         button.setAttribute("data-bs-toggle", "collapse");
         button.setAttribute("data-bs-target", "#topic-" + topic + "-collapse");
@@ -236,17 +237,43 @@ async function listSidebarData() {
                 var li = document.createElement("li");
                 li.className = "mb-1"
                 li.style.listStyleType = "disc";
+
                 var button = document.createElement("button");
                 button.type = "button";
                 button.id = "button-" + question._id;
-                button.className = "btn btn-link cut-text";
+                button.className = "btn btn-link cut-text me-2";
                 // CHOOSEN_LANGUAGE_ID is the index of the language in the languages array
                 CHOOSEN_LANGUAGE_ID = question.languages.findIndex(language => language.name == CHOOSEN_LANGUAGE);
                 button.textContent = question.languages[CHOOSEN_LANGUAGE_ID].statement; 
                 li.appendChild(button);
+
+                var button_delete = document.createElement("button");
+                button_delete.type = "button";
+                button_delete.id = "button_delete-" + question._id;
+                button_delete.className = "btn btn-outline-danger btn-delete btn-sm";
+
+                var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+                svg.setAttribute("width", "16");
+                svg.setAttribute("height", "16");
+                svg.setAttribute("fill", "currentColor");
+                svg.setAttribute("class", "bi bi-trash-fill");
+                svg.setAttribute("viewBox", "0 0 16 16");
+
+                var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute("d", "M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0");
+
+                svg.appendChild(path);
+                button_delete.appendChild(svg);
+                                
+                li.appendChild(button_delete);
                 ul.appendChild(li);
 
                 selectQuestionListener(button);
+                button_delete.addEventListener("click", function() {
+                    removeQuestionFromFolioListener(question._id);
+                    deleteQuestionFromDBListener(question._id);
+                });
             }
         });
 
@@ -322,7 +349,7 @@ function addEmptyQuestion(folioId, question, language) {
     button.type = "button";
     button.className = "btn-close question-close";
     button.addEventListener("click", function() {
-        removeQuestionListener(question._id);
+        removeQuestionFromFolioListener(question._id);
     });
     li_q.appendChild(button);
 
@@ -343,7 +370,7 @@ function addQuestion(folioId, question) {
     button.type = "button";
     button.className = "btn-close question-close";
     button.addEventListener("click", function() {     
-        removeQuestionListener(question._id);
+        removeQuestionFromFolioListener(question._id);
     });
     li_q.appendChild(button);
 
@@ -395,7 +422,6 @@ async function distributeQuestionInFolios(questionId) {
             }
         }
         else {
-            console.log("La pregunta no está en el idioma " + language);
             if (document.getElementById(folioId) != null) {
                 addEmptyQuestion(folioId, question, language);
             }
@@ -605,30 +631,6 @@ async function getAllDBData() {
 }
 
 
-
-// function getQuestionById(questionId) {
-//     fetch('/questionary/getQuestionById:' + questionId, {
-//         method: 'GET',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         }
-//     })
-//     .then(response => {
-//         if (!response.ok) {
-//             throw new Error('Error al obtener los datos de la base de datos');
-//         }
-//         return response.json();
-//     })
-//     .then(responseData => {
-//         console.debug('Respuesta del servidor:', responseData);
-//         distributeQuestionInFolios(responseData);
-//         return;
-//     })
-//     .catch(error => {
-//         console.error('Error en la solicitud:', error.message);
-//     });
-// }
-
 async function getQuestionById(questionId) {
     try {
         const response = await fetch('/questionary/getQuestionById:' + questionId, {
@@ -672,6 +674,29 @@ async function getQuestionsByLanguage(language) {
         throw error;
     }
 }
+
+function dropQuestionById(questionId) {
+    fetch('/questionary/deleteQuestionById:' + questionId, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error al obtener los datos de la base de datos');
+        }
+        return response.json();
+    })
+    .then(responseData => {
+        console.debug('Respuesta del servidor:', responseData);
+        return responseData;
+    })
+    .catch(error => {
+        console.error('Error en la solicitud:', error.message);
+    });
+}
+
 
 /*********************
  ** Event Listeners **
@@ -738,7 +763,7 @@ function selectQuestionListener(button) {
     });
 }
 
-function removeQuestionListener(questionId) {
+function removeQuestionFromFolioListener(questionId) {
     // newQuestion.parentElement.removeChild(newQuestion);   
     // Remove the question from each folio
     var folios = document.getElementById("myTabContent").getElementsByClassName("folio-container");
@@ -760,7 +785,6 @@ function removeQuestionListener(questionId) {
     disableQuestion(document.getElementById("button-" + questionId));
 }
 
-
 function exportQuestionaryListener() {
     var button = document.getElementById("exportQuestionary");
     button.addEventListener("click", function() {
@@ -776,6 +800,26 @@ function exportQuestionaryListener() {
             exportQuestionaryLaTex(questions);
         });
     });
+}
+
+function deleteQuestionFromDBListener(questionId) {
+    dropQuestionById(questionId);
+    // Remove the question from the sidebar
+    var li = document.getElementById("button-" + questionId).parentElement;
+    
+    // If the aren´t questions in the topic, delete the topic
+    var topic = li.parentElement.parentElement.parentElement;
+    
+    li.parentElement.removeChild(li);    
+    if (topic.getElementsByTagName("li").length == 0) {
+        topic.parentElement.removeChild(topic);
+    }
+    
+    // If the aren't topics in the sidebar, create a no-topics element
+    var sidebar = document.getElementById("sidebar");
+    if (sidebar.getElementsByTagName("ul")[0].childElementCount == 1) {
+        createNoTopicsElement(sidebar.getElementsByTagName("ul")[0]);
+    }
 }
 
 /****************

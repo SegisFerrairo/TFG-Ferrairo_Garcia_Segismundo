@@ -32,6 +32,10 @@ app.use('/', test);
 
 app.use(express.json());
 
+/***********
+ ** Utils **
+ ***********/
+
 // Get the supported languages
 app.get('/getSupportedLanguages', async(req, res) => {
   try {
@@ -41,19 +45,20 @@ app.get('/getSupportedLanguages', async(req, res) => {
   }
 });
 
-
-// Get all the questions with the given language.name
-app.get('/questionary/getQuestionsByLanguage:languageName', async(req, res) => {
+app.post('/translate', async(req, res) => {
   try {
-    var languageName = req.params.languageName.slice(1).toString();
-    const questions = await Question.find({ 'languages.name': languageName });
-    res.status(200).json(questions);
-  }
-  catch (error) {
+    const data = req.body;
+    const translation = await translate(data.text, { from: data.from, to: data.to });
+    res.status(200).json(translation);
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
+
+/*****************
+ ** newQuestion **
+ *****************/
 
 // Get the languages from the database
 app.get('/newQuestion/getLanguagesNames', async(req, res) => {
@@ -61,47 +66,6 @@ app.get('/newQuestion/getLanguagesNames', async(req, res) => {
     const languages = await Question.find({}).distinct('languages.name');
     res.status(200).json(languages);
   } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-app.get('/questionary/getTopicsByLanguage:language', async(req, res) => {
-  try {
-    var language = decodeURIComponent(req.params.language).slice(1).toString();
-    const topics = await Question.distinct("topic", {"languages.name": language});
-    res.status(200).json(topics);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-app.get('/questionary/getTopics', async(req, res) => {
-  try {
-    const topics = await Question.find({}).distinct('topic');
-    res.status(200).json(topics);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-app.get('/questionary/getQuestionById:questionId', async(req, res) => {
-  try {
-    var questionId = req.params.questionId.slice(1).toString();    
-    const question = await Question.findOne({ _id: questionId });    
-    res.status(200).json(question);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-
-// Get the questions from the database
-app.get('/questionary/getAllQuestions', async(req, res) => {
-  try {   
-    const questions = await Question.find({});
-    res.status(200).json(questions);
-  } catch (error) {
-
     res.status(500).json({ message: error.message });
   }
 });
@@ -139,11 +103,65 @@ app.post('/newQuestion/addQuestion', function (req, res) {
   });
 });
 
-app.post('/translate', async(req, res) => {
+/*****************
+ ** questionary **
+ *****************/
+
+app.get('/questionary/getTopicsByLanguage:language', async(req, res) => {
   try {
-    const data = req.body;
-    const translation = await translate(data.text, { from: data.from, to: data.to });
-    res.status(200).json(translation);
+    var language = decodeURIComponent(req.params.language).slice(1).toString();
+    const topics = await Question.distinct("topic", {"languages.name": language});
+    res.status(200).json(topics);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.get('/questionary/getTopics', async(req, res) => {
+  try {
+    const topics = await Question.find({}).distinct('topic');
+    res.status(200).json(topics);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.get('/questionary/getQuestionById:questionId', async(req, res) => {
+  try {
+    var questionId = req.params.questionId.slice(1).toString();    
+    const question = await Question.findOne({ _id: questionId });    
+    res.status(200).json(question);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.get('/questionary/getQuestionsByLanguage:languageName', async(req, res) => {
+  try {
+    var languageName = req.params.languageName.slice(1).toString();
+    const questions = await Question.find({ 'languages.name': languageName });
+    res.status(200).json(questions);
+  }
+  catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.get('/questionary/getAllQuestions', async(req, res) => {
+  try {   
+    const questions = await Question.find({});
+    res.status(200).json(questions);
+  } catch (error) {
+
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.delete('/questionary/deleteQuestionById:questionId', async(req, res) => {
+  try {
+    var questionId = req.params.questionId.slice(1).toString();
+    const question = await Question.deleteOne({ _id: questionId });
+    res.status(200).json({ message: 'Pregunta eliminada exitosamente.' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
