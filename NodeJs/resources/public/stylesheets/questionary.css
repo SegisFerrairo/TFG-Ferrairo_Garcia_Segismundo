@@ -123,3 +123,55 @@
     white-space: unset;
     text-overflow: unset;
 }
+
+#randomizeQuestions {
+    width: 37px;
+    height: 39px;
+    cursor: pointer;
+  }
+  
+#randomizeQuestions::before {
+    content: url("/images/shuffle.svg");
+    display: flex; /* make the div a flex container */
+    justify-content: center; /* horizontally center */
+    /* filter: invert(100%); */
+    padding-top: 3px;
+}
+
+#randomizeQuestions:hover::before {
+    filter: invert(100%);
+}
+  
+.form-clasification {
+    text-align: center;
+}
+
+.form-clasification p {
+    text-align: center;
+}
+
+.form-clasification label {
+    font-size: 20px;
+}
+
+input[type="radio"] {
+    display: none;
+}
+
+label {
+    color: grey;
+}
+
+.clasification {
+    direction: rtl;
+    unicode-bidi: bidi-override;
+}
+
+label:hover,
+label:hover ~ label {
+    color: orange;
+}
+
+input[type="radio"]:checked ~ label {
+    color: orange;
+}

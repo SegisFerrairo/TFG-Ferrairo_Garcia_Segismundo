@@ -77,7 +77,6 @@ select {
 .translate {
     width: 37px;
     height: 37px;
-    border: none;
     cursor: pointer;
   }
   
@@ -88,3 +87,37 @@ select {
     filter: invert(100%);
 }
   
+
+.form-clasification {
+    text-align: center;
+}
+
+.form-clasification p {
+    text-align: center;
+}
+
+.form-clasification label {
+    font-size: 20px;
+}
+
+input[type="radio"] {
+    display: none;
+}
+
+label {
+    color: grey;
+}
+
+.clasification {
+    direction: rtl;
+    unicode-bidi: bidi-override;
+}
+
+label:hover,
+label:hover ~ label {
+    color: orange;
+}
+
+input[type="radio"]:checked ~ label {
+    color: orange;
+}

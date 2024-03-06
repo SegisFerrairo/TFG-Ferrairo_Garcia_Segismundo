@@ -181,9 +181,9 @@ async function listSidebarData() {
     var sidebar = document.getElementById("sidebar");
 
     // Remove all the topics from the sidebar except the first one
-    while (sidebar.getElementsByTagName("ul")[0].childElementCount > 1) {
-        sidebar.getElementsByTagName("ul")[0].removeChild(sidebar.getElementsByTagName("ul")[0].lastChild);
-    }
+    // while (sidebar.getElementsByTagName("ul")[0].childElementCount > 1) {
+    //     sidebar.getElementsByTagName("ul")[0].removeChild(sidebar.getElementsByTagName("ul")[0].lastChild);
+    // }
 
     // Get the questions from the DB
     var data=[];
@@ -270,8 +270,7 @@ async function listSidebarData() {
                 ul.appendChild(li);
 
                 selectQuestionListener(button);
-                button_delete.addEventListener("click", function() {
-                    removeQuestionFromFolioListener(question._id);
+                button_delete.addEventListener("click", function() {                    
                     deleteQuestionFromDBListener(question._id);
                 });
             }
@@ -409,11 +408,21 @@ async function distributeQuestionInFolios(questionId) {
         console.error('Error en la solicitud:', error.message);
     }
 
+
     var switchedLanguages = getSwitchedLanguages();
     // For each switched language, add the question to its corresponding folio. And if the question hasn't the language, don't add it
     switchedLanguages.forEach(function(language) {
         var languageId = question.languages.findIndex(lang => lang.name == language);
         var folioId = "folio_" + Array.from(document.getElementById("languagesTabList").getElementsByTagName("a")).find(link => link.textContent == language).id.split("_")[1];
+
+        // Check if the questioId already exist in the folioId and prevent the addition
+        var questions = document.getElementById("myTabContent").getElementsByClassName("language-" + language)[0].getElementsByClassName("question");
+        for (var i = 0; i < questions.length; i++) {
+            if (questions[i].id.split("-")[1] == questionId) {
+                return;
+            }
+        }
+
         if (languageId != -1) {
             CHOOSEN_LANGUAGE_ID = languageId;
             // If the language is already in the tab list, add the question to the corresponding folio
@@ -426,7 +435,21 @@ async function distributeQuestionInFolios(questionId) {
                 addEmptyQuestion(folioId, question, language);
             }
         }
+    
     });
+}
+
+function updateQuestionsInFolios() {
+    var questions = document.getElementById("myTabContent").getElementsByClassName("language-Español")[0].getElementsByClassName("question");
+    var i = 0;
+    function nextQuestion() {
+        if (i < questions.length) {
+            var questionId = questions[i].id.split("-")[1];
+            distributeQuestionInFolios(questionId).then(nextQuestion);
+            i++;
+        }
+    }
+    nextQuestion();
 }
 
 function getNotEmptyFoliosIds() {
@@ -737,6 +760,7 @@ function switchedLanguagesListener(switchInput, language) {
         // If the input is checked, add the tab
         if (this.checked) {
             addLanguagesTab(language);
+            updateQuestionsInFolios();
         }
         // If the input is not checked, remove the tab
         else {
@@ -803,6 +827,11 @@ function exportQuestionaryListener() {
 }
 
 function deleteQuestionFromDBListener(questionId) {
+    // Set an alert to confirm the deletion
+    var confirmation = confirm("¿Estás seguro de que quieres eliminar esta pregunta de la BD?");
+    if (!confirmation) {
+        return;
+    }
     dropQuestionById(questionId);
     // Remove the question from the sidebar
     var li = document.getElementById("button-" + questionId).parentElement;
@@ -820,7 +849,51 @@ function deleteQuestionFromDBListener(questionId) {
     if (sidebar.getElementsByTagName("ul")[0].childElementCount == 1) {
         createNoTopicsElement(sidebar.getElementsByTagName("ul")[0]);
     }
+
+    removeQuestionFromFolioListener(questionId);
 }
+
+function randomQuestionListener() {
+    var button = document.getElementById("randomizeQuestions");
+    button.addEventListener("click", function() {
+        // Check if there are questions in the Español folio and if not, return
+        var questions = document.getElementById("myTabContent").getElementsByClassName("language-Español")[0].getElementsByClassName("question");
+        //var questions = document.getElementById("list-folio_0").getElementsByClassName("question");
+        if (questions.length == 0) {
+            return;
+        }
+
+        // Add the questions to the folios in a random order
+        // Initialize the array randomQuestions with the questions in the Español folio but not a copy of it
+        var randomQuestions = Array.from(questions);
+        // Shuffle the array
+        for (var i = randomQuestions.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            [randomQuestions[i], randomQuestions[j]] = [randomQuestions[j], randomQuestions[i]];
+        }
+
+        // Remove all the questions from all the folios
+        var folios = document.getElementById("myTabContent").getElementsByClassName("folio-container");
+        for (var i = 0; i < folios.length; i++) {
+            var questionsFolio = folios[i].getElementsByClassName("question");
+            questionsFolio = Array.from(questionsFolio);
+            questionsFolio.forEach(function(question) {
+                question.parentElement.removeChild(question);
+            });
+        }
+
+        var i = 0;
+        function nextQuestion() {
+            if (i < randomQuestions.length) {
+                var questionId = randomQuestions[i].id.split("-")[1];
+                distributeQuestionInFolios(questionId).then(nextQuestion);
+                i++;
+            }
+        }
+        nextQuestion();
+    });
+}
+
 
 /****************
  ** DOM Loaded **
@@ -832,4 +905,5 @@ document.addEventListener("DOMContentLoaded", function() {
     listSidebarData();
     dropdownLanguagesListener();
     exportQuestionaryListener();
+    randomQuestionListener();
 });

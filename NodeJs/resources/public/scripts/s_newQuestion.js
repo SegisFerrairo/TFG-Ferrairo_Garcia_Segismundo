@@ -703,6 +703,18 @@ function checkEmptyTopic() {
     return false;
 }
 
+function checkEmptyDifficulty() {
+    // Check if at least one radio button is checked
+    var radios = document.getElementById('clasification').getElementsByTagName('input');
+    var checked = Array.from(radios).filter((elem) => elem.checked == true);
+    if (checked.length == 0) {
+        missingFieldsAlert('Debes especificar una dificultad para la pregunta.');
+        return true;
+    }
+    return false;
+}
+
+
 
 function emptyFields(formId, showAlerts = true, showInvalid = true) {
     var empty = true;
@@ -834,7 +846,7 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
         else {    
-            if (checkEmptyTopic() || emptyFields(MAIN_FORM_ID)) {
+            if (checkEmptyDifficulty() || checkEmptyTopic() || emptyFields(MAIN_FORM_ID)) {
                 event.preventDefault();
                 return;
             }
