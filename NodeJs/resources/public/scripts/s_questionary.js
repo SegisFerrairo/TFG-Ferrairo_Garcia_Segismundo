@@ -181,8 +181,8 @@ async function listSidebarData() {
     var sidebar = document.getElementById("sidebar");
 
     // Remove all the topics from the sidebar except the first one
-    // while (sidebar.getElementsByTagName("ul")[0].childElementCount > 1) {
-    //     sidebar.getElementsByTagName("ul")[0].removeChild(sidebar.getElementsByTagName("ul")[0].lastChild);
+    // while (document.getElementById("sidebarQuestionsList").childElementCount > 1) {
+    //     document.getElementById("sidebarQuestionsList").removeChild(document.getElementById("sidebarQuestionsList").lastChild);
     // }
 
     // Get the questions from the DB
@@ -195,7 +195,7 @@ async function listSidebarData() {
 
     // if data is empty, create a no-topics element
     if (data.length == 0) {        
-        createNoTopicsElement(sidebar.getElementsByTagName("ul")[0]);
+        createNoTopicsElement(document.getElementById("sidebarQuestionsList"));
         return;
     }
 
@@ -279,7 +279,7 @@ async function listSidebarData() {
         div.appendChild(ul);
         li_topic.appendChild(div);
 
-        sidebar.getElementsByTagName("ul")[0].appendChild(li_topic);
+        document.getElementById("sidebarQuestionsList").appendChild(li_topic);
 
         expandTopicListener(button,div);
     });
@@ -846,8 +846,8 @@ function deleteQuestionFromDBListener(questionId) {
     
     // If the aren't topics in the sidebar, create a no-topics element
     var sidebar = document.getElementById("sidebar");
-    if (sidebar.getElementsByTagName("ul")[0].childElementCount == 1) {
-        createNoTopicsElement(sidebar.getElementsByTagName("ul")[0]);
+    if (document.getElementById("sidebarQuestionsList").childElementCount == 1) {
+        createNoTopicsElement(document.getElementById("sidebarQuestionsList"));
     }
 
     removeQuestionFromFolioListener(questionId);

@@ -46,7 +46,9 @@ body {
 }
 
 .reasons {
-    background-color: #f8f9fa;    
+    /* background-color: #f8f9fa;    */
+    background-color: aliceblue;
+    padding-bottom: 1px; 
 }
 
 .container-elements {

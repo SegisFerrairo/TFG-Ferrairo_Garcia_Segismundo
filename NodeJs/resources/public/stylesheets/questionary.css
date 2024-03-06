@@ -154,24 +154,24 @@
     font-size: 20px;
 }
 
-input[type="radio"] {
-    display: none;
-}
-
-label {
-    color: grey;
-}
-
 .clasification {
     direction: rtl;
     unicode-bidi: bidi-override;
 }
 
-label:hover,
-label:hover ~ label {
+.clasification input[type="radio"] {
+    display: none;
+}
+
+.clasification label {
+    color: grey;
+}
+
+.clasification label:hover,
+.clasification label:hover ~ label {
     color: orange;
 }
 
-input[type="radio"]:checked ~ label {
+.clasification input[type="radio"]:checked ~ label {
     color: orange;
 }
