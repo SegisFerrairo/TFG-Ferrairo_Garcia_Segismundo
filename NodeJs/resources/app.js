@@ -80,16 +80,40 @@ app.post('/addQuestion', function (req, res) {
   // Delete data.difficulty from data
   delete data.difficulty;
  
-  question.save(function (err, doc) {
-    if (!err) {
-        // console.log(doc);
-        res.status(200).json({ message: 'Pregunta añadida exitosamente.' });          
-    }
-    else {
-        // console.log(err);
+  // question.save(function (err, doc) {
+  //   if (!err) {
+  //       // console.log(doc);
+  //       res.status(200).json({ message: 'Pregunta añadida exitosamente.' });          
+  //   }
+  //   else {
+  //       // console.log(err);
+  //       res.status(500).json({ error: 'Error al procesar la solicitud.' });
+  //   }
+  // });
+  // Check if the question already exists
+  Question   
+    .findOne({ topic: question.topic, difficulty: question.difficulty })
+    .where('languages.name').equals(data.languages[0].name)
+    .exec(function (err, question) {
+      if (err) {
         res.status(500).json({ error: 'Error al procesar la solicitud.' });
-    }
-  });
+      }
+      else if (question) {
+        res.status(409).json({ error: 'La pregunta ya existe.' });
+      }
+      else {
+        question.save(function (err, doc) {
+          if (!err) {
+              // console.log(doc);
+              res.status(200).json({ message: 'Pregunta añadida exitosamente.' });          
+          }
+          else {
+              // console.log(err);
+              res.status(500).json({ error: 'Error al procesar la solicitud.' });
+          }
+        });
+      }
+    });
 });
 
 
