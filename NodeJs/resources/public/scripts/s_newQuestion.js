@@ -428,7 +428,9 @@ function submitData() {
 
     var data = catchFormData(MAIN_FORM_ID, OPTIONS_MAIN_FORM_NAME_ID);
     data.name = MAIN_FORM_LANGUAGE;  
-    question['language_'+0] = data;
+    // question['language_'+0] = data;
+    question.languages = [];
+    question.languages.push(data);
 
     // Get the number of tabs
     var tabs = getTabLinks();
@@ -445,7 +447,8 @@ function submitData() {
 
         // Add content to the data as a new property called name
         data.name = content;
-        question['language_'+i] = data;                
+        // question['language_'+i] = data;    
+        question.languages.push(data);            
     }       
     // Reset each tab
     for (var i = 1; i <= tabs.length; i++) {
@@ -453,7 +456,6 @@ function submitData() {
         document.getElementById(tabId).reset();
     }  
 
-    //console.log(question);
     // Send the data
     sendFormData(question);
 
@@ -804,7 +806,7 @@ function catchFormData(formId, optionsFormId) {
  ***************/
 
 function sendFormData(data) {
-    fetch('/newQuestion/addQuestion', {
+    fetch('/addQuestion', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

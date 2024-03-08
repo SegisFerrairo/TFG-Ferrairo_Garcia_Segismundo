@@ -202,10 +202,8 @@ function createNoTopicsElement(ul) {
 }
 
 async function listSidebarData() {
-    // Remove all the topics from the sidebar except the first one
-    // while (document.getElementById("sidebarQuestionsList").childElementCount > 1) {
-    //     document.getElementById("sidebarQuestionsList").removeChild(document.getElementById("sidebarQuestionsList").lastChild);
-    // }
+    // Remove all the topics from the sidebar
+    resetSidebar();
 
     // Get the questions from the DB
     var data=[];
@@ -267,7 +265,7 @@ async function listSidebarData() {
         data.forEach(function(question) {
             if (question.topic == topic && (difficulty != undefined ? question.difficulty == difficulty : true)) {
                 var li = document.createElement("li");
-                li.className = "mb-1"
+                li.className = "question mb-1"
                 li.style.listStyleType = "disc";
 
                 var button = document.createElement("button");
@@ -300,6 +298,15 @@ async function listSidebarData() {
                                 
                 li.appendChild(button_delete);
                 ul.appendChild(li);
+
+                // If question is already in the folio, disable the button
+                var folioId = "folio_0"; // The first folio is the default one
+                var questions = document.getElementById("list-" + folioId).getElementsByClassName("question");
+                for (var j = 0; j < questions.length; j++) {
+                    if (questions[j].id.split("-")[1] == question._id) {
+                        disableQuestion(button);
+                    }
+                }
 
                 selectQuestionListener(button);
                 button_delete.addEventListener("click", function() {                    
@@ -586,6 +593,102 @@ function generateLaTexContent(questions) {
     return texCode;
 }
 
+function importQuestionay(button) {
+    // If there is no file selected, return
+    if (button.files.length == 0) {
+        return;
+    }
+
+    var file = button.files[0];
+
+    // Check if the file is a CSV file
+    if (file.type != "text/csv") {
+        alert("El archivo seleccionado no es un archivo CSV");
+        return;
+    }
+
+    var groupedQuestions = [];
+    var reader = new FileReader();
+    reader.onload = function(event) {
+        var csv = event.target.result;
+        // Group the questions by id, they have in common the id, the topic and the difficulty
+        var questions = csv.split("\n");
+        // Delete de \r character from each question
+        questions = questions.map(q => q.replace(/\r/g, ""));
+        // If the last element is empty, delete it
+        if (questions[questions.length - 1] == "") {
+            questions.pop();
+        }
+
+        // Remove the first element, the headers
+        questions.shift();
+        var resultData = [];
+        questions.forEach(function(question) {
+            var questionData = question.split(",");
+
+            var id = questionData[0].replace(/"/g, "");
+            var topic = questionData[1].replace(/"/g, "");
+            var difficulty = questionData[2].replace(/"/g, "");
+            var languageName = questionData[3].replace(/"/g, "");
+            var statement = questionData[4].replace(/"/g, "");
+            var options = questionData[5].replace(/"/g, "").split("|");
+
+            var answer = questionData[6].replace(/"/g, "").split("|").map(a => parseInt(a));
+
+            var question = {
+                id: id,
+                topic: topic,
+                difficulty: difficulty,
+                languages: [
+                    {
+                        name: languageName,
+                        statement: statement,
+                        options: options,
+                        answer: answer
+                    }
+                ]
+            };
+            resultData.push(question);
+        });
+
+        // Group the questions by id, and each question will have in common: id, topic and difficulty. The languages will be different and will be added to the languages array
+        
+        resultData.forEach(function(question) {
+            var index = groupedQuestions.findIndex(q => q.id == question.id && q.topic == question.topic && q.difficulty == question.difficulty);
+            if (index == -1) {
+                groupedQuestions.push(question);
+            }
+            else {
+                groupedQuestions[index].languages.push(question.languages[0]);
+            }
+        });
+
+        
+        // Delete de id of the questions
+        groupedQuestions.forEach(function(question) {
+            delete question.id;
+        });      
+        
+
+        // When sending the questions to the server, increment the counter of questions completly saved, 
+        // and when the counter is equal to the length of the groupedQuestions, list the sidebar data
+        var counter = 0;
+        groupedQuestions.forEach(function(question) {
+            sendFormData(question).then(function() {
+                counter++;
+                if (counter == groupedQuestions.length) {
+                    // Refresh the page
+                    location.reload();
+                }
+            });
+        });
+
+    };
+    reader.readAsText(file);    
+
+    // Reset the input
+    button.value = "";
+}
 
 
 /*************
@@ -729,6 +832,32 @@ function dropQuestionById(questionId) {
     });
 }
 
+/***************
+ ** Post DB **
+ ***************/
+
+async function sendFormData(data) {
+    try {
+        const response = await fetch('/addQuestion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        if (!response.ok) {
+            throw new Error('Error al enviar los datos del formulario');
+        }
+
+        const responseData = await response.json();
+        console.debug('Respuesta del servidor:', responseData);
+        return responseData;
+    } catch (error) {
+        console.error('Error en la solicitud:', error.message);
+        throw error;
+    }
+}
 
 /*********************
  ** Event Listeners **
@@ -843,23 +972,32 @@ function deleteQuestionFromDBListener(questionId) {
     }
     dropQuestionById(questionId);
     // Remove the question from the sidebar
-    var li = document.getElementById("button-" + questionId).parentElement;
+    // var li = document.getElementById("button-" + questionId).parentElement;
     
-    // If the aren´t questions in the topic, delete the topic
-    var topic = li.parentElement.parentElement.parentElement;
-    
-    li.parentElement.removeChild(li);    
-    if (topic.getElementsByTagName("li").length == 0) {
-        topic.parentElement.removeChild(topic);
+    var topics = document.getElementById("sidebarQuestionsList").getElementsByClassName("topic");
+    for (var i = 0; i < topics.length; i++) {
+        var questions = topics[i].getElementsByClassName("question");
+        for (var j = 0; j < questions.length; j++) {
+            if (questions[j].id.split("-")[1] == questionId) {
+                questions[j].parentElement.removeChild(questions[j]);
+            }
+        }
+    }
+
+    // If a topic is empty, remove it
+    for (var i = 0; i < topics.length; i++) {
+        if (topics[i].getElementsByClassName("list-unstyled")[0].childElementCount == 0) {
+            topics[i].parentElement.removeChild(topics[i]);
+        }
     }
     
     // If the aren't topics in the sidebar, create a no-topics element
-    var sidebar = document.getElementById("sidebar");
-    if (document.getElementById("sidebarQuestionsList").childElementCount == 1) {
+    if (document.getElementById("sidebarQuestionsList").childElementCount == 0) {
         createNoTopicsElement(document.getElementById("sidebarQuestionsList"));
     }
 
     removeQuestionFromFolioListener(questionId);
+    listSidebarData();
 }
 
 function randomQuestionListener() {
@@ -906,8 +1044,7 @@ function randomQuestionListener() {
 function resetDifficultyListener() {
     var button = document.getElementById("resetDifficultyLabel");
     button.addEventListener("click", function() {   
-        resetDifficulty();
-        resetSidebar();
+        resetDifficulty();        
         listSidebarData();
     });
 }
@@ -917,10 +1054,17 @@ function difficultyListener() {
     var radios = document.getElementById('clasification').getElementsByTagName('input');
     for (var i = 0; i < radios.length; i++) {
         radios[i].addEventListener("change", function() {
-            resetSidebar();
             listSidebarData();
         });
     }
+}
+
+function importQuestionaryListener() {
+    var button = document.getElementById("csvFileInput");
+    // Add an event listener to the input element to catch the file selected
+    button.addEventListener("change", function() {
+        importQuestionay(button);        
+    });
 }
 
 /****************
@@ -928,6 +1072,7 @@ function difficultyListener() {
  ****************/
 
 document.addEventListener("DOMContentLoaded", function() {
+    importQuestionaryListener();
     resetDifficultyListener();
     getLanguagesNames();
     listSidebarData();

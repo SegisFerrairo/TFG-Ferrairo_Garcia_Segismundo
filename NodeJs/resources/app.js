@@ -64,6 +64,33 @@ app.post('/translate', async(req, res) => {
   }
 });
 
+app.post('/addQuestion', function (req, res) {
+  
+  const data = req.body;
+
+  var question = new Question ({
+    topic: data.topic,
+    difficulty: data.difficulty,
+    languages: data.languages
+  });
+
+  // Delete data.topic from data
+  delete data.topic;
+
+  // Delete data.difficulty from data
+  delete data.difficulty;
+ 
+  question.save(function (err, doc) {
+    if (!err) {
+        // console.log(doc);
+        res.status(200).json({ message: 'Pregunta añadida exitosamente.' });          
+    }
+    else {
+        // console.log(err);
+        res.status(500).json({ error: 'Error al procesar la solicitud.' });
+    }
+  });
+});
 
 
 /*****************
@@ -80,42 +107,6 @@ app.get('/newQuestion/getLanguagesNames', async(req, res) => {
   }
 });
 
-app.post('/newQuestion/addQuestion', function (req, res) {
-  const data = req.body;
-
-  var question = new Question ({
-    topic: data.topic,
-    difficulty: data.difficulty,
-    languages: []
-  });
-
-  // Delete data.topic from data
-  delete data.topic;
-
-  // Delete data.difficulty from data
-  delete data.difficulty;
-
-  Object.values(data).forEach(language => {
-    question.languages.push({
-      name: language.name,
-      languageId: language.languageId,
-      statement: language.statement,
-      options: language.options,
-      answer: language.answer
-    });
-  });
- 
-  question.save(function (err, doc) {
-    if (!err) {
-        // console.log(doc);
-        res.status(200).json({ message: 'Pregunta añadida exitosamente.' });          
-    }
-    else {
-        // console.log(err);
-        res.status(500).json({ error: 'Error al procesar la solicitud.' });
-    }
-  });
-});
 
 /*****************
  ** questionary **
