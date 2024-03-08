@@ -141,6 +141,10 @@
 #randomizeQuestions:hover::before {
     filter: invert(100%);
 }
+
+.csvFileInput {
+    cursor: pointer;
+}
   
 .form-clasification {
     text-align: center;
@@ -152,6 +156,15 @@
 
 .form-clasification label {
     font-size: 20px;
+    /* cursor: pointer; */
+}
+
+#resetDifficultyLabel {
+    cursor: pointer;
+}
+
+#resetDifficultyLabel:hover {
+    color: orange;
 }
 
 .clasification {

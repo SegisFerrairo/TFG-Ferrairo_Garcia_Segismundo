@@ -16,6 +16,15 @@ var OPTION_TYPE = 'radio';
  ** Utils **
  ***********/
 
+function getDifficultyValue() {
+    var radios = document.getElementById('clasification').getElementsByTagName('input');
+    for (var i = 0; i < radios.length; i++) {
+        if (radios[i].checked) {
+            return radios[i].value;
+        }
+    }
+}
+
 function getTabLinks() {
     var tabs = document.getElementById('tabList').getElementsByTagName('li');
     return tabs;
@@ -410,10 +419,12 @@ function showLangs() {
     }
 }
 
-
 function submitData() {
     var question = {};
     question.topic = document.getElementById('floatingTopic').value;
+
+    // Get the difficulty
+    question.difficulty = getDifficultyValue();
 
     var data = catchFormData(MAIN_FORM_ID, OPTIONS_MAIN_FORM_NAME_ID);
     data.name = MAIN_FORM_LANGUAGE;  
@@ -440,7 +451,7 @@ function submitData() {
     for (var i = 1; i <= tabs.length; i++) {
         var tabId = 'tab' + tabs[i-1].getElementsByTagName('a')[0].id.slice(7);
         document.getElementById(tabId).reset();
-    }     
+    }  
 
     //console.log(question);
     // Send the data
@@ -648,7 +659,7 @@ function getTopics() {
         return response.json();
     })
     .then(responseData => {
-        console.log('Respuesta del servidor:', responseData);
+        console.debug('Respuesta del servidor:', responseData);
         // Add the topics to the select
         var select = document.getElementById('topics-list');
         for (var i = 0; i < responseData.length; i++) {
@@ -807,9 +818,7 @@ function sendFormData(data) {
         return response.json();
     })
     .then(responseData => {
-        console.log('Respuesta del servidor:', responseData);
-        // Redirect to Home Page
-        //window.location.href = '/';        
+        console.debug('Respuesta del servidor:', responseData);    
     })
     .catch(error => {
         console.error('Error en la solicitud:', error.message);

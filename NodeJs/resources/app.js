@@ -85,11 +85,15 @@ app.post('/newQuestion/addQuestion', function (req, res) {
 
   var question = new Question ({
     topic: data.topic,
+    difficulty: data.difficulty,
     languages: []
   });
 
   // Delete data.topic from data
   delete data.topic;
+
+  // Delete data.difficulty from data
+  delete data.difficulty;
 
   Object.values(data).forEach(language => {
     question.languages.push({
@@ -126,6 +130,21 @@ app.get('/questionary/getTopicsByLanguage:language', async(req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+//Get topics by language and difficulty
+app.get('/questionary/getTopicsByLaD:langAndDiff', async(req, res) => {
+  try {
+    var langAndDiff = decodeURIComponent(req.params.langAndDiff).slice(1).toString();
+    var language = langAndDiff.split("-")[0];
+    var difficulty = langAndDiff.split("-")[1];
+    
+    const topics = await Question.distinct("topic", {"languages.name": language, difficulty: difficulty});
+    res.status(200).json(topics);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 
 app.get('/questionary/getQuestionById:questionId', async(req, res) => {
   try {

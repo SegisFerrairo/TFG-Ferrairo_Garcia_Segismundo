@@ -20,6 +20,10 @@ const question_schema = new mongoose.Schema({
         type: String,
         required: 'This field is required'
     },
+    difficulty: {
+        type: Number,
+        required: 'This field is required'
+    },
     languages: [{
         name: {
             type: String,

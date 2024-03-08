@@ -10,6 +10,30 @@ var CHOOSEN_LANGUAGE_ID = 0;
  ** Utils **
  ***********/
 
+function getDifficultyValue() {
+    var radios = document.getElementById('clasification').getElementsByTagName('input');
+    for (var i = 0; i < radios.length; i++) {
+        if (radios[i].checked) {
+            return radios[i].value;
+        }
+    }
+}
+
+function resetDifficulty() {
+    var radios = document.getElementById('clasification').getElementsByTagName('input');
+    for (var i = 0; i < radios.length; i++) {
+        radios[i].checked = false;
+    }
+}
+
+function resetSidebar() {
+    var sidebar = document.getElementById("sidebarQuestionsList");
+    // Remove all children from the sidebar, all of them
+    while (sidebar.firstChild) {
+        sidebar.removeChild(sidebar.firstChild);
+    }
+}
+
 function openTab(linkTabId, folioId) {
     var tabList = document.getElementById('languagesTabList');
 
@@ -178,8 +202,6 @@ function createNoTopicsElement(ul) {
 }
 
 async function listSidebarData() {
-    var sidebar = document.getElementById("sidebar");
-
     // Remove all the topics from the sidebar except the first one
     // while (document.getElementById("sidebarQuestionsList").childElementCount > 1) {
     //     document.getElementById("sidebarQuestionsList").removeChild(document.getElementById("sidebarQuestionsList").lastChild);
@@ -199,12 +221,22 @@ async function listSidebarData() {
         return;
     }
 
-    // Get the topics from the DB
+    // if difficulty is empty, get all the topics by language. Otherwise, get the topics by language and difficulty
     var topics;
-    try {
-        topics = await getTopicsByLanguage(CHOOSEN_LANGUAGE);
-    } catch (error) {
-        console.error('Error en la solicitud:', error.message);
+    var difficulty = getDifficultyValue();
+    if (difficulty == undefined) {
+        try {
+            topics = await getTopicsByLanguage(CHOOSEN_LANGUAGE);
+        } catch (error) {
+            console.error('Error en la solicitud:', error.message);
+        }
+    }
+    else {
+        try {
+            topics = await getTopicsByLanguageAndDifficulty(CHOOSEN_LANGUAGE, difficulty);
+        } catch (error) {
+            console.error('Error en la solicitud:', error.message);
+        }
     }
 
     topics.forEach(function(topic) {
@@ -233,7 +265,7 @@ async function listSidebarData() {
         ul.className = "btn-toggle-nav list-unstyled fw-normal pb-1 small";
 
         data.forEach(function(question) {
-            if (question.topic == topic) {
+            if (question.topic == topic && (difficulty != undefined ? question.difficulty == difficulty : true)) {
                 var li = document.createElement("li");
                 li.className = "mb-1"
                 li.style.listStyleType = "disc";
@@ -608,32 +640,10 @@ async function getTopicsByLanguage(language) {
     }
 }
 
-async function getTopics() {
+async function getTopicsByLanguageAndDifficulty(language, difficulty) {
     try {
-        const response = await fetch('/getTopics', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        });
-        
-        if (!response.ok) {
-            throw new Error('Error al obtener los datos de la base de datos');
-        }
-        
-        const responseData = await response.json();
-        console.debug('Respuesta del servidor:', responseData);
-        return responseData;
-    } catch (error) {
-        console.error('Error en la solicitud:', error.message);
-        throw error;
-    }
-}
-
-// Get the questions from the database
-async function getAllDBData() {
-    try {
-        const response = await fetch('/questionary/getAllQuestions', {
+        var langAndDiff = language + "-" + difficulty;
+        const response = await fetch('/questionary/getTopicsByLaD:' + encodeURIComponent(langAndDiff), {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -652,7 +662,6 @@ async function getAllDBData() {
         throw error;
     }
 }
-
 
 async function getQuestionById(questionId) {
     try {
@@ -894,15 +903,35 @@ function randomQuestionListener() {
     });
 }
 
+function resetDifficultyListener() {
+    var button = document.getElementById("resetDifficultyLabel");
+    button.addEventListener("click", function() {   
+        resetDifficulty();
+        resetSidebar();
+        listSidebarData();
+    });
+}
+
+// when difficulty is changed, update the sidebar
+function difficultyListener() {
+    var radios = document.getElementById('clasification').getElementsByTagName('input');
+    for (var i = 0; i < radios.length; i++) {
+        radios[i].addEventListener("change", function() {
+            resetSidebar();
+            listSidebarData();
+        });
+    }
+}
 
 /****************
  ** DOM Loaded **
  ****************/
 
 document.addEventListener("DOMContentLoaded", function() {
+    resetDifficultyListener();
     getLanguagesNames();
-    //getAllDBData();
     listSidebarData();
+    difficultyListener();
     dropdownLanguagesListener();
     exportQuestionaryListener();
     randomQuestionListener();

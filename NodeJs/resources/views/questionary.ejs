@@ -20,7 +20,7 @@
                 <li class="border-top" style="list-style: none;"></li>
      
                 <div>
-                    <label for="csvFileInput" class="form-label ms-1 mt-3">
+                    <label for="csvFileInput" class="form-label csvFileInput ms-1 mt-3">
                         Importar cuestionario
                         <img src="images/file-earmark-arrow-up.svg" class="ms-3" alt="Subir archivo" style="width: 30px; height: 30px;">
                     </label>
@@ -34,7 +34,7 @@
 
             </div>
             <div class="sidebar-content">
-                <ul id="sidebarQuestionsList" class="list-unstyled ps-0">
+                <ul class="list-unstyled ps-0">
                     <li class="border-top my-3"></li>
                     <form class="form-clasification">
                         <label id="resetDifficultyLabel" for="clasification">Dificultad de preguntas</label>
@@ -47,11 +47,13 @@
                           <label for="radio3">★</label>
                           <input id="radio4" type="radio" name="stars" value="2">
                           <label for="radio4">★</label>
-                          <input id="radio5" type="radio" name="stars" value="1" required>
+                          <input id="radio5" type="radio" name="stars" value="1">
                           <label for="radio5">★</label>
                         </p>
                     </form>
                     <li class="border-top my-3"></li>
+                </ul>
+                <ul id="sidebarQuestionsList" class="list-unstyled ps-0">
                 </ul>
             </div>
         </div>
