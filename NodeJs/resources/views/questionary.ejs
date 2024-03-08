@@ -14,22 +14,35 @@
         <!-- Barra lateral -->
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h5>Cuestiones</h5>
+                <div style="display: flex;">
+                    <h5>Cuestiones</h5>
+                    <button type="button" id="randomizeQuestions" class="btn btn-outline-primary ms-3"></button>
+                </div>
                 <!-- Create a divider -->
 
                 <li class="border-top" style="list-style: none;"></li>
-     
                 <div>
-                    <label for="csvFileInput" class="form-label csvFileInput ms-1 mt-3">
+                    <label for="csvFileInput" class="btn btn-outline-secondary form-label csvFileInput mt-3">
+                        <img src="images/file-earmark-arrow-up.svg" class="me-3" alt="Subir archivo" style="width: 30px; height: 30px;">
                         Importar cuestionario
-                        <img src="images/file-earmark-arrow-up.svg" class="ms-3" alt="Subir archivo" style="width: 30px; height: 30px;">
+                        <span class="me-3"></span>
                     </label>
                     <input class="form-control" style="display: none;" type="file" id="csvFileInput" accept=".csv">
                 </div>
-                <div>
-                    <button type="sumbit" id="exportQuestionary" class="btn btn-primary">Exportar cuestionario</button>
-                    <!-- Create a button to randomize questions order in folio -->
-                    <button type="button" id="randomizeQuestions" class="btn btn-outline-primary ms-3"></button>
+
+                <div class="btn-group" role="group" style="height: 50px;" aria-label="Button group with nested dropdown">                    
+                    <button type="sumbit" id="exportQuestionary" class="btn btn-primary">
+                        <img src="images/cloud-download-fill.svg" alt="Exportar cuestionario" style="width: 30px; height: 30px;">
+                        <span>Exportar a</span>
+                        <strong>LaTex</strong>
+                    </button>     
+                    <div class="btn-group" role="group">
+                      <button id="exportDropdown" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button> 
+                      <div class="dropdown-menu exportDropdown-menu" aria-labelledby="exportDropdown">
+                        <a class="dropdown-item">CSV</a>
+                        <a class="dropdown-item">LaTeX</a>
+                      </div>
+                    </div>
                 </div>
 
             </div>

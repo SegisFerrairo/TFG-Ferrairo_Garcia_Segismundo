@@ -124,10 +124,18 @@
     text-overflow: unset;
 }
 
+.exportDropdown-menu {
+    margin-top: 42px;
+    min-width: 0px;
+}
+
 #randomizeQuestions {
     width: 37px;
     height: 39px;
     cursor: pointer;
+    position: relative;
+    left: 70px;
+    bottom: 10px;
   }
   
 #randomizeQuestions::before {
@@ -141,11 +149,27 @@
 #randomizeQuestions:hover::before {
     filter: invert(100%);
 }
-
 .csvFileInput {
     cursor: pointer;
 }
-  
+
+#exportQuestionary {
+    min-width: 192px;
+}
+
+#exportQuestionary img {
+    filter: invert(100%);
+    margin-right: 16px;
+    position:absolute;
+    left: 18px;
+    top: 10px;
+}
+
+#exportQuestionary strong {
+    position:fixed;
+    margin-left: 4px;
+}
+
 .form-clasification {
     text-align: center;
 }

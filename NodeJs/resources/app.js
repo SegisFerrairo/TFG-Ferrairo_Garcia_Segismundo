@@ -93,12 +93,11 @@ app.post('/addQuestion', function (req, res) {
   // Check if the question already exists
   Question   
     .findOne({ topic: question.topic, difficulty: question.difficulty })
-    .where('languages.name').equals(data.languages[0].name)
-    .exec(function (err, question) {
+    .exec(function (err, questionError) {
       if (err) {
         res.status(500).json({ error: 'Error al procesar la solicitud.' });
       }
-      else if (question) {
+      else if (questionError) {
         res.status(409).json({ error: 'La pregunta ya existe.' });
       }
       else {
