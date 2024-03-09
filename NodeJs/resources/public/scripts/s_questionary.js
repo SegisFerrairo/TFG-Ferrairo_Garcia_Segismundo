@@ -139,27 +139,8 @@ function addCabeceraTab() {
     addFolioHeader(folioHeaderId);
 }
 
-
 function addFolioHeader(folioHeaderId) {
     var myTabContent = document.getElementById("myTabContent");
-    // var div = document.createElement("div");
-    // div.id = folioId;
-    // div.className = "tab-pane fade folio-container";
-    // // Add language as a class to the div
-    // div.classList.add("language-"+language);
-    // var divHeader = document.createElement("div");
-    // divHeader.className = "folio-header";
-    // divHeader.id = "header-" + folioId;  
-
-    // var divBody = document.createElement("div");
-    // divBody.className = "folio-body";
-    // var ol = document.createElement("ol");
-    // ol.className = "list-group ms-3";
-    // ol.id = "list-" + folioId;
-    // divBody.appendChild(ol);
-    // div.appendChild(divBody);
-
-    // myTabContent.appendChild(div);
 
     var divContainer = document.createElement("div");
     divContainer.id = folioHeaderId;
@@ -180,6 +161,8 @@ function addFolioHeader(folioHeaderId) {
 
     var div = document.createElement("div");
     div.className = "form-floating";
+    div.style.width = "400px";
+
     var input = document.createElement("input");
     input.type = "input";
     input.className = "form-control mb-2";
@@ -211,11 +194,14 @@ function addFolioHeader(folioHeaderId) {
 
     divTop.appendChild(divTitle);
 
+    var divOptions = document.createElement("div");
+    divTop.className = "d-flex justify-content-between";
+
     var div = document.createElement("div");
     div.className = "form-floating";
     var input = document.createElement("input");
     input.type = "input";
-    input.className = "form-control";
+    input.className = "form-control mb-2";
     input.id = "floatingTopic-calification";
     div.appendChild(input);
 
@@ -224,10 +210,43 @@ function addFolioHeader(folioHeaderId) {
     label.textContent = "Puntuación máxima";
     div.appendChild(label);
 
-    divTop.appendChild(div);
+    divOptions.appendChild(div);
 
+    var div = document.createElement("div");
+    div.className = "form-floating";
+    var input = document.createElement("input");
+    input.type = "input";
+    input.className = "form-control mb-2";
+    input.id = "floatingTopic-version";
+    div.appendChild(input);
+
+    var label = document.createElement("label");
+    label.htmlFor = "floatingTopic-version";
+    label.textContent = "Número de versiones";
+    div.appendChild(label);
+
+    divOptions.appendChild(div);
+
+    divTop.appendChild(divOptions);
 
     divHeader.appendChild(divTop);
+
+    var div = document.createElement("div");
+    div.className = "form-check form-switch mt-2";
+    var input = document.createElement("input");
+    input.className = "form-check-input";
+    input.type = "checkbox";
+    input.id = "answersSwitch";
+    input.checked = true;
+    div.appendChild(input);
+
+    var label = document.createElement("label");
+    label.className = "form-check-label";
+    label.htmlFor = "answersSwitch";
+    label.innerHTML = "<small>Incluir respuestas</small>";
+    div.appendChild(label);
+
+    divHeader.appendChild(div);
     
     var ul = document.createElement("ul");
     ul.className = "list-unstyled ps-0";
@@ -258,6 +277,7 @@ function addFolioHeader(folioHeaderId) {
     popoverDiv.id = "popoverDiv-criteriaUseExample";
     popoverDiv.setAttribute("data-popper-placement", "bottom");
 
+    popoverDiv.style.minWidth = "500px";
     popoverDiv.style.position = "absolute";
     popoverDiv.style.display = "none";
 
@@ -269,7 +289,7 @@ function addFolioHeader(folioHeaderId) {
 
     var popoverBody = document.createElement("div");
     popoverBody.className = "popover-body";
-    popoverBody.innerHTML = "Criterio 1<br>Criterio 2:<br>-> Subcriterio 2.1<br>-> Subcriterio 2.2";
+    popoverBody.innerHTML = "Duración máxima del examen 2 horas<br>Normas del test:<br>-> El test se recogerá a los 30 minutos del comienzo del examen<br>-> Cada respuesta incorrecta resta 1/2 respuesta correcta<br>-> No olvides indicar la modalidad del test en la hoja de respuestas";
 
     popoverDiv.appendChild(popoverBody);
     document.body.appendChild(popoverDiv);
@@ -805,28 +825,35 @@ function catchHeaderData() {
     headerData.title = document.getElementById("floatingTopic-title").value;
     headerData.subtitle = document.getElementById("floatingTopic-subtitle").value;
     headerData.calification = document.getElementById("floatingTopic-calification").value;
+    headerData.versions = document.getElementById("floatingTopic-version").value;
+    headerData.answers = document.getElementById("answersSwitch").checked;
     var criteria = document.getElementById("exampleTextarea").value;
     headerData.criteria = processCriteria(criteria);
 
     return headerData;
 }
 
-
 function generateLaTexContent(questions) {
-    var texCode = generateLaTexPackages();
-    texCode += generateLaTexChoiceCommand();
-    texCode += generateLaTexVersionsAndAnswers();
-    texCode += "\\begin{document}\n";
-
     var headerData = catchHeaderData();
     var title = headerData.title;
     var subtitle = headerData.subtitle;
     var calification = headerData.calification;
+    var versions = headerData.versions;
+    // if versions is "", it is 3 by default
+    if (versions == "") {
+        versions = 1;
+    }
+    var answers = headerData.answers;
     var criteria = headerData.criteria;
     // if criteria is [""] or [], it is an empty array
     if (criteria.length == 1 && criteria[0] == "") {
         criteria = [];
     }    
+
+    var texCode = generateLaTexPackages();
+    texCode += generateLaTexChoiceCommand();
+    texCode += generateLaTexVersionsAndAnswers(versions, answers);
+    texCode += "\\begin{document}\n";  
 
     texCode += generateLaTexHeaderAndCriteria(title, subtitle, criteria, calification);
 
@@ -870,7 +897,7 @@ function generateLaTexChoiceCommand() {
     return texCode;
 }
 
-function generateLaTexVersionsAndAnswers(versions=3, answers=true) {
+function generateLaTexVersionsAndAnswers(versions=1, answers=true) {
     var texCode = "\\NumberOfVersions{" + versions + "}\n";
 
     if (answers) {
@@ -921,8 +948,9 @@ function generateLaTexHeaderAndCriteria(title, subtitle, criteria, calification)
     }
     texCode += "\\paragraph{}\n";
     if (calification != undefined && calification != "") {
-        texCode += "\\textbf{Test (" + calification + " puntos)} --- \\textbf{Modalidad \\arabic{version}}\n";
+        texCode += "\\textbf{Test (" + calification + " puntos)} --- ";
     }
+    texCode += "\\textbf{Modalidad \\arabic{version}}\n";
 
     texCode += "\\end{examtop}\n";
     return texCode;
