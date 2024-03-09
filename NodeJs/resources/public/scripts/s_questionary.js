@@ -380,7 +380,7 @@ function addEmptyQuestion(folioId, question, language) {
     li_q.id = "question-" + question._id;
     li_q.className = "question empty-question";
     var label = document.createElement("label");
-    label.textContent = "La pregunta no está en el idioma " + language;
+    label.textContent = "Error: La pregunta no está en el idioma " + language;
     li_q.appendChild(label);
 
     var button = document.createElement("button");
@@ -517,7 +517,7 @@ function catchQuestionary(folioId) {
         if (questions[i].classList.contains("empty-question")) {
             // Create an empty question
             question[languageName] = {
-                statement: "La pregunta no está en el idioma " + languageName,
+                statement: "Error: La pregunta no está en el idioma " + languageName,
                 options: [],
                 answer: []
             };
@@ -561,6 +561,10 @@ async function processData(questionsData) {
     return questionsData;
 }
 
+/************
+ ** Export **
+ ************/
+
 function exportQuestionaryLaTex(questions) {
     var texContent = generateLaTexContent(questions);
     var data = new Blob([texContent], {type: 'application/x-latex'});
@@ -574,24 +578,135 @@ function exportQuestionaryLaTex(questions) {
 }
 
 function generateLaTexContent(questions) {
-    var texCode = "\\documentclass{article}\n";
-    texCode += "\\begin{document}\n\n";
-    texCode += "\\section*{Preguntas}\n\n";
-    texCode += "\\begin{tabular}{|p{6cm}|p{6cm}|p{4cm}|}\n";
-    texCode += "\\hline\n";
-    texCode += "\\textbf{Pregunta} & \\textbf{Opciones} & \\textbf{Respuesta} \\\\ \n";
-    texCode += "\\hline\n";
-    questions.forEach(function(question) {
-        var statement = question[Object.keys(question)[0]].statement;
-        var options = question[Object.keys(question)[0]].options.join(", ");
-        var answer = question[Object.keys(question)[0]].answer.join(", ");
-        texCode += statement + " & " + options + " & " + answer + " \\\\ \n";
-        texCode += "\\hline\n";
-    });
-    texCode += "\\end{tabular}\n\n";
-    texCode += "\\end{document}\n";
+    var texCode = generateLaTexPackages();
+    texCode += generateLaTexChoiceCommand();
+    texCode += generateLaTexVersionsAndAnswers();
+    texCode += "\\begin{document}\n";
+
+    var title = "Diseño de Sistemas Software";
+    var subtitle = "Examen final -- Junio 2023";
+    var criteria = ["Duración máxima del examen 2 horas", "Normas del test:", ["El test se recogerá a los 30 minutos del comienzo del examen", "Cada respuesta incorrecta resta 1/2 respuesta correcta", "No olvides indicar la modalidad del test en la hoja de respuestas"]];
+    var calification = 4;
+    texCode += generateLaTexHeaderAndCriteria(title, subtitle, criteria, calification);
+
+    texCode += generateLaTexQuestions(questions);
+
+    texCode += "\\end{document}";
     return texCode;
 }
+
+function generateLaTexPackages() {
+    var texCode = "\\documentclass[a4paper, 10pt]{examdesign}\n";
+    texCode += "\\setrandomseed{555}\n";
+    texCode += "\\usepackage[spanish]{babel}\n";
+    texCode += "\\usepackage[utf8]{inputenc}\n";
+    texCode += "\\usepackage{palatino}\n";
+    texCode += "\\usepackage{color}\n";
+    texCode += "\\usepackage[top=1.5cm, bottom=2cm, left=1.5cm, right=1.5cm]{geometry}\n";
+    texCode += "\\usepackage{enumitem}\n";
+    texCode += "\\pagenumbering{gobble} % disable page numbering\n\n";
+    texCode += "\\usepackage[T1]{fontenc}\n";
+    texCode += "\\newcommand{\\role}[1] {\\guillemotleft #1\\guillemotright}\n";
+    return texCode;
+}
+
+function generateLaTexChoiceCommand() {
+    var texCode = "% Custom command to handle the \"!\" option in choices\n";
+    texCode += "\\makeatletter\n";
+    texCode += "\\renewcommand{\\exam@ShortKeyChoice}[2][]{%\n";
+    texCode += "  \\if#1!%\n";
+    texCode += "    \\ifOneCorrectAnswerAlreadyGiven\n";
+    texCode += "    , (\\alph{choice})\n";
+    texCode += "    \\else\n";
+    texCode += "    \\exam@MultipleChoiceShortKeyPrefix\n";
+    texCode += "    (\\alph{choice})%\n";
+    texCode += "    \\OneCorrectAnswerAlreadyGiventrue\n";
+    texCode += "    \\fi\n";
+    texCode += "   \\fi\n";
+    texCode += "  \\stepcounter{choice}%\n";
+    texCode += "  \\ignorespaces}\n";
+    texCode += "\\makeatother\n";
+    return texCode;
+}
+
+function generateLaTexVersionsAndAnswers(versions=3, answers=true) {
+    var texCode = "\\NumberOfVersions{" + versions + "}\n";
+
+    if (answers) {
+        texCode += "\\ShortKey\n";
+    }
+    else {
+        texCode += "\\NoKey\n";
+    }
+
+    texCode += "\\begin{keytop} {\\huge Respuestas correctas para la Modalidad {\\bf \\arabic{version}}}\n";
+    texCode += "\\end{keytop}\n";
+
+    return texCode;
+}
+
+function generateLaTexHeaderAndCriteria(title, subtitle, criteria, calification) {
+    var texCode = "\\begin{examtop}\n";
+    texCode += "\\begin{center}\n";
+    texCode += "\\begin{huge}\n";
+    texCode += title + "\\\\ \n";
+    texCode += "\\end{huge}\n";
+    texCode += "\\begin{Large}\n";
+    texCode += subtitle + "\\\\ \n";
+    texCode += "\\end{Large}\n";
+    texCode += "\\end{center}\n";
+    texCode += "\\vspace{0.2cm}\n";
+
+    texCode += "\\begin{itemize}[leftmargin=1.5cm]\n";
+    criteria.forEach(function(rule) {
+        // if rule is an array, it is a list of rules
+        if (Array.isArray(rule)) {
+            texCode += "\\begin{itemize}\n";
+            rule.forEach(function(subrule) {
+                texCode += "\\item " + subrule + "\n";
+            });
+            texCode += "\\end{itemize}\n";
+        }
+        else {
+            texCode += "\\item " + rule + "\n";
+        }
+    });
+    texCode += "\\end{itemize}\n";
+    texCode += "\\paragraph{}\n";
+    texCode += "\\textbf{Test (" + calification + " puntos)} --- \\textbf{Modalidad \\arabic{version}}\n";
+    texCode += "\\end{examtop}\n";
+    return texCode;
+}
+
+function generateLaTexQuestions(questions) {
+    var texCode = "\\begin{multiplechoice}[examcolumns=1]\n";
+    questions.forEach(function(question) {
+        var language = Object.keys(question)[0];
+        var statement = question[language].statement;
+        var options = question[language].options;
+        var answer = question[language].answer;
+        texCode += "\\begin{question}\n";
+        // if the statement starts with "Error", it is an empty question
+        if (statement.startsWith("Error")) {
+            texCode += "\\textcolor{red}{Pregunta vacía}\n";
+            texCode += "\\choice{\\textcolor{red}{"+statement+"}}\n";
+        }
+        else {        
+            texCode += statement + "\n";
+            options.forEach(function(option) {
+                var correct = answer.includes(options.indexOf(option)+1) ? "[!]" : "";
+                texCode += "\\choice" + correct + "{" + option + "}\n";
+            });
+        }
+        texCode += "\\end{question}\n";
+    });
+    texCode += "\\end{multiplechoice}\n";
+    return texCode;
+}
+
+/************
+ ** Import **
+ ************/
 
 function importQuestionay(button) {
     // If there is no file selected, return
