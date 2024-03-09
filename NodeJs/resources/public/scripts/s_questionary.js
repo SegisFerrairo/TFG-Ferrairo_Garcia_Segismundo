@@ -65,14 +65,13 @@ function openTab(linkTabId, folioId) {
         // Add the 'active' class to the clicked <div> element
         var tabContent = document.getElementById(folioId);
         tabContent.classList.add('active', 'show');
-
-
     }
 }
 
 function removeLanguagesTab(language) {
     var languagesTabList = document.getElementById("languagesTabList");
-    var links = languagesTabList.getElementsByTagName("a");
+    // var links = languagesTabList.getElementsByTagName("a"); Exclude the first tab, the header
+    var links = Array.from(languagesTabList.getElementsByTagName("a")).slice(1);
     for (var i = 0; i < links.length; i++) {
         if (links[i].textContent == language) {
             var folioId = "folio_" + links[i].id.split("_")[1];
@@ -100,7 +99,6 @@ function addLanguagesTab(language) {
     var a = document.createElement("a");
     a.id = "linkTab_" + COUNTER_LANGUAGE;
     a.className = "nav-link";
-    a.href = "#";
     a.role = "tab";
     a.setAttribute("aria-selected", "false");
     a.tabIndex = "-1";
@@ -118,16 +116,185 @@ function addLanguagesTab(language) {
     COUNTER_LANGUAGE++;
 }
 
-function addFolioHeader(folioHeaderId) {
-    var folioHeader = document.getElementById(folioHeaderId);
+function addCabeceraTab() {
+    var languagesTabList = document.getElementById("languagesTabList");
 
-    var h3 = document.createElement("h3");
-    h3.textContent = "Cuestionario";
-    folioHeader.appendChild(h3);
+    var li = document.createElement("li");
+    li.className = "nav-item";
+    li.role = "presentation";
+    var a = document.createElement("a");
+    a.id = "header-linkTab";
+    a.className = "nav-link active";
+    a.role = "tab";
+    a.setAttribute("aria-selected", "false");
+    a.tabIndex = "-1";
+    a.textContent = "Cabecera";
+
+    var folioHeaderId = "folioHeader";
+
+    a.addEventListener("click", function() {openTab(a.id, folioHeaderId)});
+    li.appendChild(a);
+    languagesTabList.appendChild(li);
+
+    addFolioHeader(folioHeaderId);
+}
+
+
+function addFolioHeader(folioHeaderId) {
+    var myTabContent = document.getElementById("myTabContent");
+    // var div = document.createElement("div");
+    // div.id = folioId;
+    // div.className = "tab-pane fade folio-container";
+    // // Add language as a class to the div
+    // div.classList.add("language-"+language);
+    // var divHeader = document.createElement("div");
+    // divHeader.className = "folio-header";
+    // divHeader.id = "header-" + folioId;  
+
+    // var divBody = document.createElement("div");
+    // divBody.className = "folio-body";
+    // var ol = document.createElement("ol");
+    // ol.className = "list-group ms-3";
+    // ol.id = "list-" + folioId;
+    // divBody.appendChild(ol);
+    // div.appendChild(divBody);
+
+    // myTabContent.appendChild(div);
+
+    var divContainer = document.createElement("div");
+    divContainer.id = folioHeaderId;
+    divContainer.className = "tab-pane fade folio-container";
+    // Add language as a class to the div
+    // div.classList.add("language-"+language);
+    var divHeader = document.createElement("div");
+    divHeader.className = "folio-header";
+    divHeader.id = "header-" + folioHeaderId;  
+
+
+    var divTop = document.createElement("div");
+    // display: flex; justify-content: space-between;
+    divTop.className = "d-flex justify-content-between";
+
+    var divTitle = document.createElement("div");
+
+    var div = document.createElement("div");
+    div.className = "form-floating";
+    var input = document.createElement("input");
+    input.type = "input";
+    input.className = "form-control mb-2";
+    input.id = "floatingTopic-title";
+    div.appendChild(input);
+
+    var label = document.createElement("label");
+    label.htmlFor = "floatingTopic-title";
+    label.textContent = "Título del cuestionario";
+    div.appendChild(label);
+
+    divTitle.appendChild(div);
+
+
+    var div = document.createElement("div");
+    div.className = "form-floating";
+    var input = document.createElement("input");
+    input.type = "input";
+    input.className = "form-control mb-2";
+    input.id = "floatingTopic-subtitle";
+    div.appendChild(input);
+
+    var label = document.createElement("label");
+    label.htmlFor = "floatingTopic-subtitle";
+    label.textContent = "Subtítulo del cuestionario";
+    div.appendChild(label);
+
+    divTitle.appendChild(div);
+
+    divTop.appendChild(divTitle);
+
+    var div = document.createElement("div");
+    div.className = "form-floating";
+    var input = document.createElement("input");
+    input.type = "input";
+    input.className = "form-control";
+    input.id = "floatingTopic-calification";
+    div.appendChild(input);
+
+    var label = document.createElement("label");
+    label.htmlFor = "floatingTopic-calification";
+    label.textContent = "Calificación";
+    div.appendChild(label);
+
+    divTop.appendChild(div);
+
+
+    divHeader.appendChild(divTop);
+    
+    var ul = document.createElement("ul");
+    ul.className = "list-unstyled ps-0";
+    var li = document.createElement("li");
+    li.className = "border-top my-3";
+    ul.appendChild(li);
+    divHeader.appendChild(ul);
+
+    var div = document.createElement("div");
+    div.className = "form-group";
+    var label = document.createElement("label");
+    label.htmlFor = "exampleTextarea";
+    label.textContent = "Criterios de corrección:";
 
     var p = document.createElement("p");
-    p.textContent = "Criterios de correción: ----";
-    folioHeader.appendChild(p);
+
+    var popoverButton = document.createElement("button");
+    popoverButton.type = "button";
+    popoverButton.id = "popoverButton-criteriaUseExample";
+    popoverButton.className = "btn btn-secondary me-1";
+    popoverButton.textContent = "Ejemplo";
+    p.appendChild(popoverButton);
+
+    var popoverDiv = document.createElement("div");
+    popoverDiv.className = "popover bs-popover-auto fade show mt-1";
+    popoverDiv.setAttribute("role", "tooltip");
+    popoverDiv.id = "popoverDiv-criteriaUseExample";
+    popoverDiv.setAttribute("data-popper-placement", "bottom");
+
+    popoverDiv.style.position = "absolute";
+    popoverDiv.style.display = "none";
+
+    var popoverHeader = document.createElement("h3");
+    popoverHeader.className = "popover-header";
+    popoverHeader.textContent = "Ejemplo de uso";
+
+    popoverDiv.appendChild(popoverHeader);
+
+    var popoverBody = document.createElement("div");
+    popoverBody.className = "popover-body";
+    popoverBody.innerHTML = "Criterio 1<br>Criterio 2:<br>&nbsp;&nbsp;-> Subcriterio 2.1<br>&nbsp;&nbsp;-> Subcriterio 2.2";
+
+    popoverDiv.appendChild(popoverBody);
+    document.body.appendChild(popoverDiv);
+
+    popoverListener(popoverButton, popoverDiv);
+
+    var small = document.createElement("small");
+    var strongContent = "<strong>Consejo: </strong>";
+    small.innerHTML = "(" + strongContent + "Usa -> para crear listas)";
+    p.appendChild(small);
+
+    label.appendChild(p);
+    div.appendChild(label);
+
+    var textarea = document.createElement("textarea");
+    textarea.className = "form-control";
+    textarea.id = "exampleTextarea";
+    textarea.rows = "3";
+    div.appendChild(textarea);
+    divHeader.appendChild(div);
+
+    var ul = document.createElement("ul");
+    ul.className = "list-unstyled ps-0";
+    var li = document.createElement("li");
+    li.className = "border-top my-3";
+    ul.appendChild(li);
+    divHeader.appendChild(ul);
 
     var ul = document.createElement("ul");
     ul.className = "single-choice";
@@ -138,7 +305,7 @@ function addFolioHeader(folioHeaderId) {
     small.appendChild(label);
     li.appendChild(small);
     ul.appendChild(li);
-    folioHeader.appendChild(ul);
+    divHeader.appendChild(ul);
 
     var ul = document.createElement("ul");
     ul.className = "multiple-choice";
@@ -149,7 +316,13 @@ function addFolioHeader(folioHeaderId) {
     small.appendChild(label);
     li.appendChild(small);
     ul.appendChild(li);
-    folioHeader.appendChild(ul);
+    divHeader.appendChild(ul);
+
+    divContainer.appendChild(divHeader);
+
+    myTabContent.appendChild(divContainer);
+
+    popoverDivListener();
 }
 
 function addFolio(folioId, language) {
@@ -160,10 +333,11 @@ function addFolio(folioId, language) {
     div.className = "tab-pane fade folio-container";
     // Add language as a class to the div
     div.classList.add("language-"+language);
-    var divHeader = document.createElement("div");
-    divHeader.className = "folio-header";
-    divHeader.id = "header-" + folioId;    
-    div.appendChild(divHeader);
+
+    // var divHeader = document.createElement("div");
+    // divHeader.className = "folio-header";
+    // divHeader.id = "header-" + folioId;    
+    // div.appendChild(divHeader);
 
     var divBody = document.createElement("div");
     divBody.className = "folio-body";
@@ -172,9 +346,10 @@ function addFolio(folioId, language) {
     ol.id = "list-" + folioId;
     divBody.appendChild(ol);
     div.appendChild(divBody);
+
     myTabContent.appendChild(div);
 
-    addFolioHeader(divHeader.id);
+    //addFolioHeader(divHeader.id);
 }
 
 function disableQuestion(button) {
@@ -327,6 +502,10 @@ async function listSidebarData() {
 
 function addOptionNames(languages) {
     var fieldset = document.getElementById("choosenLanguages").getElementsByTagName("fieldset")[0];
+
+    // Create Cabecera Tab
+    addCabeceraTab("Cabecera");
+
     // If Español is in the array, remove it
     if (languages.includes("Español")) {
         languages.splice(languages.indexOf("Español"), 1);
@@ -1073,7 +1252,6 @@ function dropdownExportListener() {
     });
 }
 
-
 function switchedLanguagesListener(switchInput, language) {
     switchInput.addEventListener("change", function() {
         // If the input is checked, add the tab
@@ -1251,6 +1429,30 @@ function importQuestionaryListener() {
     // Add an event listener to the input element to catch the file selected
     button.addEventListener("change", function() {
         importQuestionay(button);        
+    });
+}
+
+function popoverListener(popoverButton, popoverDiv) {
+    popoverButton.addEventListener("click", function() {
+        // if popoverDiv is style display none, display block
+        if (popoverDiv.style.display == "none") {
+            popoverDiv.style.display = "block";
+        }
+        // if popoverDiv is style display block, display none
+        else {
+            popoverDiv.style.display = "none";
+        }
+    });
+}
+
+function popoverDivListener() {    
+    var popoverButton = document.getElementById("popoverButton-criteriaUseExample");
+    var popoverDiv = document.getElementById("popoverDiv-criteriaUseExample");
+    popoverButton.addEventListener("click", function() {
+        // popoverDiv.style.top = popoverButton.getBoundingClientRect().bottom + window.scrollY + "px";
+        // popoverDiv.style.left = popoverButton.getBoundingClientRect().left + window.scrollX + "px";
+        popoverDiv.style.top = popoverButton.getBoundingClientRect().bottom + "px";
+        popoverDiv.style.left = popoverButton.getBoundingClientRect().left + "px";
     });
 }
 
