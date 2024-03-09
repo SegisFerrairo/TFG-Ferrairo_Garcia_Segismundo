@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('navbarColor01').removeAttribute('style');
         } else {
             document.getElementById('dropdown-button').setAttribute('aria-expanded', 'true');
-            document.getElementById('navbarColor01').style.height = '120px';
+            document.getElementById('navbarColor01').style.height = '80px';
         }
 
         // document.getElementById('navbarColor01')

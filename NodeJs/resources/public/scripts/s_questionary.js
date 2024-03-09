@@ -281,6 +281,14 @@ function addFolioHeader(folioHeaderId) {
     popoverDiv.style.position = "absolute";
     popoverDiv.style.display = "none";
 
+    var copyClipboard = document.createElement("button");
+    copyClipboard.type = "button";
+    copyClipboard.className = "btn btn-outline-primary btn-sm";
+    copyClipboard.textContent = "Copiar al portapapeles";
+    copyClipboard.style.float = "right";
+    copyClipboard.style.margin = "5px";
+    popoverDiv.appendChild(copyClipboard);
+
     var popoverHeader = document.createElement("h3");
     popoverHeader.className = "popover-header";
     popoverHeader.textContent = "Ejemplo de uso";
@@ -289,12 +297,16 @@ function addFolioHeader(folioHeaderId) {
 
     var popoverBody = document.createElement("div");
     popoverBody.className = "popover-body";
-    popoverBody.innerHTML = "Duración máxima del examen 2 horas<br>Normas del test:<br>-> El test se recogerá a los 30 minutos del comienzo del examen<br>-> Cada respuesta incorrecta resta 1/2 respuesta correcta<br>-> No olvides indicar la modalidad del test en la hoja de respuestas";
+    popoverBody.innerHTML = "Duración máxima del examen 2 horas<br>\nNormas del test:<br>\n-> El test se recogerá a los 30 minutos del comienzo del examen<br>\n-> Cada respuesta incorrecta resta 1/2 respuesta correcta<br>\n-> No olvides indicar la modalidad del test en la hoja de respuestas";
 
     popoverDiv.appendChild(popoverBody);
     document.body.appendChild(popoverDiv);
 
     popoverListener(popoverButton, popoverDiv);
+
+    copyClipboard.addEventListener("click", function() {
+        navigator.clipboard.writeText(popoverBody.textContent);
+    });
 
     var small = document.createElement("small");
     var strongContent = "<strong>Consejo: </strong>";
@@ -462,7 +474,7 @@ async function listSidebarData() {
         button.type = "button";
         button.className = "btn btn-toggle align-items-center rounded collapsed";
         button.setAttribute("data-bs-toggle", "collapse");
-        button.setAttribute("data-bs-target", "#topic-" + topic + "-collapse");
+        button.setAttribute("data-bs-target", "topic-" + topic + "-collapse");
         button.setAttribute("aria-expanded", "false");
 
         var span = document.createElement("span");

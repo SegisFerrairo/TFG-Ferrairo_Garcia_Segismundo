@@ -343,7 +343,7 @@ function addForm(formId, optionsName) {
     labelEnunciado.textContent = "Introduce el enunciado de tu pregunta:";
 
     var textareaEnunciado = document.createElement("textarea");
-    textareaEnunciado.className = "form-control";
+    textareaEnunciado.className = "form-control textarea-statement";
     textareaEnunciado.setAttribute("id", formId+"_statement");
     textareaEnunciado.setAttribute("name", formId+"_statement");
     textareaEnunciado.setAttribute("rows", "3");
