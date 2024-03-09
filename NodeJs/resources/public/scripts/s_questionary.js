@@ -169,6 +169,7 @@ function addFolioHeader(folioHeaderId) {
     var divHeader = document.createElement("div");
     divHeader.className = "folio-header";
     divHeader.id = "header-" + folioHeaderId;  
+    divHeader.style.padding = "30px";
 
 
     var divTop = document.createElement("div");
@@ -220,7 +221,7 @@ function addFolioHeader(folioHeaderId) {
 
     var label = document.createElement("label");
     label.htmlFor = "floatingTopic-calification";
-    label.textContent = "Calificación";
+    label.textContent = "Puntuación máxima";
     div.appendChild(label);
 
     divTop.appendChild(div);
@@ -242,6 +243,7 @@ function addFolioHeader(folioHeaderId) {
     label.textContent = "Criterios de corrección:";
 
     var p = document.createElement("p");
+    p.className = "mt-2";
 
     var popoverButton = document.createElement("button");
     popoverButton.type = "button";
@@ -267,7 +269,7 @@ function addFolioHeader(folioHeaderId) {
 
     var popoverBody = document.createElement("div");
     popoverBody.className = "popover-body";
-    popoverBody.innerHTML = "Criterio 1<br>Criterio 2:<br>&nbsp;&nbsp;-> Subcriterio 2.1<br>&nbsp;&nbsp;-> Subcriterio 2.2";
+    popoverBody.innerHTML = "Criterio 1<br>Criterio 2:<br>-> Subcriterio 2.1<br>-> Subcriterio 2.2";
 
     popoverDiv.appendChild(popoverBody);
     document.body.appendChild(popoverDiv);
@@ -276,7 +278,7 @@ function addFolioHeader(folioHeaderId) {
 
     var small = document.createElement("small");
     var strongContent = "<strong>Consejo: </strong>";
-    small.innerHTML = "(" + strongContent + "Usa -> para crear listas)";
+    small.innerHTML = "(" + strongContent + "Usa -> para crear sublistas)";
     p.appendChild(small);
 
     label.appendChild(p);
@@ -333,11 +335,30 @@ function addFolio(folioId, language) {
     div.className = "tab-pane fade folio-container";
     // Add language as a class to the div
     div.classList.add("language-"+language);
+    div.style.padding = "50px";
 
-    // var divHeader = document.createElement("div");
-    // divHeader.className = "folio-header";
-    // divHeader.id = "header-" + folioId;    
-    // div.appendChild(divHeader);
+    var divHeader = document.createElement("div");
+    divHeader.className = "folio-header";
+    divHeader.id = "header-" + folioId;    
+
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn btn-outline-primary mb-3";
+    button.textContent = "Espacio reservado para la cabecera del cuestionario";
+    button.style.width = "100%";
+
+    button.addEventListener("click", function() { openTab("header-linkTab", "folioHeader") });
+
+    divHeader.appendChild(button);
+
+    var ul = document.createElement("ul");
+    ul.className = "list-unstyled ps-0";
+    var li = document.createElement("li");
+    li.className = "border-top my-3";
+    ul.appendChild(li);
+    divHeader.appendChild(ul);
+
+    div.appendChild(divHeader);
 
     var divBody = document.createElement("div");
     divBody.className = "folio-body";
@@ -756,16 +777,57 @@ function exportQuestionaryLaTex(questions) {
     window.URL.revokeObjectURL(url);
 }
 
+function processCriteria(criteria) {
+    var criteriaArray = criteria.split("\n");
+    var processedCriteria = [];
+    var subcriteria = [];
+    for (var i = 0; i < criteriaArray.length; i++) {
+        if (criteriaArray[i].startsWith("->")) {
+            subcriteria.push(criteriaArray[i].substring(3));
+        }
+        else {
+            if (subcriteria.length > 0) {
+                processedCriteria.push(subcriteria);
+                subcriteria = [];
+            }
+            processedCriteria.push(criteriaArray[i]);
+        }
+    }
+    if (subcriteria.length > 0) {
+        processedCriteria.push(subcriteria);
+    }
+            
+    return processedCriteria;
+}
+
+function catchHeaderData() {
+    var headerData = {};
+    headerData.title = document.getElementById("floatingTopic-title").value;
+    headerData.subtitle = document.getElementById("floatingTopic-subtitle").value;
+    headerData.calification = document.getElementById("floatingTopic-calification").value;
+    var criteria = document.getElementById("exampleTextarea").value;
+    headerData.criteria = processCriteria(criteria);
+
+    return headerData;
+}
+
+
 function generateLaTexContent(questions) {
     var texCode = generateLaTexPackages();
     texCode += generateLaTexChoiceCommand();
     texCode += generateLaTexVersionsAndAnswers();
     texCode += "\\begin{document}\n";
 
-    var title = "Diseño de Sistemas Software";
-    var subtitle = "Examen final -- Junio 2023";
-    var criteria = ["Duración máxima del examen 2 horas", "Normas del test:", ["El test se recogerá a los 30 minutos del comienzo del examen", "Cada respuesta incorrecta resta 1/2 respuesta correcta", "No olvides indicar la modalidad del test en la hoja de respuestas"]];
-    var calification = 4;
+    var headerData = catchHeaderData();
+    var title = headerData.title;
+    var subtitle = headerData.subtitle;
+    var calification = headerData.calification;
+    var criteria = headerData.criteria;
+    // if criteria is [""] or [], it is an empty array
+    if (criteria.length == 1 && criteria[0] == "") {
+        criteria = [];
+    }    
+
     texCode += generateLaTexHeaderAndCriteria(title, subtitle, criteria, calification);
 
     texCode += generateLaTexQuestions(questions);
@@ -826,33 +888,42 @@ function generateLaTexVersionsAndAnswers(versions=3, answers=true) {
 
 function generateLaTexHeaderAndCriteria(title, subtitle, criteria, calification) {
     var texCode = "\\begin{examtop}\n";
-    texCode += "\\begin{center}\n";
-    texCode += "\\begin{huge}\n";
-    texCode += title + "\\\\ \n";
-    texCode += "\\end{huge}\n";
-    texCode += "\\begin{Large}\n";
-    texCode += subtitle + "\\\\ \n";
-    texCode += "\\end{Large}\n";
-    texCode += "\\end{center}\n";
+    // If title and subtitle are not empty, add them
+    if (title != undefined && title != "") {
+        texCode += "\\begin{center}\n";
+        texCode += "\\begin{huge}\n";
+        texCode += title + "\\\\ \n";
+        texCode += "\\end{huge}\n";
+    }
+    if (subtitle != undefined && subtitle != "") {
+        texCode += "\\begin{Large}\n";
+        texCode += subtitle + "\\\\ \n";
+        texCode += "\\end{Large}\n";
+        texCode += "\\end{center}\n";
+    }
     texCode += "\\vspace{0.2cm}\n";
-
-    texCode += "\\begin{itemize}[leftmargin=1.5cm]\n";
-    criteria.forEach(function(rule) {
-        // if rule is an array, it is a list of rules
-        if (Array.isArray(rule)) {
-            texCode += "\\begin{itemize}\n";
-            rule.forEach(function(subrule) {
-                texCode += "\\item " + subrule + "\n";
-            });
-            texCode += "\\end{itemize}\n";
-        }
-        else {
-            texCode += "\\item " + rule + "\n";
-        }
-    });
-    texCode += "\\end{itemize}\n";
+    if (criteria != undefined && criteria.length > 0) {
+        texCode += "\\begin{itemize}[leftmargin=1.5cm]\n";
+        criteria.forEach(function(rule) {
+            // if rule is an array, it is a list of rules
+            if (Array.isArray(rule)) {
+                texCode += "\\begin{itemize}\n";
+                rule.forEach(function(subrule) {
+                    texCode += "\\item " + subrule + "\n";
+                });
+                texCode += "\\end{itemize}\n";
+            }
+            else {
+                texCode += "\\item " + rule + "\n";
+            }
+        });
+        texCode += "\\end{itemize}\n";
+    }
     texCode += "\\paragraph{}\n";
-    texCode += "\\textbf{Test (" + calification + " puntos)} --- \\textbf{Modalidad \\arabic{version}}\n";
+    if (calification != undefined && calification != "") {
+        texCode += "\\textbf{Test (" + calification + " puntos)} --- \\textbf{Modalidad \\arabic{version}}\n";
+    }
+
     texCode += "\\end{examtop}\n";
     return texCode;
 }
@@ -1442,6 +1513,20 @@ function popoverListener(popoverButton, popoverDiv) {
         else {
             popoverDiv.style.display = "none";
         }
+
+        // Prevent the popover from closing when clicking on the div
+        if (popoverDiv.classList.contains("show")) {
+            popoverDiv.addEventListener("click", function(event) {
+                event.stopPropagation();
+            });
+        }
+
+        // Close the popover when clicking outside of it
+        document.addEventListener("click", function(event) {
+            if (!popoverButton.contains(event.target)) {
+                popoverDiv.style.display = "none";
+            }
+        });
     });
 }
 
@@ -1451,8 +1536,8 @@ function popoverDivListener() {
     popoverButton.addEventListener("click", function() {
         // popoverDiv.style.top = popoverButton.getBoundingClientRect().bottom + window.scrollY + "px";
         // popoverDiv.style.left = popoverButton.getBoundingClientRect().left + window.scrollX + "px";
-        popoverDiv.style.top = popoverButton.getBoundingClientRect().bottom + "px";
-        popoverDiv.style.left = popoverButton.getBoundingClientRect().left + "px";
+        popoverDiv.style.top = popoverButton.getBoundingClientRect().bottom + window.scrollY + "px";
+        popoverDiv.style.left = popoverButton.getBoundingClientRect().left + window.scrollX + "px";
     });
 }
 
