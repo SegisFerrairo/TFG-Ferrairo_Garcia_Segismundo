@@ -11,9 +11,27 @@
         </li>
         <li class="nav-item">
           <a class="nav-link" href="/questionary">Cuestionario</a>
-        </li>            
+        </li>    
+        <li id="db-options" class="nav-item dropdown db-options-right" aria-expanded="false">
+          <img src="images/database-options.svg" alt="Opciones" style="width: 30px; height: 30px;">
+          <div class="dropdown-menu">
+            <!-- label for dropdown-menu Base de Datos -->
+            <h6 class="dropdown-header">Base de Datos</h6>
+            <div>
+              <div class="dropdown-divider"></div>
+              <div>                  
+                  <label class="dropdown-item" for="csvFileInput">Cargar (CSV)</label>
+                  <input class="form-control" style="display: none;" type="file" id="csvFileInput" accept=".csv">
+                </div>
+              <div>
+                <label id="exportDB" class="dropdown-item">Backup (CSV)</label>
+              </div>                
+            </div>
+          </div>
+        </li>        
       </ul>            
     </div>
+
   </div>
 </div>
 

@@ -154,19 +154,15 @@
 }
 
 #exportQuestionary {
-    min-width: 192px;
+    min-width: 236px;
 }
 
 #exportQuestionary img {
     filter: invert(100%);
     margin-right: 16px;
-    position:absolute;
-    left: 18px;
-    top: 10px;
 }
 
 #exportQuestionary strong {
-    position:fixed;
     margin-left: 4px;
 }
 

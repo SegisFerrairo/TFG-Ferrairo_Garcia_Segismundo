@@ -1,0 +1,26 @@
+#db-options img {
+    filter: invert(100%);
+}
+
+#db-options .dropdown-menu {
+    margin-top: 5px;
+    right: -2px;
+    border-color: #d2d2d2;
+}
+
+#db-options .dropdown-divider {
+    border-top-color: #d2d2d2;
+}
+
+#db-options .dropdown-menu label {
+    color: black;
+}
+
+#db-options .dropdown-menu label:hover {
+    background-color: #9ec8f0;
+}
+
+.db-options-right {
+    position: absolute;
+    right: 14px;
+}

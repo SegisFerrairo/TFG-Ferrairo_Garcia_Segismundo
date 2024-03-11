@@ -631,7 +631,8 @@ function addQuestion(folioId, question) {
 
     var li_q = document.createElement("li");
     li_q.id = "question-" + question._id;
-    li_q.className = "question";
+    // Add topic and difficulty as classes to the li
+    li_q.className = "question topic-\"" + question.topic + "\" \"" + "difficulty-\"" + question.difficulty + "\"";
     var label = document.createElement("label");
     label.textContent = question.languages[CHOOSEN_LANGUAGE_ID].statement;
     li_q.appendChild(label);
@@ -784,7 +785,6 @@ async function processData(questionsData) {
             }
 
             CHOOSEN_LANGUAGE_ID = question.languages.findIndex(language => language.name == languageName);
-            // Add the processed question to the questionsData in the same position
             questionsData[i][languageName].statement = question.languages[CHOOSEN_LANGUAGE_ID].statement;
             questionsData[i][languageName].options = question.languages[CHOOSEN_LANGUAGE_ID].options;
             questionsData[i][languageName].answer = question.languages[CHOOSEN_LANGUAGE_ID].answer;
@@ -1327,42 +1327,6 @@ function dropdownLanguagesListener() {
         });
     });
 }
-
-function dropdownExportListener() {
-    var button = document.getElementById("exportDropdown");
-    button.addEventListener("click", function() {
-        // var a = button.getElementsByClassName("dropdown-toggle")[0];
-        // Toggle the value of aria-expanded between true and false when clicked
-        button.setAttribute("aria-expanded", button.getAttribute("aria-expanded") === "false" ? "true" : "false");
-        // Toggle class show from a
-        button.classList.toggle("show");
-        var div = button.nextElementSibling;
-        // Toggle class show from the div element
-        div.classList.toggle("show");
-
-        // Close the dropdown when clicking outside of it
-        document.addEventListener("click", function(event) {
-            if (!button.contains(event.target)) {
-                button.setAttribute("aria-expanded", "false");
-                button.classList.remove("show");
-                div.classList.remove("show");
-            }
-        });
-
-        // Add a listener to the dropdown items
-        var items = div.getElementsByClassName("dropdown-item");
-        for (var i = 0; i < items.length; i++) {
-            items[i].addEventListener("click", function() {
-                // Get the content of the item
-                var content = this.textContent;
-                // Replace the content of the exportQuestionary button in strong element
-                var strong = document.getElementById("exportQuestionary").getElementsByTagName("strong")[0];
-                strong.textContent = content;
-            });
-        }
-    });
-}
-
 function switchedLanguagesListener(switchInput, language) {
     switchInput.addEventListener("change", function() {
         // If the input is checked, add the tab
@@ -1420,7 +1384,6 @@ function removeQuestionFromFolioListener(questionId) {
 function exportQuestionaryListener() {
     var button = document.getElementById("exportQuestionary");
     button.addEventListener("click", function() {
-        var content = button.getElementsByTagName("strong")[0].textContent;
         var notEmptyFolios = getNotEmptyFoliosIds();
         notEmptyFolios.forEach(async function(folioId) {
             var questions = {};
@@ -1430,12 +1393,8 @@ function exportQuestionaryListener() {
             catch (error) {
                 console.error('Error en la solicitud:', error.message);
             }
-            if (content == "CSV") {
-                // exportQuestionaryCSV(questions);
-            }
-            else if (content == "LaTeX") {
-                exportQuestionaryLaTex(questions);
-            }
+
+            exportQuestionaryLaTex(questions);            
         });
     });
 }
@@ -1586,7 +1545,6 @@ function popoverDivListener() {
  ****************/
 
 document.addEventListener("DOMContentLoaded", function() {
-    dropdownExportListener();
     importQuestionaryListener();
     resetDifficultyListener();
     getLanguagesNames();

@@ -36,6 +36,16 @@ app.use(express.json());
  ** Utils **
  ***********/
 
+app.get('/getAllQuestions', async(req, res) => {
+  try {   
+    const questions = await Question.find({});
+    res.status(200).json(questions);
+  } catch (error) {
+
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Get the supported languages
 app.get('/getSupportedLanguages', async(req, res) => {
   try {
@@ -181,15 +191,6 @@ app.get('/questionary/getQuestionsByLanguage:languageName', async(req, res) => {
   }
 });
 
-app.get('/questionary/getAllQuestions', async(req, res) => {
-  try {   
-    const questions = await Question.find({});
-    res.status(200).json(questions);
-  } catch (error) {
-
-    res.status(500).json({ message: error.message });
-  }
-});
 
 app.delete('/questionary/deleteQuestionById:questionId', async(req, res) => {
   try {
