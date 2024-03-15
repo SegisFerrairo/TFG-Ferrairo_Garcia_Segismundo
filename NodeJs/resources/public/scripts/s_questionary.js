@@ -6,9 +6,22 @@ var COUNTER_LANGUAGE = 0;
 var CHOOSEN_LANGUAGE = "Español";
 var CHOOSEN_LANGUAGE_ID = 0;
 
+Math.seedrandom('555');
+
 /***********
  ** Utils **
  ***********/
+
+function shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+    return array;
+}
+
 
 function getDifficultyValue() {
     var radios = document.getElementById('clasification').getElementsByTagName('input');
@@ -797,6 +810,10 @@ async function processData(questionsData) {
  ** Export **
  ************/
 
+/*----------*
+*   LaTex   *
+*-----------*/
+
 function exportQuestionaryLaTex(questions) {
     var texContent = generateLaTexContent(questions);
     var data = new Blob([texContent], {type: 'application/x-latex'});
@@ -867,7 +884,7 @@ function generateLaTexContent(questions) {
     texCode += generateLaTexVersionsAndAnswers(versions, answers);
     texCode += "\\begin{document}\n";  
 
-    texCode += generateLaTexHeaderAndCriteria(title, subtitle, criteria, calification);
+    texCode += generateLaTexHeader(title, subtitle, criteria, calification);
 
     texCode += generateLaTexQuestions(questions);
 
@@ -925,7 +942,7 @@ function generateLaTexVersionsAndAnswers(versions=1, answers=true) {
     return texCode;
 }
 
-function generateLaTexHeaderAndCriteria(title, subtitle, criteria, calification) {
+function generateLaTexHeader(title, subtitle, criteria, calification) {
     var texCode = "\\begin{examtop}\n";
     // If title and subtitle are not empty, add them
     if (title != undefined && title != "") {
@@ -992,6 +1009,118 @@ function generateLaTexQuestions(questions) {
     });
     texCode += "\\end{multiplechoice}\n";
     return texCode;
+}
+
+/*-----------*
+*  Markdown  *
+*------------*/
+
+function exportQuestionaryMarkdown(questions) {
+    var mdContent = generateMarkdownContent(questions);
+    var data = new Blob([mdContent], {type: 'text/markdown'});
+    var url = window.URL.createObjectURL(data);
+    var a = document.createElement("a");
+    a.href = url;
+    var language = Object.keys(questions[0])[0];
+    a.download = language + "_cuestionario.md";
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+function generateMarkdownContent(questions) {
+    var headerData = catchHeaderData();
+    var title = headerData.title;
+    var subtitle = headerData.subtitle;
+    var calification = headerData.calification;
+    var versions = headerData.versions;
+    // if versions is "", it is 3 by default
+    if (versions == "") {
+        versions = 1;
+    }
+    var answers = headerData.answers;
+    var criteria = headerData.criteria;
+    // if criteria is [""] or [], it is an empty array
+    if (criteria.length == 1 && criteria[0] == "") {
+        criteria = [];
+    }
+
+    var mdCode = generateMarkdownHeader(title, subtitle, criteria);
+    // mdCode += generateMarkdownQuestions(questions, answers);
+    // For the number of versions, randomize the questions and add them to the markdown content
+    for (var i = 0; i < versions; i++) {
+        if (calification != undefined && calification != "") {
+            mdCode += "### Test (" + calification + " puntos)";
+        }
+        if (versions > 1) {
+            // questions = questions.sort(() => Math.random() - 0.5);
+            questions = shuffleArray(questions);
+        }
+        mdCode += "- Modalidad " + (i+1) + "\n";
+        mdCode += generateMarkdownQuestions(questions, answers);
+    }
+    return mdCode;
+}
+
+function generateMarkdownHeader(title, subtitle, criteria) {
+    var mdCode = "";
+    // If title and subtitle are not empty, add them
+    if (title != undefined && title != "") {
+        mdCode += "# " + title + "\n\n";
+    }
+    if (subtitle != undefined && subtitle != "") {
+        mdCode += "## " + subtitle + "\n\n";
+    }
+    if (criteria != undefined && criteria.length > 0) {
+        mdCode += "### Normas del test\n";
+        criteria.forEach(function(rule) {
+            // if rule is an array, it is a list of rules
+            if (Array.isArray(rule)) {
+                rule.forEach(function(subrule) {
+                    mdCode += "  - " + subrule + "\n";
+                });
+            }
+            else {
+                mdCode += "- " + rule + "\n";
+            }
+        });
+        mdCode += "\n";
+    }
+
+    return mdCode;
+}
+
+function generateMarkdownQuestions(questions, answers) {
+    var mdCode = "";
+    var questionNumber = 1; // Variable para la numeración automática
+
+    questions.forEach(function(question) {
+        var language = Object.keys(question)[0];
+        var statement = question[language].statement;
+        var options = question[language].options;
+        var answer = question[language].answer;
+        
+        // if the statement starts with "Error", it is an empty question
+        if (statement.startsWith("Error")) {
+            mdCode += "$\\color{red}{"; // Cambia el color de la pregunta
+            mdCode += questionNumber + ". Pregunta \\ vacía}$\n";
+            mdCode += "$\\color{red}{"; 
+            statement = statement.replace(/ /g, " \\ ");
+            mdCode += "\\ \\ \\ " + statement + "}$\n";
+        } else {
+            mdCode += questionNumber + ". " + statement + "\n"; // Numeración automática
+            options.forEach(function(option) {
+                var correct = "";
+                if (answers) {
+                    correct = answer.includes(options.indexOf(option)+1) ? "[!] " : "";
+                }
+                mdCode += "  " + String.fromCharCode(97 + options.indexOf(option)) + ". " + correct + option + "\n"; // Utiliza letras para las opciones
+            });
+        }
+        questionNumber++; // Incrementa el número de la pregunta
+        mdCode += "\n<br>\n\n";
+    });
+
+    return mdCode;
 }
 
 /************
@@ -1424,6 +1553,8 @@ function exportQuestionaryListener() {
         var content = button.getElementsByTagName("strong")[0].textContent;
         var notEmptyFolios = getNotEmptyFoliosIds();
         notEmptyFolios.forEach(async function(folioId) {
+            // Reset the random seed for the randomize function
+            Math.seedrandom("555");
             var questions = {};
             try {
                 questions = await processData(catchQuestionary(folioId));
@@ -1433,7 +1564,7 @@ function exportQuestionaryListener() {
             }
 
             if (content == "Markdown") {
-                //exportQuestionaryMD(questions);
+                exportQuestionaryMarkdown(questions);
             }
             else if (content == "LaTeX") {
                 exportQuestionaryLaTex(questions);            
@@ -1441,6 +1572,8 @@ function exportQuestionaryListener() {
         });
     });
 }
+
+
 
 function deleteQuestionFromDBListener(questionId) {
     // Set an alert to confirm the deletion
