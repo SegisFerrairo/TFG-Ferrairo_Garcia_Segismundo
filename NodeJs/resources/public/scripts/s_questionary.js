@@ -6,20 +6,41 @@ var COUNTER_LANGUAGE = 0;
 var CHOOSEN_LANGUAGE = "Español";
 var CHOOSEN_LANGUAGE_ID = 0;
 
-Math.seedrandom('555');
-
 /***********
  ** Utils **
  ***********/
 
-function shuffleArray(array) {
-    for (var i = array.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
+ function generateRandomSeed() {
+    // Get the current date in milliseconds
+    var nowDate = new Date();
+
+    // Obtain the seconds from the midnight UTC of January 1, 1970
+    var seed = Math.floor(nowDate.getTime()) % 1000;
+
+    return seed;
+}
+
+function shuffleArray(array, seed) {                // <-- ADDED ARGUMENT
+    var m = array.length, t, i;
+  
+    // While there remain elements to shuffle…
+    while (m) {  
+      // Pick a remaining element…
+      i = Math.floor(random(seed) * m--);        // <-- MODIFIED LINE
+  
+      // And swap it with the current element.
+      t = array[m];
+      array[m] = array[i];
+      array[i] = t;
+      ++seed                                     // <-- ADDED LINE
     }
+  
     return array;
+}
+  
+function random(seed) {
+    var x = Math.sin(seed++) * 10000; 
+    return x - Math.floor(x);
 }
 
 
@@ -1015,8 +1036,8 @@ function generateLaTexQuestions(questions) {
 *  Markdown  *
 *------------*/
 
-function exportQuestionaryMarkdown(questions) {
-    var mdContent = generateMarkdownContent(questions);
+function exportQuestionaryMarkdown(questions, randomSeed) {
+    var mdContent = generateMarkdownContent(questions, randomSeed);
     var data = new Blob([mdContent], {type: 'text/markdown'});
     var url = window.URL.createObjectURL(data);
     var a = document.createElement("a");
@@ -1027,7 +1048,7 @@ function exportQuestionaryMarkdown(questions) {
     window.URL.revokeObjectURL(url);
 }
 
-function generateMarkdownContent(questions) {
+function generateMarkdownContent(questions, randomSeed) {
     var headerData = catchHeaderData();
     var title = headerData.title;
     var subtitle = headerData.subtitle;
@@ -1049,13 +1070,14 @@ function generateMarkdownContent(questions) {
     // For the number of versions, randomize the questions and add them to the markdown content
     for (var i = 0; i < versions; i++) {
         if (calification != undefined && calification != "") {
-            mdCode += "### Test (" + calification + " puntos)";
+            mdCode += "### Test (" + calification + " puntos) - ";
         }
         if (versions > 1) {
-            // questions = questions.sort(() => Math.random() - 0.5);
-            questions = shuffleArray(questions);
+            questions = shuffleArray(questions, randomSeed);
+            // Change the seed for the next version
+            randomSeed = randomSeed + 1;
         }
-        mdCode += "- Modalidad " + (i+1) + "\n";
+        mdCode += "Modalidad " + (i+1) + "\n\n";
         mdCode += generateMarkdownQuestions(questions, answers);
     }
     return mdCode;
@@ -1552,9 +1574,10 @@ function exportQuestionaryListener() {
     button.addEventListener("click", function() {
         var content = button.getElementsByTagName("strong")[0].textContent;
         var notEmptyFolios = getNotEmptyFoliosIds();
+        let seed = generateRandomSeed();
+
         notEmptyFolios.forEach(async function(folioId) {
-            // Reset the random seed for the randomize function
-            Math.seedrandom("555");
+            var randomSeed = seed;
             var questions = {};
             try {
                 questions = await processData(catchQuestionary(folioId));
@@ -1564,7 +1587,7 @@ function exportQuestionaryListener() {
             }
 
             if (content == "Markdown") {
-                exportQuestionaryMarkdown(questions);
+                exportQuestionaryMarkdown(questions, randomSeed);
             }
             else if (content == "LaTeX") {
                 exportQuestionaryLaTex(questions);            
