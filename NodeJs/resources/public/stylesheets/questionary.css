@@ -161,12 +161,17 @@
     filter: invert(100%);
     position:absolute;
     left: 18px;
-    top: 10px;
+    top: 8px;
 }
 
 #exportQuestionary strong {
     position:fixed;
     margin-left: 4px;
+}
+
+#searchQuestionContent {
+    border-radius: 10px;
+    max-width: 90%;
 }
 
 .form-clasification {
@@ -188,6 +193,14 @@
 
 #resetDifficultyLabel:hover {
     color: orange;
+}
+
+#clasification {
+    margin-bottom: 0px;
+}
+
+.form-clasification-top {
+    margin-top: 1rem !important;
 }
 
 .clasification {
@@ -212,11 +225,32 @@
     color: orange;
 }
 
+.btn-edit {
+    padding: 4px 8px;
+    width: 40px;
+    height: 33px;
+}
+
 .btn-edit img {
     filter: invert(40%);
 }
 
 /* When hovering .btn-edit, filter: ivert(100%); just the img */
 .btn-edit:hover img {
+    filter: invert(100%);
+}
+
+.btn-delete {
+    padding: 4px 8px;
+    width: 33px;
+    height: 33px;
+}
+
+.btn-delete img {
+    /* filter: invert(42%) sepia(59%) saturate(6348%) hue-rotate(338deg) brightness(100%) contrast(100%); */
+    filter: invert(17%) sepia(63%) saturate(5659%) hue-rotate(347deg) brightness(90%) contrast(103%);
+}
+
+.btn-delete:hover img {
     filter: invert(100%);
 }

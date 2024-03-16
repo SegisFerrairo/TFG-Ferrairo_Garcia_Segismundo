@@ -148,31 +148,6 @@ app.get('/newQuestion/getLanguagesNames', async(req, res) => {
  ** questionary **
  *****************/
 
-app.get('/questionary/getTopicsByLanguage:language', async(req, res) => {
-  try {
-    var language = decodeURIComponent(req.params.language).slice(1).toString();
-    const topics = await Question.distinct("topic", {"languages.name": language});
-    res.status(200).json(topics);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-//Get topics by language and difficulty
-app.get('/questionary/getTopicsByLaD:langAndDiff', async(req, res) => {
-  try {
-    var langAndDiff = decodeURIComponent(req.params.langAndDiff).slice(1).toString();
-    var language = langAndDiff.split("-")[0];
-    var difficulty = langAndDiff.split("-")[1];
-    
-    const topics = await Question.distinct("topic", {"languages.name": language, difficulty: difficulty});
-    res.status(200).json(topics);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-
 app.get('/questionary/getQuestionsByLanguage:languageName', async(req, res) => {
   try {
     var languageName = req.params.languageName.slice(1).toString();

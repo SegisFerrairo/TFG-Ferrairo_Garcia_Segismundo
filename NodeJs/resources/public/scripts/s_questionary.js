@@ -481,23 +481,24 @@ async function listSidebarData() {
         return;
     }
 
-    // if difficulty is empty, get all the topics by language. Otherwise, get the topics by language and difficulty
-    var topics;
+    var searchQuestionContent = document.getElementById("searchQuestionContent").value;
+    if (searchQuestionContent != "") {
+        // Filter the data by question.statements, question.topics and question.options
+        data = data.filter(question => question.languages[CHOOSEN_LANGUAGE_ID].statement.toLowerCase().includes(searchQuestionContent.toLowerCase()) || question.topic.toLowerCase().includes(searchQuestionContent.toLowerCase()) || question.languages[CHOOSEN_LANGUAGE_ID].options.some(option => option.toLowerCase().includes(searchQuestionContent.toLowerCase())));
+    }
+
     var difficulty = getDifficultyValue();
-    if (difficulty == undefined) {
-        try {
-            topics = await getTopicsByLanguage(CHOOSEN_LANGUAGE);
-        } catch (error) {
-            console.error('Error en la solicitud:', error.message);
-        }
+
+    if (difficulty != undefined) {
+        data = data.filter(question => question.difficulty == difficulty);
     }
-    else {
-        try {
-            topics = await getTopicsByLanguageAndDifficulty(CHOOSEN_LANGUAGE, difficulty);
-        } catch (error) {
-            console.error('Error en la solicitud:', error.message);
-        }
-    }
+
+
+    // Obtain the topics from the questions data
+    var topics = data.map(question => question.topic);
+    topics = topics.filter((topic, index) => topics.indexOf(topic) === index); // Remove duplicates
+    // Oder alphabetically
+    topics.sort();
 
     topics.forEach(function(topic) {
         var li_topic = document.createElement("li");
@@ -509,7 +510,9 @@ async function listSidebarData() {
         button.className = "btn btn-toggle align-items-center rounded collapsed";
         button.setAttribute("data-bs-toggle", "collapse");
         button.setAttribute("data-bs-target", "topic-" + topic + "-collapse");
-        button.setAttribute("aria-expanded", "false");
+        // button.setAttribute("aria-expanded", "false");
+        button.setAttribute("aria-expanded", "true");
+        
 
         var span = document.createElement("span");
         span.className = "svg-container me-1";
@@ -519,17 +522,23 @@ async function listSidebarData() {
         li_topic.appendChild(button);        
 
         var div = document.createElement("div");
-        div.className = "collapse topic-container";
+        // div.className = "collapse topic-container";
+        div.className = "topic-container";
         div.id = "topic-" + topic + "-collapse";
         var ul = document.createElement("ul");
         ul.className = "btn-toggle-nav list-unstyled fw-normal pb-1 small";
 
+        expandTopicListener(button,div);
+
         data.forEach(function(question) {
             if (question.topic == topic && (difficulty != undefined ? question.difficulty == difficulty : true)) {
                 var li = document.createElement("li");
-                li.className = "question mb-1"
+                li.className = "question mb-1";
                 li.style.listStyleType = "disc";
 
+                var divContainer = document.createElement("div");
+                divContainer.className = "d-flex";
+                var div = document.createElement("div");
                 var button = document.createElement("button");
                 button.type = "button";
                 button.id = "button-" + question._id;
@@ -537,7 +546,18 @@ async function listSidebarData() {
                 // CHOOSEN_LANGUAGE_ID is the index of the language in the languages array
                 CHOOSEN_LANGUAGE_ID = question.languages.findIndex(language => language.name == CHOOSEN_LANGUAGE);
                 button.textContent = question.languages[CHOOSEN_LANGUAGE_ID].statement; 
-                li.appendChild(button);
+                
+                div.appendChild(button);
+
+                // Show the difficulty of the question under the statement
+                var span = document.createElement("span");
+                span.className = "badge rounded-pill bg-info";
+                span.textContent = "dificultad " + question.difficulty;
+                div.appendChild(span);
+
+                divContainer.appendChild(div);
+                                
+                li.appendChild(divContainer);
 
                 var button_edit = document.createElement("button");
                 button_edit.type = "button";
@@ -551,11 +571,12 @@ async function listSidebarData() {
                 img_edit.width = "16";
                 img_edit.height = "16";
                 button_edit.appendChild(img_edit);
-                li.appendChild(button_edit);
+
+                divContainer.appendChild(button_edit);
+                li.appendChild(divContainer);
 
                 button_edit.addEventListener("click", function() {
                     editQuestion(question._id);
-                    //removeQuestionFromFolio(question._id);
                 });
 
                 var button_delete = document.createElement("button");
@@ -563,21 +584,16 @@ async function listSidebarData() {
                 button_delete.id = "button_delete-" + question._id;
                 button_delete.className = "btn btn-outline-danger btn-delete btn-sm";
 
-                var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-                svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-                svg.setAttribute("width", "16");
-                svg.setAttribute("height", "16");
-                svg.setAttribute("fill", "currentColor");
-                svg.setAttribute("class", "bi bi-trash-fill");
-                svg.setAttribute("viewBox", "0 0 16 16");
-
-                var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                path.setAttribute("d", "M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0");
-
-                svg.appendChild(path);
-                button_delete.appendChild(svg);
+                // use the svg /images/trash.svg for button_delete
+                var img_delete = document.createElement("img");
+                img_delete.src = "/images/trash-fill.svg";
+                img_delete.alt = "Eliminar";
+                img_delete.width = "16";
+                img_delete.height = "16";
+                button_delete.appendChild(img_delete);                
                                 
-                li.appendChild(button_delete);
+                divContainer.appendChild(button_delete);
+                li.appendChild(divContainer);
                 ul.appendChild(li);
 
                 // If question is already in the folio, disable the button
@@ -595,13 +611,14 @@ async function listSidebarData() {
                 });
             }
         });
-
-        div.appendChild(ul);
-        li_topic.appendChild(div);
-
-        document.getElementById("sidebarQuestionsList").appendChild(li_topic);
-
-        expandTopicListener(button,div);
+        
+        // If a topic is empty, remove it from the sidebar before adding it
+        if (ul.children.length > 0) {
+            div.appendChild(ul);
+            li_topic.appendChild(div);
+            document.getElementById("sidebarQuestionsList").appendChild(li_topic);
+        }
+        
     });
 
 }
@@ -1207,51 +1224,6 @@ function getLanguagesNames() {
     );
 }
 
-async function getTopicsByLanguage(language) {
-    try {
-        const response = await fetch('/questionary/getTopicsByLanguage:' + encodeURIComponent(language), {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        });
-        
-        if (!response.ok) {
-            throw new Error('Error al obtener los datos de la base de datos');
-        }
-        
-        const responseData = await response.json();
-        console.debug('Respuesta del servidor:', responseData);
-        return responseData;
-    } catch (error) {
-        console.error('Error en la solicitud:', error.message);
-        throw error;
-    }
-}
-
-async function getTopicsByLanguageAndDifficulty(language, difficulty) {
-    try {
-        var langAndDiff = language + "-" + difficulty;
-        const response = await fetch('/questionary/getTopicsByLaD:' + encodeURIComponent(langAndDiff), {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error('Error al obtener los datos de la base de datos');
-        }
-
-        const responseData = await response.json();
-        console.debug('Respuesta del servidor:', responseData);
-        return responseData;
-    } catch (error) {
-        console.error('Error en la solicitud:', error.message);
-        throw error;
-    }
-}
-
 async function getQuestionById(questionId) {
     try {
         const response = await fetch('/getQuestionById:' + questionId, {
@@ -1508,38 +1480,9 @@ function deleteQuestionFromDBListener(questionId) {
         return;
     }
     dropQuestionById(questionId);
-    // Remove the question from the sidebar
-    // var li = document.getElementById("button-" + questionId).parentElement;
-
     
     // Reload the page
     location.reload();
-    
-    //removeQuestionFromFolio(questionId);
-
-    // var topics = document.getElementById("sidebarQuestionsList").getElementsByClassName("topic");
-    // for (var i = 0; i < topics.length; i++) {
-    //     var questions = topics[i].getElementsByClassName("question");
-    //     for (var j = 0; j < questions.length; j++) {
-    //         if (questions[j].id.split("-")[1] == questionId) {
-    //             questions[j].parentElement.removeChild(questions[j]);
-    //         }
-    //     }
-    // }
-
-    // // If a topic is empty, remove it
-    // for (var i = 0; i < topics.length; i++) {
-    //     if (topics[i].getElementsByClassName("list-unstyled")[0].childElementCount == 0) {
-    //         topics[i].parentElement.removeChild(topics[i]);
-    //     }
-    // }
-    
-    // // If the aren't topics in the sidebar, create a no-topics element
-    // if (document.getElementById("sidebarQuestionsList").childElementCount == 0) {
-    //     createNoTopicsElement(document.getElementById("sidebarQuestionsList"));
-    // }
-    
-    // listSidebarData();
 }
 
 function randomQuestionListener() {
@@ -1639,13 +1582,32 @@ function popoverDivListener() {
     });
 }
 
+function searchQuestionContentListener() {
+    var input = document.getElementById("searchQuestionContent");
+    input.addEventListener("input", function() {
+        listSidebarData();
+    });
+}
+
+function resetSearchQuestionContentListener()  {
+    var button = document.getElementById("resetSearchQuestionContent");
+    button.addEventListener("click", function() {
+        var input = document.getElementById("searchQuestionContent");
+        input.value = "";
+        listSidebarData();
+    });
+}
+
+
 /****************
  ** DOM Loaded **
  ****************/
 
 document.addEventListener("DOMContentLoaded", function() {
+    resetSearchQuestionContentListener();
     dropdownExportListener();
     resetDifficultyListener();
+    searchQuestionContentListener();
     getLanguagesNames();
     listSidebarData();
     difficultyListener();
