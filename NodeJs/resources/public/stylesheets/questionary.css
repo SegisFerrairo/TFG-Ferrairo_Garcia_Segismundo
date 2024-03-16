@@ -3,7 +3,7 @@
     position: fixed;
     top: 50px;
     left: 0;
-    width: 282px;
+    width: 333px;
     padding: 20px;
     background-color: #f8f9fa;
     border-right: 1px solid #dee2e6; /* Borde derecho de la barra lateral */
@@ -14,7 +14,7 @@
 }
 
 .main-content {
-    margin-left: 250px; /* Ancho de la barra lateral + espacio de margen */
+    margin-left: 325px; /* Ancho de la barra lateral + espacio de margen */
     padding: 20px;
 }
 
@@ -134,7 +134,7 @@
     height: 39px;
     cursor: pointer;
     position: relative;
-    left: 70px;
+    left: 128px;
     bottom: 10px;
   }
   
@@ -153,22 +153,8 @@
     cursor: pointer;
 }
 
-/* #exportQuestionary {
-    min-width: 236px;
-}
-
-#exportQuestionary img {
-    filter: invert(100%);
-    margin-right: 16px;
-}
-
-#exportQuestionary strong {
-    margin-left: 4px;
-} */
-
-
 #exportQuestionary {
-    min-width: 198px;
+    min-width: 248px;
 }
 
 #exportQuestionary img {
@@ -224,4 +210,13 @@
 
 .clasification input[type="radio"]:checked ~ label {
     color: orange;
+}
+
+.btn-edit img {
+    filter: invert(40%);
+}
+
+/* When hovering .btn-edit, filter: ivert(100%); just the img */
+.btn-edit:hover img {
+    filter: invert(100%);
 }

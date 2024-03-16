@@ -10,7 +10,7 @@ var CHOOSEN_LANGUAGE_ID = 0;
  ** Utils **
  ***********/
 
- function generateRandomSeed() {
+function generateRandomSeed() {
     // Get the current date in milliseconds
     var nowDate = new Date();
 
@@ -533,11 +533,30 @@ async function listSidebarData() {
                 var button = document.createElement("button");
                 button.type = "button";
                 button.id = "button-" + question._id;
-                button.className = "btn btn-link cut-text me-2";
+                button.className = "btn btn-link cut-text me-3";
                 // CHOOSEN_LANGUAGE_ID is the index of the language in the languages array
                 CHOOSEN_LANGUAGE_ID = question.languages.findIndex(language => language.name == CHOOSEN_LANGUAGE);
                 button.textContent = question.languages[CHOOSEN_LANGUAGE_ID].statement; 
                 li.appendChild(button);
+
+                var button_edit = document.createElement("button");
+                button_edit.type = "button";
+                button_edit.id = "button_edit-" + question._id;
+                button_edit.className = "btn btn-outline-secondary btn-edit btn-sm me-2";
+
+                // use the svg /images/pencil-square.svg for button_edit
+                var img_edit = document.createElement("img");
+                img_edit.src = "/images/pencil-square.svg";
+                img_edit.alt = "Editar";
+                img_edit.width = "16";
+                img_edit.height = "16";
+                button_edit.appendChild(img_edit);
+                li.appendChild(button_edit);
+
+                button_edit.addEventListener("click", function() {
+                    editQuestion(question._id);
+                    //removeQuestionFromFolio(question._id);
+                });
 
                 var button_delete = document.createElement("button");
                 button_delete.type = "button";
@@ -653,7 +672,7 @@ function addEmptyQuestion(folioId, question, language) {
     button.type = "button";
     button.className = "btn-close question-close";
     button.addEventListener("click", function() {
-        removeQuestionFromFolioListener(question._id);
+        removeQuestionFromFolio(question._id);
     });
     li_q.appendChild(button);
 
@@ -675,7 +694,7 @@ function addQuestion(folioId, question) {
     button.type = "button";
     button.className = "btn-close question-close";
     button.addEventListener("click", function() {     
-        removeQuestionFromFolioListener(question._id);
+        removeQuestionFromFolio(question._id);
     });
     li_q.appendChild(button);
 
@@ -826,6 +845,18 @@ async function processData(questionsData) {
     }
     return questionsData;
 }
+
+/**********
+ ** Edit **
+ **********/
+
+function editQuestion(questionId) {
+    // Send the questionId to the newQuestion page and redirect to it
+    sessionStorage.setItem("questionId", questionId);
+    window.location.href = "/newQuestion";
+}
+
+
 
 /************
  ** Export **
@@ -1145,137 +1176,6 @@ function generateMarkdownQuestions(questions, answers) {
     return mdCode;
 }
 
-/************
- ** Import **
- ************/
-
-function importQuestionay(button) {
-    // If there is no file selected, return
-    if (button.files.length == 0) {
-        return;
-    }
-
-    var file = button.files[0];
-
-    // Check if the file is a CSV file
-    if (file.type != "text/csv") {
-        alert("El archivo seleccionado no es un archivo CSV");
-        return;
-    }
-
-    var groupedQuestions = [];
-    var reader = new FileReader();
-    reader.readAsText(file);   
-    reader.onload = function(event) {
-        var csv = event.target.result;
-        // If csv is empty, throw an error
-        if (csv == "") {
-            alert("El archivo seleccionado está vacío");
-            return;
-        }
-
-        // Group the questions by id, they have in common the id, the topic and the difficulty
-        var questions = csv.split("\n");
-
-        // Delete de \r character from each question
-        questions = questions.map(q => q.replace(/\r/g, ""));
-        // If the last element is empty, delete it
-        if (questions[questions.length - 1] == "") {
-            questions.pop();
-        }
-
-        // Remove the first element, the headers
-        questions.shift();
-        var resultData = [];
-        try {
-            questions.forEach(function(question) {
-                try {
-                    var questionData = question.split(",");
-
-                    var id = questionData[0].replace(/"/g, "");
-                    var topic = questionData[1].replace(/"/g, "");
-                    var difficulty = questionData[2].replace(/"/g, "");
-                    var languageName = questionData[3].replace(/"/g, "");
-                    var statement = questionData[4].replace(/"/g, "");
-                    var options = questionData[5].replace(/"/g, "").split("|");
-
-                    var answer = questionData[6].replace(/"/g, "").split("|").map(a => parseInt(a));
-                }
-                catch (error) {
-                    throw new Error("Error al leer el archivo");
-                }
-
-                var question = {
-                    id: id,
-                    topic: topic,
-                    difficulty: difficulty,
-                    languages: [
-                        {
-                            name: languageName,
-                            statement: statement,
-                            options: options,
-                            answer: answer
-                        }
-                    ]
-                };
-                resultData.push(question);
-            });
-        }
-        catch (error) {
-            alert(error.message);
-            return;
-        }
-
-        // Group the questions by id, and each question will have in common: id, topic and difficulty. The languages will be different and will be added to the languages array
-        
-        resultData.forEach(function(question) {
-            var index = groupedQuestions.findIndex(q => q.id == question.id && q.topic == question.topic && q.difficulty == question.difficulty);
-            if (index == -1) {
-                groupedQuestions.push(question);
-            }
-            else {
-                groupedQuestions[index].languages.push(question.languages[0]);
-            }
-        });
-
-        
-        // Delete de id of the questions
-        groupedQuestions.forEach(function(question) {
-            delete question.id;
-        });          
-
-        // When sending the questions to the server, increment the counter of questions completly saved, 
-        // and when the counter is equal to the length of the groupedQuestions, list the sidebar data
-        var counter = 0;
-        groupedQuestions.forEach(function(question) {
-            sendFormData(question)
-            .then(function() {
-                counter++;
-                if (counter == groupedQuestions.length) {
-                    // Refresh the page
-                    location.reload();
-                }                
-            })
-            .catch(function(error) {
-                console.error(error.message);
-                // Just display the alert once
-                if (counter == 0) {
-                    alert("Error al enviar los datos al servidor");
-                }
-                counter++;
-                location.reload();
-            });
-        });
-    };
-
-    reader.onerror = function() {
-        alert("Error al leer el archivo");
-    };
-    
-    // Reset the input
-    button.value = "";
-}
-
 
 /*************
  ** Read DB **
@@ -1354,7 +1254,7 @@ async function getTopicsByLanguageAndDifficulty(language, difficulty) {
 
 async function getQuestionById(questionId) {
     try {
-        const response = await fetch('/questionary/getQuestionById:' + questionId, {
+        const response = await fetch('/getQuestionById:' + questionId, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -1396,6 +1296,38 @@ async function getQuestionsByLanguage(language) {
     }
 }
 
+
+/***************
+ ** Post DB **
+ ***************/
+
+async function sendFormData(data) {
+    try {
+        const response = await fetch('/addQuestion', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+
+        const responseData = await response.json();
+        console.debug('Respuesta del servidor:', responseData);
+        return responseData;
+    } catch (error) {
+        //console.error('Error en la solicitud:', error.message);
+        throw error;
+    }
+}
+
+/*************
+ ** Drop DB **
+ *************/
+
 function dropQuestionById(questionId) {
     fetch('/questionary/deleteQuestionById:' + questionId, {
         method: 'DELETE',
@@ -1418,32 +1350,6 @@ function dropQuestionById(questionId) {
     });
 }
 
-/***************
- ** Post DB **
- ***************/
-
-async function sendFormData(data) {
-    try {
-        const response = await fetch('/addQuestion', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-        
-        if (!response.ok) {
-            throw new Error(response.statusText);
-        }
-
-        const responseData = await response.json();
-        console.debug('Respuesta del servidor:', responseData);
-        return responseData;
-    } catch (error) {
-        //console.error('Error en la solicitud:', error.message);
-        throw error;
-    }
-}
 
 /*********************
  ** Event Listeners **
@@ -1547,8 +1453,7 @@ function selectQuestionListener(button) {
     });
 }
 
-function removeQuestionFromFolioListener(questionId) {
-    // newQuestion.parentElement.removeChild(newQuestion);   
+function removeQuestionFromFolio(questionId) {
     // Remove the question from each folio
     var folios = document.getElementById("myTabContent").getElementsByClassName("folio-container");
     for (var i = 0; i < folios.length; i++) {
@@ -1596,8 +1501,6 @@ function exportQuestionaryListener() {
     });
 }
 
-
-
 function deleteQuestionFromDBListener(questionId) {
     // Set an alert to confirm the deletion
     var confirmation = confirm("¿Estás seguro de que quieres eliminar esta pregunta de la BD?");
@@ -1607,31 +1510,36 @@ function deleteQuestionFromDBListener(questionId) {
     dropQuestionById(questionId);
     // Remove the question from the sidebar
     // var li = document.getElementById("button-" + questionId).parentElement;
-    
-    var topics = document.getElementById("sidebarQuestionsList").getElementsByClassName("topic");
-    for (var i = 0; i < topics.length; i++) {
-        var questions = topics[i].getElementsByClassName("question");
-        for (var j = 0; j < questions.length; j++) {
-            if (questions[j].id.split("-")[1] == questionId) {
-                questions[j].parentElement.removeChild(questions[j]);
-            }
-        }
-    }
 
-    // If a topic is empty, remove it
-    for (var i = 0; i < topics.length; i++) {
-        if (topics[i].getElementsByClassName("list-unstyled")[0].childElementCount == 0) {
-            topics[i].parentElement.removeChild(topics[i]);
-        }
-    }
     
-    // If the aren't topics in the sidebar, create a no-topics element
-    if (document.getElementById("sidebarQuestionsList").childElementCount == 0) {
-        createNoTopicsElement(document.getElementById("sidebarQuestionsList"));
-    }
+    // Reload the page
+    location.reload();
+    
+    //removeQuestionFromFolio(questionId);
 
-    removeQuestionFromFolioListener(questionId);
-    listSidebarData();
+    // var topics = document.getElementById("sidebarQuestionsList").getElementsByClassName("topic");
+    // for (var i = 0; i < topics.length; i++) {
+    //     var questions = topics[i].getElementsByClassName("question");
+    //     for (var j = 0; j < questions.length; j++) {
+    //         if (questions[j].id.split("-")[1] == questionId) {
+    //             questions[j].parentElement.removeChild(questions[j]);
+    //         }
+    //     }
+    // }
+
+    // // If a topic is empty, remove it
+    // for (var i = 0; i < topics.length; i++) {
+    //     if (topics[i].getElementsByClassName("list-unstyled")[0].childElementCount == 0) {
+    //         topics[i].parentElement.removeChild(topics[i]);
+    //     }
+    // }
+    
+    // // If the aren't topics in the sidebar, create a no-topics element
+    // if (document.getElementById("sidebarQuestionsList").childElementCount == 0) {
+    //     createNoTopicsElement(document.getElementById("sidebarQuestionsList"));
+    // }
+    
+    // listSidebarData();
 }
 
 function randomQuestionListener() {
@@ -1693,14 +1601,6 @@ function difficultyListener() {
     }
 }
 
-function importQuestionaryListener() {
-    var button = document.getElementById("csvFileInput");
-    // Add an event listener to the input element to catch the file selected
-    button.addEventListener("change", function() {
-        importQuestionay(button);        
-    });
-}
-
 function popoverListener(popoverButton, popoverDiv) {
     popoverButton.addEventListener("click", function() {
         // if popoverDiv is style display none, display block
@@ -1745,7 +1645,6 @@ function popoverDivListener() {
 
 document.addEventListener("DOMContentLoaded", function() {
     dropdownExportListener();
-    importQuestionaryListener();
     resetDifficultyListener();
     getLanguagesNames();
     listSidebarData();

@@ -4,6 +4,8 @@
 var langs_supported;
 var FROM = 'es';
 
+var QUESTION_ID = '';
+
 let COUNTER_TAB = 1;
 let DEFAULT_NUM_OPTIONS = 2;
 let MAIN_FORM_ID = 'mainform';
@@ -319,7 +321,6 @@ function changeOptionType(value) {
     }
 }
 
-
 function addForm(formId, optionsName) {
     // Create the form
     var formulario = document.createElement("form");
@@ -395,7 +396,6 @@ function addForm(formId, optionsName) {
     }
 }
 
-
 function showLangs() { 
     if (document.getElementById('right-space').classList.contains('hidden')) {
         document.getElementById('languages').innerHTML="Ocultar idiomas";
@@ -421,6 +421,10 @@ function showLangs() {
 
 function submitData() {
     var question = {};
+    // If QUESTION_ID is not empty, it is because the user wants to edit a question
+    if (QUESTION_ID != '') {
+        question._id = QUESTION_ID;
+    }
     question.topic = document.getElementById('floatingTopic').value;
 
     // Get the difficulty
@@ -459,6 +463,9 @@ function submitData() {
     // Send the data
     sendFormData(question);
 
+    // Reset QUESTION_ID
+    QUESTION_ID = '';
+
     // After sending the main form, clear the form
     document.getElementById(MAIN_FORM_ID).reset();
 }
@@ -492,6 +499,102 @@ function missingFieldsAlert(message) {
         alert.remove();
     });
 }
+
+function succesAlert(message) {
+    var alert = document.createElement('div');
+    alert.className = 'alert alert-dismissible alert-success';
+    var button = document.createElement('button');
+    button.className = 'btn-close';
+    button.setAttribute('type', 'button');
+    button.setAttribute('data-bs-dismiss', 'alert');
+    alert.appendChild(button);
+    var strong = document.createElement('strong');
+    strong.textContent = 'Éxito! ';
+    alert.appendChild(strong);
+    var u = document.createElement('u');
+    u.textContent = message;
+    alert.appendChild(u);
+    // Insert as the first child of the body
+    document.body.insertBefore(alert, document.body.firstChild);
+
+    // Remove the alert after 5 seconds
+    setTimeout(function() {
+        alert.remove();
+    }, 3000);
+}
+
+function fillQuestionFields(questionId) {
+    getQuestionById(questionId)
+    .then(responseData => {
+        console.debug('Respuesta del servidor:', responseData);
+        // Fill the fields of the main form
+        document.getElementById('floatingTopic').value = responseData.topic;
+
+        var radios = document.getElementById('clasification').getElementsByTagName('input');        
+        for (var i = 0; i < radios.length; i++) {
+            if (radios[i].value == responseData.difficulty) {
+                radios[i].checked = true;
+            }
+        }
+        
+        // Fill the fields of the main form
+        document.getElementById(MAIN_FORM_ID+'_statement').value = responseData.languages[0].statement;
+        var numOptions = responseData.languages[0].options.length;
+        // Create the question options before filling the fields using + Añadir otra opción button, but just if the number of options is greater than the default number of options
+        if (numOptions > DEFAULT_NUM_OPTIONS) {
+            for (var i = DEFAULT_NUM_OPTIONS+1; i <= numOptions; i++) {
+                addMoreOptions(MAIN_FORM_ID, OPTIONS_MAIN_FORM_NAME_ID, i);
+            }
+        }
+
+        for (var i = 1; i <= numOptions; i++) {
+            document.getElementById(MAIN_FORM_ID).querySelector(`input[name="inputOption${i}"]`).value = responseData.languages[0].options[i-1];
+        }
+        if (responseData.languages[0].answer.length == 1) {
+            document.getElementById(MAIN_FORM_ID).querySelector(`input[value="option${responseData.languages[0].answer[0]}"]`).checked = true;
+        }
+        else {
+            document.getElementById('optionType').value = 'Checkbox';
+            changeOptionType('Checkbox');
+            document.getElementById(MAIN_FORM_ID).querySelector(`input[value="option1"]`).removeAttribute('checked'); 
+
+            responseData.languages[0].answer.forEach((elem) => {
+                document.getElementById(MAIN_FORM_ID).querySelector(`input[value="option${elem}"]`).setAttribute('checked', '');
+            });
+        }
+
+        // If there are more than one language, click the "Mostrar idiomas" button
+        if (responseData.languages.length > 1) {
+            showLangs();
+    
+            // For each language, add a new tab and fill the fields, using the function addTab
+            for (var i = 1; i < responseData.languages.length; i++) {
+                // Set the language name to the tab
+                document.getElementById('newTabName').value = responseData.languages[i].name;
+                addTab();
+
+                var tabId = 'tab' + i;
+                document.getElementById(tabId+'_statement').value = responseData.languages[i].statement;
+                var numOptions = responseData.languages[i].options.length;
+                for (var j = 1; j <= numOptions; j++) {
+                    document.getElementById(tabId).querySelector(`input[name="inputOption${j}"]`).value = responseData.languages[i].options[j-1];
+                }
+                if (responseData.languages[i].answer.length == 1) {
+                    document.getElementById(tabId).querySelector(`input[value="option${responseData.languages[i].answer[0]}"]`).checked = true;
+                }
+                else {
+                    for (var j = 0; j < responseData.languages[i].answer.length; j++) {
+                        document.getElementById(tabId).querySelector(`input[value="option${responseData.languages[i].answer[j]}"]`).checked = true;
+                    }
+                }
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error en la solicitud:', error.message);
+    });
+}
+
 
 
 
@@ -610,6 +713,47 @@ function translateButtonListener() {
     });
 }
 
+function langsTabsSumbitListeners() {
+    // Add event listener to the "Mostrar /Ocultar idiomas" button
+    document.getElementById('languages').addEventListener('click', showLangs);
+
+    // Add event listener to the "Añadir pestaña" button
+    document.getElementById('button-addon2').addEventListener('click', addTab);
+    // Add event listener to the "Añadir pestaña" button but when the user presses enter key
+    document.getElementById('newTabName').addEventListener('keyup', function(event) {
+        if (event.key === 'Enter') {
+            addTab();
+        }
+    });
+
+    // Add event listener to the "Enviar" button, submit button of the main form
+    document.getElementById('submitButton').addEventListener('click', function(event) {        
+        var confirmSubmission = window.confirm("¿Está seguro de que desea enviar el formulario?");
+        if (!confirmSubmission) {
+            event.preventDefault();
+            return;
+        }
+        else {    
+            if (checkEmptyDifficulty() || checkEmptyTopic() || emptyFields(MAIN_FORM_ID)) {
+                event.preventDefault();
+                return;
+            }
+            submitData();            
+        }
+    });
+}
+
+function checkEditQuestionListener() {
+    // Check if the sessionStorage is not empty and print the questionId
+    if (sessionStorage.getItem("questionId") != null) {
+        // var questionId = sessionStorage.getItem("questionId");
+        QUESTION_ID = sessionStorage.getItem("questionId");
+        sessionStorage.removeItem("questionId");
+        fillQuestionFields(QUESTION_ID);
+    }
+}
+
+
 /**************
  ** Get data **
  **************/
@@ -676,6 +820,28 @@ function getTopics() {
     });
 }
 
+async function getQuestionById(questionId) {
+    try {
+        const response = await fetch('/getQuestionById:' + questionId, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al obtener los datos de la base de datos');
+        }
+
+        const responseData = await response.json();
+        console.debug('Respuesta del servidor:', responseData);
+        return responseData;
+    } catch (error) {
+        console.error('Error en la solicitud:', error.message);
+        throw error;
+    }
+}
+
 /***************
  ** Cath data **
  ***************/
@@ -726,8 +892,6 @@ function checkEmptyDifficulty() {
     }
     return false;
 }
-
-
 
 function emptyFields(formId, showAlerts = true, showInvalid = true) {
     var empty = true;
@@ -805,9 +969,32 @@ function catchFormData(formId, optionsFormId) {
  ** Send data **
  ***************/
 
+// function sendFormData(data) {
+//     fetch('/addQuestion', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify(data)
+//     })
+//     .then(response => {
+//         if (!response.ok) {
+//             throw new Error('Error al enviar los datos del formulario');
+//         }
+//         return response.json();
+//     })
+//     .then(responseData => {
+//         console.debug('Respuesta del servidor:', responseData);    
+//     })
+//     .catch(error => {
+//         console.error('Error en la solicitud:', error.message);
+//     });
+// }
+
+// The above functioo now calls a PUT request to update the question
 function sendFormData(data) {
     fetch('/addQuestion', {
-        method: 'POST',
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
@@ -821,6 +1008,7 @@ function sendFormData(data) {
     })
     .then(responseData => {
         console.debug('Respuesta del servidor:', responseData);    
+        succesAlert(responseData.message);
     })
     .catch(error => {
         console.error('Error en la solicitud:', error.message);
@@ -837,36 +1025,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
     getSupportedLanguages();
 
-    // Add event listener to the "Mostrar /Ocultar idiomas" button
-    document.getElementById('languages').addEventListener('click', showLangs);
-
-    // Add event listener to the "Añadir pestaña" button
-    document.getElementById('button-addon2').addEventListener('click', addTab);
-    // Add event listener to the "Añadir pestaña" button but when the user presses enter key
-    document.getElementById('newTabName').addEventListener('keyup', function(event) {
-        if (event.key === 'Enter') {
-            addTab();
-        }
-    });
-
-    // Add event listener to the "Enviar" button, submit button of the main form
-    document.getElementById('submitButton').addEventListener('click', function(event) {        
-        var confirmSubmission = window.confirm("¿Está seguro de que desea enviar el formulario?");
-        if (!confirmSubmission) {
-            event.preventDefault();
-            return;
-        }
-        else {    
-            if (checkEmptyDifficulty() || checkEmptyTopic() || emptyFields(MAIN_FORM_ID)) {
-                event.preventDefault();
-                return;
-            }
-            submitData();            
-        }
-    });
+    langsTabsSumbitListeners();
 
     addOptionsListeners();
     changeOptionTypeListener();
     translateButtonListener();
+
+    checkEditQuestionListener();
 });
 

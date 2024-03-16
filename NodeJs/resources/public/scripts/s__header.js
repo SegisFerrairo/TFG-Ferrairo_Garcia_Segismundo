@@ -1,8 +1,3 @@
-
-
-
-
-
 function lastClicked() {
     var navLinks = document.getElementById('navbarColor01').getElementsByClassName('nav-link');
 
@@ -101,6 +96,7 @@ function dropdownDB() {
 function importQuestionayCSV(input) {
     // If there is no file selected, return
     if (input.files.length == 0) {
+        console.error("No file selected");
         return;
     }
 
@@ -174,9 +170,11 @@ function importQuestionayCSV(input) {
             alert(error.message);
             return;
         }
+        
+        // Delete all the questions from the database
+        dropAllDB();
 
         // Group the questions by id, and each question will have in common: id, topic and difficulty. The languages will be different and will be added to the languages array
-        
         resultData.forEach(function(question) {
             var index = groupedQuestions.findIndex(q => q.id == question.id && q.topic == question.topic && q.difficulty == question.difficulty);
             if (index == -1) {
@@ -258,29 +256,70 @@ function exportQuestionaryCSV() {
 }
 
 
+/*************
+ ** Drop DB **
+ *************/
+
+function dropAllDB() {
+    fetch('/deleteAllQuestions', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error al obtener los datos de la base de datos');
+        }
+        return response.json();
+    })
+    .then(responseData => {
+        console.debug('Respuesta del servidor:', responseData);
+        return responseData;
+    })
+    .catch(error => {
+        console.error('Error en la solicitud:', error.message);
+    });
+}
+
+
+/*********************
+ ** Event Listeners **
+ *********************/
+
 function importQuestionaryListener() {
     var input = document.getElementById("csvFileInput");
     // Add an event listener to the input element to catch the file selected
-    input.addEventListener("change", function() {
-        importQuestionayCSV(input);        
+    input.addEventListener("click", function() {
+        // Alert the user "La BD se restaurará completamente, ¿está seguro?"
+        var confirmation = confirm("La BD se restaurará completamente, ¿está seguro?");
+        if (confirmation) {
+            // Wait until the user selects a file
+            input.addEventListener("change", function(event) {
+                importQuestionayCSV(input);
+            });
+        }       
+        else {
+            // Prevent the event from opening a select file dialog box and reset the input
+            event.preventDefault();
+            input.value = "";          
+        }
     });
 }
+
+
 function exportQuestionaryListener() {
     var label = document.getElementById("exportDB");
     label.addEventListener("click", function() {
-        console.log("Exporting questionary");
         exportQuestionaryCSV();
     });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    var label = document.getElementById("exportDB");
-    label.addEventListener("click", function() {
-        console.log("Exporting questionary");
-        exportQuestionaryCSV();
-    });
     // Add event listerner to dropdown button
+    lastClicked();
     dropdownNavBar();
     dropdownDB();
-    lastClicked();
+    importQuestionaryListener();
+    exportQuestionaryListener();
 });

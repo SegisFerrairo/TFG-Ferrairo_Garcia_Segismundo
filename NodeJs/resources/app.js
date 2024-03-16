@@ -64,6 +64,16 @@ app.get('/getTopics', async(req, res) => {
   }
 });
 
+app.get('/getQuestionById:questionId', async(req, res) => {
+  try {
+    var questionId = req.params.questionId.slice(1).toString();    
+    const question = await Question.findOne({ _id: questionId });    
+    res.status(200).json(question);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 app.post('/translate', async(req, res) => {
   try {
     const data = req.body;
@@ -74,57 +84,50 @@ app.post('/translate', async(req, res) => {
   }
 });
 
-app.post('/addQuestion', function (req, res) {
-  
-  const data = req.body;
+// The above function but with app.put instead of app.post
+app.put('/addQuestion', async(req, res) => {
+  try {
+    const data = req.body;
+    // var questionId = data._id;
+    var questionId;
+    var existingQuestion;
+    if (data._id) {
+      questionId = data._id;
+      existingQuestion = await Question.findOne({ _id: questionId });      
+    }
 
-  var question = new Question ({
-    topic: data.topic,
-    difficulty: data.difficulty,
-    languages: data.languages
-  });
+    // If question already exists, update it not create a new one
+    if (existingQuestion) {
+      console.log("Updating question");
+      var updatedParameters = { $set: { topic: data.topic, difficulty: data.difficulty, languages: data.languages } };
+      await Question.updateOne({ _id: questionId }, updatedParameters );
+      res.status(200).json({ message: 'Pregunta actualizada exitosamente.' });
+    }
+    else {
+      console.log("Creating question");
+      var question = new Question ({
+        topic: data.topic,
+        difficulty: data.difficulty,
+        languages: data.languages
+      });
+      await question.save();
+      res.status(200).json({ message: 'Pregunta añadida exitosamente.' });
+    }
 
-  // Delete data.topic from data
-  delete data.topic;
-
-  // Delete data.difficulty from data
-  delete data.difficulty;
- 
-  // question.save(function (err, doc) {
-  //   if (!err) {
-  //       // console.log(doc);
-  //       res.status(200).json({ message: 'Pregunta añadida exitosamente.' });          
-  //   }
-  //   else {
-  //       // console.log(err);
-  //       res.status(500).json({ error: 'Error al procesar la solicitud.' });
-  //   }
-  // });
-  // Check if the question already exists
-  Question   
-    .findOne({ topic: question.topic, difficulty: question.difficulty })
-    .exec(function (err, questionError) {
-      if (err) {
-        res.status(500).json({ error: 'Error al procesar la solicitud.' });
-      }
-      else if (questionError) {
-        res.status(409).json({ error: 'La pregunta ya existe.' });
-      }
-      else {
-        question.save(function (err, doc) {
-          if (!err) {
-              // console.log(doc);
-              res.status(200).json({ message: 'Pregunta añadida exitosamente.' });          
-          }
-          else {
-              // console.log(err);
-              res.status(500).json({ error: 'Error al procesar la solicitud.' });
-          }
-        });
-      }
-    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
+// Delete all questions from the database
+app.delete('/deleteAllQuestions', async(req, res) => {
+  try {
+    const question = await Question.deleteMany({});
+    res.status(200).json({ message: 'Todas las preguntas han sido eliminadas exitosamente.' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 /*****************
  ** newQuestion **
@@ -170,16 +173,6 @@ app.get('/questionary/getTopicsByLaD:langAndDiff', async(req, res) => {
 });
 
 
-app.get('/questionary/getQuestionById:questionId', async(req, res) => {
-  try {
-    var questionId = req.params.questionId.slice(1).toString();    
-    const question = await Question.findOne({ _id: questionId });    
-    res.status(200).json(question);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
 app.get('/questionary/getQuestionsByLanguage:languageName', async(req, res) => {
   try {
     var languageName = req.params.languageName.slice(1).toString();
@@ -201,6 +194,7 @@ app.delete('/questionary/deleteQuestionById:questionId', async(req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
 
 // Redirect to 404 page if no route is found
 app.use('*', error404);
