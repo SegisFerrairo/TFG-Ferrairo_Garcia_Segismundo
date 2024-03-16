@@ -551,8 +551,13 @@ async function listSidebarData() {
 
                 // Show the difficulty of the question under the statement
                 var span = document.createElement("span");
-                span.className = "badge rounded-pill bg-info";
-                span.textContent = "dificultad " + question.difficulty;
+                span.className = "badge rounded-pill";
+                // span.textContent = "dificultad " + question.difficulty;
+                for (var i = 0; i < question.difficulty; i++) {
+                    span.textContent += "★";
+                }
+                span.style.color = "orange";
+                span.style.padding = "0px";
                 div.appendChild(span);
 
                 divContainer.appendChild(div);
@@ -598,13 +603,15 @@ async function listSidebarData() {
 
                 // If question is already in the folio, disable the button
                 var folioId = "folio_0"; // The first folio is the default one
-                var questions = document.getElementById("list-" + folioId).getElementsByClassName("question");
-                for (var j = 0; j < questions.length; j++) {
-                    if (questions[j].id.split("-")[1] == question._id) {
-                        disableQuestion(button);
+                if (document.getElementById("list-" + folioId) != null) {
+                    var questions = document.getElementById("list-" + folioId).getElementsByClassName("question");
+                    for (var j = 0; j < questions.length; j++) {
+                        if (questions[j].id.split("-")[1] == question._id) {
+                            disableQuestion(button);
+                        }
                     }
-                }
-
+                }            
+           
                 selectQuestionListener(button);
                 button_delete.addEventListener("click", function() {                    
                     deleteQuestionFromDBListener(question._id);
