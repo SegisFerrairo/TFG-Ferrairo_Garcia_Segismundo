@@ -20,19 +20,19 @@ function generateRandomSeed() {
     return seed;
 }
 
-function shuffleArray(array, seed) {                // <-- ADDED ARGUMENT
+function shuffleArray(array, seed) {
     var m = array.length, t, i;
   
     // While there remain elements to shuffle…
     while (m) {  
       // Pick a remaining element…
-      i = Math.floor(random(seed) * m--);        // <-- MODIFIED LINE
+      i = Math.floor(random(seed) * m--);
   
       // And swap it with the current element.
       t = array[m];
       array[m] = array[i];
       array[i] = t;
-      ++seed                                     // <-- ADDED LINE
+      ++seed
     }
   
     return array;
@@ -42,7 +42,6 @@ function random(seed) {
     var x = Math.sin(seed++) * 10000; 
     return x - Math.floor(x);
 }
-
 
 function getDifficultyValue() {
     var radios = document.getElementById('clasification').getElementsByTagName('input');
@@ -104,7 +103,6 @@ function openTab(linkTabId, folioId) {
 
 function removeLanguagesTab(language) {
     var languagesTabList = document.getElementById("languagesTabList");
-    // var links = languagesTabList.getElementsByTagName("a"); Exclude the first tab, the header
     var links = Array.from(languagesTabList.getElementsByTagName("a")).slice(1);
     for (var i = 0; i < links.length; i++) {
         if (links[i].textContent == language) {
@@ -179,8 +177,6 @@ function addFolioHeader(folioHeaderId) {
     var divContainer = document.createElement("div");
     divContainer.id = folioHeaderId;
     divContainer.className = "tab-pane fade folio-container";
-    // Add language as a class to the div
-    // div.classList.add("language-"+language);
     var divHeader = document.createElement("div");
     divHeader.className = "folio-header";
     divHeader.id = "header-" + folioHeaderId;  
@@ -188,7 +184,6 @@ function addFolioHeader(folioHeaderId) {
 
 
     var divTop = document.createElement("div");
-    // display: flex; justify-content: space-between;
     divTop.className = "d-flex justify-content-between";
 
     var divTitle = document.createElement("div");
@@ -435,12 +430,9 @@ function addFolio(folioId, language) {
     div.appendChild(divBody);
 
     myTabContent.appendChild(div);
-
-    //addFolioHeader(divHeader.id);
 }
 
 function disableQuestion(button) {
-    // button.classList.toggle("disabled");
     var li = button.parentElement;
     if (button.classList.contains("disabled")) {   
         button.classList.remove("disabled");         
@@ -456,7 +448,7 @@ function createNoTopicsElement(ul) {
     var li = document.createElement("li");
     li.className = "no-topics";
     var link = document.createElement("a");
-    link.href = "/newQuestion";
+    link.href = "/Question";
     link.textContent = "No hay temas";
     li.appendChild(link);
     li.style.listStyleType = "none";
@@ -497,7 +489,7 @@ async function listSidebarData() {
     // Obtain the topics from the questions data
     var topics = data.map(question => question.topic);
     topics = topics.filter((topic, index) => topics.indexOf(topic) === index); // Remove duplicates
-    // Oder alphabetically
+    // Order alphabetically
     topics.sort();
 
     topics.forEach(function(topic) {
@@ -510,7 +502,6 @@ async function listSidebarData() {
         button.className = "btn btn-toggle align-items-center rounded collapsed";
         button.setAttribute("data-bs-toggle", "collapse");
         button.setAttribute("data-bs-target", "topic-" + topic + "-collapse");
-        // button.setAttribute("aria-expanded", "false");
         button.setAttribute("aria-expanded", "true");
         
 
@@ -522,7 +513,6 @@ async function listSidebarData() {
         li_topic.appendChild(button);        
 
         var div = document.createElement("div");
-        // div.className = "collapse topic-container";
         div.className = "topic-container";
         div.id = "topic-" + topic + "-collapse";
         var ul = document.createElement("ul");
@@ -551,8 +541,6 @@ async function listSidebarData() {
 
                 // Show the difficulty of the question under the statement
                 var span = document.createElement("span");
-                span.className = "badge rounded-pill";
-                // span.textContent = "dificultad " + question.difficulty;
                 for (var i = 0; i < question.difficulty; i++) {
                     span.textContent += "★";
                 }
@@ -569,7 +557,6 @@ async function listSidebarData() {
                 button_edit.id = "button_edit-" + question._id;
                 button_edit.className = "btn btn-outline-secondary btn-edit btn-sm me-2";
 
-                // use the svg /images/pencil-square.svg for button_edit
                 var img_edit = document.createElement("img");
                 img_edit.src = "/images/pencil-square.svg";
                 img_edit.alt = "Editar";
@@ -589,7 +576,6 @@ async function listSidebarData() {
                 button_delete.id = "button_delete-" + question._id;
                 button_delete.className = "btn btn-outline-danger btn-delete btn-sm";
 
-                // use the svg /images/trash.svg for button_delete
                 var img_delete = document.createElement("img");
                 img_delete.src = "/images/trash-fill.svg";
                 img_delete.alt = "Eliminar";
@@ -875,9 +861,9 @@ async function processData(questionsData) {
  **********/
 
 function editQuestion(questionId) {
-    // Send the questionId to the newQuestion page and redirect to it
+    // Send the questionId to the Question page and redirect to it
     sessionStorage.setItem("questionId", questionId);
-    window.location.href = "/newQuestion";
+    window.location.href = "/Question";
 }
 
 
@@ -1207,7 +1193,7 @@ function generateMarkdownQuestions(questions, answers) {
 
 // Get all the possible languages from the database
 function getLanguagesNames() {
-    fetch('/newQuestion/getLanguagesNames', {
+    fetch('/Question/getLanguagesNames', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -1398,7 +1384,6 @@ function dropdownExportListener() {
         }
     });
 }
-
 
 function switchedLanguagesListener(switchInput, language) {
     switchInput.addEventListener("change", function() {

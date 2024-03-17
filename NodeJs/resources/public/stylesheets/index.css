@@ -17,10 +17,6 @@ body {
     background:url("/images/TriangleLights_index.jpg");
     background-size:cover;
     z-index:1;
-    /* -webkit-filter: blur(10px);
-    -moz-filter: blur(10px);
-    -o-filter: blur(10px);
-    -ms-filter: blur(10px); */
     filter: blur(4px);   
 }
 
@@ -46,7 +42,6 @@ body {
 }
 
 .reasons {
-    /* background-color: #f8f9fa;    */
     background-color: aliceblue;
     padding-bottom: 1px; 
 }

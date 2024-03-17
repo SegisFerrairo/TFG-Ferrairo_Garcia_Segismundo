@@ -1,7 +1,7 @@
 /***************
  ** Constants **
  ***************/
-var langs_supported;
+var LANGS_SUPPORTED;
 var FROM = 'es';
 
 var QUESTION_ID = '';
@@ -32,7 +32,6 @@ function getTabLinks() {
     return tabs;
 }
 
-
 function addTab() {    
     // Obtain the name of the new tab
     // If the input just contains spaces, show an alert
@@ -49,8 +48,8 @@ function addTab() {
     
     var isSupported = false;
     var langCode = '';
-    for (var key in langs_supported) {
-        if (langs_supported[key] == newTabName) {
+    for (var key in LANGS_SUPPORTED) {
+        if (LANGS_SUPPORTED[key] == newTabName) {
             langCode = key;
             isSupported = true;
             break;
@@ -58,7 +57,7 @@ function addTab() {
     }
 
     // Check if the newTabName is in the supported languages
-    if (langs_supported[newTabName] == undefined) {
+    if (LANGS_SUPPORTED[newTabName] == undefined) {
         if (!isSupported) {            
             missingFieldsAlert('El idioma no está soportado.');
             return;
@@ -66,7 +65,7 @@ function addTab() {
     }
     else {
         // Replace the newTabName with the language code
-        newTabName = langs_supported[newTabName];        
+        newTabName = LANGS_SUPPORTED[newTabName];        
     }
 
     // Check if the tab name already exists in the tab list
@@ -133,7 +132,6 @@ function addTab() {
     addOptionsListeners();
 }
 
-
 function openTab(nextLinkTab, nextTabId) {
     var tabList = document.getElementById('tabList');
 
@@ -151,9 +149,7 @@ function openTab(nextLinkTab, nextTabId) {
 
         // Add the 'active' class to the clicked <a> element
         tabElement.classList.add('active');
-        // Change the aria-selected property to true
         tabElement.setAttribute('aria-selected', true);
-        // Remove the tabindex attribute
         tabElement.removeAttribute('tabindex');
 
         // Delete the 'active' class from all <div> elements inside myTabContent
@@ -191,11 +187,9 @@ function howManyOptions(formId) {
     if (document.getElementById(formId) == null) {
         return DEFAULT_NUM_OPTIONS;
     }
-    else {
-        // If mainform has childs, options will be the number of input elements
-        var options = document.getElementById(formId).getElementsByTagName('input');
-    }
 
+    // If mainform has childs, options will be the number of input elements
+    var options = document.getElementById(formId).getElementsByTagName('input');
     var counter = Array.from(options).filter((elem) => elem.type == 'text').length;
 
     return counter;
@@ -206,8 +200,8 @@ function createOptions(formId, optionsName, fieldset) {
 
     // Create the asnwer options
     for (var i = 1; i <= numOptions; i++) {
-        var divOpcion = document.createElement("div");
-        divOpcion.className = "form-check mb-2";
+        var divOption = document.createElement("div");
+        divOption.className = "form-check mb-2";
 
         var input = document.createElement("input");
         input.className = "form-check-input";
@@ -237,10 +231,10 @@ function createOptions(formId, optionsName, fieldset) {
         inputRespuesta.setAttribute("for", OPTIONS_FORM_NAME_ID + i);
         inputRespuesta.setAttribute("required", "");
 
-        divOpcion.appendChild(input);
-        divOpcion.appendChild(inputRespuesta);
+        divOption.appendChild(input);
+        divOption.appendChild(inputRespuesta);
 
-        fieldset.appendChild(divOpcion);
+        fieldset.appendChild(divOption);
     }
 }
 
@@ -251,17 +245,15 @@ function addMoreOptions(formId, optionsName, numOptions) {
     var fieldset = document.getElementById(formId).getElementsByTagName('fieldset')[0];
 
     // Create the asnwer options
-    var divOpcion = document.createElement("div");
-    divOpcion.className = "form-check mb-2";
+    var divOption = document.createElement("div");
+    divOption.className = "form-check mb-2";
 
     var input = document.createElement("input");
     input.className = "form-check-input";
     input.setAttribute("type", OPTION_TYPE);
     input.setAttribute("id", OPTIONS_FORM_NAME_ID + numOptions);
     input.setAttribute("name", optionsName);
-    input.setAttribute("value", "option" + numOptions);
-    //input.setAttribute("checked", "");
-    
+    input.setAttribute("value", "option" + numOptions);  
 
     var inputRespuesta = document.createElement("input");
     inputRespuesta.className = "form-control form-control-sm";
@@ -271,22 +263,22 @@ function addMoreOptions(formId, optionsName, numOptions) {
     inputRespuesta.setAttribute("name", "inputOption" + numOptions);
     inputRespuesta.setAttribute("for", OPTIONS_FORM_NAME_ID + numOptions);
 
-    divOpcion.appendChild(input);
-    divOpcion.appendChild(inputRespuesta);
+    divOption.appendChild(input);
+    divOption.appendChild(inputRespuesta);
 
-    fieldset.appendChild(divOpcion);
+    fieldset.appendChild(divOption);
 
     addOptionsListeners();
 }
 
 function deleteLastOption(formId) {
     // Delete the div that contains the last option of the form
-    // Check firsr if the formId exists
+    // Check first if the formId exists
     if (document.getElementById(formId) == null) {
         return;
     }
     var fieldset = document.getElementById(formId).getElementsByTagName('fieldset')[0];
-    // But just if there are more than 2 options
+    // But just if there are more than DEFAULT_NUM_OPTIONS options
     if (howManyOptions(formId) > DEFAULT_NUM_OPTIONS) {
         fieldset.removeChild(fieldset.lastChild);
     }
@@ -309,7 +301,7 @@ function changeOptionType(value) {
         options[i].setAttribute('type', OPTION_TYPE);
     }
 
-    // Change the type of the options of the tabs
+    // Change the type of the options of the other form tabs
     var tabs = getTabLinks();
     for (var i = 0; i < tabs.length; i++) {
         var tabId = 'tab' + tabs[i].getElementsByTagName('a')[0].id.slice(7);
@@ -451,7 +443,6 @@ function submitData() {
 
         // Add content to the data as a new property called name
         data.name = content;
-        // question['language_'+i] = data;    
         question.languages.push(data);            
     }       
     // Reset each tab
@@ -469,7 +460,6 @@ function submitData() {
     // After sending the main form, clear the form
     document.getElementById(MAIN_FORM_ID).reset();
 }
-
 
 function missingFieldsAlert(message) {
     var alert = document.createElement('div');
@@ -596,9 +586,6 @@ function fillQuestionFields(questionId) {
 }
 
 
-
-
-
 /*********************
  ** Event Listeners **
  *********************/
@@ -682,12 +669,6 @@ function translateButtonListener() {
 
         var tabId = 'tab' + activeLinkTab;
 
-        // // Check if the active tab has not empty fields
-        // if (!emptyFields(tabId, false, false)) {
-        //     missingFieldsAlert('Los campos de destino deben estar vacíos para usar la traducción automática.');
-        //     return;
-        // }
-
         // Replace the statement of the tab with the statement of the main form translated to the language of the tab
         var to = activeLinkLangCode;
 
@@ -746,7 +727,6 @@ function langsTabsSumbitListeners() {
 function checkEditQuestionListener() {
     // Check if the sessionStorage is not empty and print the questionId
     if (sessionStorage.getItem("questionId") != null) {
-        // var questionId = sessionStorage.getItem("questionId");
         QUESTION_ID = sessionStorage.getItem("questionId");
         sessionStorage.removeItem("questionId");
         fillQuestionFields(QUESTION_ID);
@@ -759,18 +739,24 @@ function checkEditQuestionListener() {
  **************/
 
 async function getSupportedLanguages() {
-    const response = await fetch('/getSupportedLanguages');
-    langs_supported = await response.json();
+    try {
+        const response = await fetch('/getSupportedLanguages');
+        if (!response.ok) {
+            throw new Error('Error al obtener los idiomas soportados');
+        }
+        LANGS_SUPPORTED = await response.json();
 
-    // Add the supported languages
-    var datalist = document.getElementById('languages-list');
-    for (var key in langs_supported) {
-        var option = document.createElement('option');
-        option.value = langs_supported[key];
-        option.textContent = key;
-        datalist.appendChild(option);
+        // Add the supported languages
+        var datalist = document.getElementById('languages-list');
+        for (var key in LANGS_SUPPORTED) {
+            var option = document.createElement('option');
+            option.value = LANGS_SUPPORTED[key];
+            option.textContent = key;
+            datalist.appendChild(option);
+        }
+    } catch (error) {
+        console.error('Error en la solicitud:', error.message);
     }
-
 }
 
 async function translate(text, from, to) {
@@ -969,29 +955,6 @@ function catchFormData(formId, optionsFormId) {
  ** Send data **
  ***************/
 
-// function sendFormData(data) {
-//     fetch('/addQuestion', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         },
-//         body: JSON.stringify(data)
-//     })
-//     .then(response => {
-//         if (!response.ok) {
-//             throw new Error('Error al enviar los datos del formulario');
-//         }
-//         return response.json();
-//     })
-//     .then(responseData => {
-//         console.debug('Respuesta del servidor:', responseData);    
-//     })
-//     .catch(error => {
-//         console.error('Error en la solicitud:', error.message);
-//     });
-// }
-
-// The above functioo now calls a PUT request to update the question
 function sendFormData(data) {
     fetch('/addQuestion', {
         method: 'PUT',

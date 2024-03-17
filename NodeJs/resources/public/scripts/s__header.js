@@ -1,5 +1,9 @@
+/***********
+ ** Utils **
+ ***********/
+
 function lastClicked() {
-    var navLinks = document.getElementById('navbarColor01').getElementsByClassName('nav-link');
+    var navLinks = document.getElementById('mainNavbar').getElementsByClassName('nav-link');
 
     // Check if the url matches a nav-link and add active class
     var currentPage = window.location.pathname;
@@ -24,37 +28,36 @@ function dropdownNavBar() {
         // Change aria-expanded attribute of dropdown button
         if (document.getElementById('dropdown-button').getAttribute('aria-expanded') == 'true') {
             document.getElementById('dropdown-button').setAttribute('aria-expanded', 'false');
-            document.getElementById('navbarColor01').removeAttribute('style');
+            document.getElementById('mainNavbar').removeAttribute('style');
             dbButton.classList.add('db-options-right');       
         } else {
             document.getElementById('dropdown-button').setAttribute('aria-expanded', 'true');            
-            document.getElementById('navbarColor01').style.height = '111px';
+            document.getElementById('mainNavbar').style.height = '111px';
             dbButton.classList.remove('db-options-right');
-            // If db-options aria-expanded is true, expand height of navbarColor01
+            // If db-options aria-expanded is true, expand height of mainNavbar
             dbButton.addEventListener('click', function() {
                 if (dbButton.getAttribute('aria-expanded') == 'true') {
-                    document.getElementById('navbarColor01').style.height = '250px';
+                    document.getElementById('mainNavbar').style.height = '250px';
                 }
                 else {
-                    document.getElementById('navbarColor01').style.height = '111px';
+                    document.getElementById('mainNavbar').style.height = '111px';
                 }
             });        
         }
 
-        // document.getElementById('navbarColor01')
-        // Change class collapse for collapsing in the element with id navbarColor01
-        document.getElementById('navbarColor01').classList.toggle('collapse');
-        document.getElementById('navbarColor01').classList.toggle('collapsing');
+        // Change class collapse for collapsing in the element with id mainNavbar
+        document.getElementById('mainNavbar').classList.toggle('collapse');
+        document.getElementById('mainNavbar').classList.toggle('collapsing');
         
         
-        document.getElementById('navbarColor01').classList.toggle('collapse');
-        document.getElementById('navbarColor01').classList.toggle('show');        
+        document.getElementById('mainNavbar').classList.toggle('collapse');
+        document.getElementById('mainNavbar').classList.toggle('show');        
     });
 
-    // If navbarColor01 changes its width, remove style attribute
+    // If mainNavbar changes its width, remove style attribute
     window.addEventListener('resize', function() {
         if (window.innerWidth > 991) {
-            document.getElementById('navbarColor01').removeAttribute('style');
+            document.getElementById('mainNavbar').removeAttribute('style');
         }
 
     });
@@ -120,6 +123,7 @@ function importQuestionayCSV(input) {
         }
 
         // Group the questions by id, they have in common the id, the topic and the difficulty
+        // Split the csv by new line
         var questions = csv.split("\n");
 
         // Delete de \r character from each question
@@ -139,11 +143,10 @@ function importQuestionayCSV(input) {
 
                     var id = questionData[0].replace(/"/g, "");
                     var topic = questionData[1].replace(/"/g, "");
-                    var difficulty = questionData[2].replace(/"/g, "");
+                    var difficulty = parseInt(questionData[2].replace(/"/g, ""));
                     var languageName = questionData[3].replace(/"/g, "");
                     var statement = questionData[4].replace(/"/g, "");
                     var options = questionData[5].replace(/"/g, "").split("|");
-
                     var answer = questionData[6].replace(/"/g, "").split("|").map(a => parseInt(a));
                 }
                 catch (error) {
@@ -174,7 +177,8 @@ function importQuestionayCSV(input) {
         // Delete all the questions from the database
         dropAllDB();
 
-        // Group the questions by id, and each question will have in common: id, topic and difficulty. The languages will be different and will be added to the languages array
+        // Group the questions by id, and each question will have in common: id, topic and difficulty. 
+        // The languages will be different and will be added to the languages array
         resultData.forEach(function(question) {
             var index = groupedQuestions.findIndex(q => q.id == question.id && q.topic == question.topic && q.difficulty == question.difficulty);
             if (index == -1) {
@@ -290,8 +294,7 @@ function dropAllDB() {
 function importQuestionaryListener() {
     var input = document.getElementById("csvFileInput");
     // Add an event listener to the input element to catch the file selected
-    input.addEventListener("click", function() {
-        // Alert the user "La BD se restaurará completamente, ¿está seguro?"
+    input.addEventListener("click", function(event) {
         var confirmation = confirm("La BD se restaurará completamente, ¿está seguro?");
         if (confirmation) {
             // Wait until the user selects a file
@@ -307,7 +310,6 @@ function importQuestionaryListener() {
     });
 }
 
-
 function exportQuestionaryListener() {
     var label = document.getElementById("exportDB");
     label.addEventListener("click", function() {
@@ -316,7 +318,6 @@ function exportQuestionaryListener() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Add event listerner to dropdown button
     lastClicked();
     dropdownNavBar();
     dropdownDB();

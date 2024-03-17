@@ -3,17 +3,14 @@ const path = require('path');
 const translate = require('@iamtraction/google-translate');
 const langs_supported = require('./public/other/langs.json');
 
-//var Question = require('./db/database');
-// ./db/database.js has multiple exports, so we need to import the whole module
 var database = require('./db/database');
-var Question = database.Question;
+var QuestionSchema = database.Question;
 // var connectToDatabase = database.connectToDatabase;
 // var closeConnection = database.closeConnection;
 
 var index = require('./routes/index');
+var Question = require('./routes/Question'); // Change the import statement to use the correct casing
 var questionary = require('./routes/questionary');
-var newQuestion = require('./routes/newQuestion');
-var test = require('./routes/test');
 var error404 = require('./routes/404');
 
 var app = express();
@@ -27,8 +24,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use('/', index);
 app.use('/', questionary);
-app.use('/', newQuestion);
-app.use('/', test);
+app.use('/', Question);
 
 app.use(express.json());
 
@@ -38,7 +34,7 @@ app.use(express.json());
 
 app.get('/getAllQuestions', async(req, res) => {
   try {   
-    const questions = await Question.find({});
+    const questions = await QuestionSchema.find({});
     res.status(200).json(questions);
   } catch (error) {
 
@@ -57,7 +53,7 @@ app.get('/getSupportedLanguages', async(req, res) => {
 
 app.get('/getTopics', async(req, res) => {
   try {
-    const topics = await Question.find({}).distinct('topic');
+    const topics = await QuestionSchema.find({}).distinct('topic');
     res.status(200).json(topics);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -67,7 +63,7 @@ app.get('/getTopics', async(req, res) => {
 app.get('/getQuestionById:questionId', async(req, res) => {
   try {
     var questionId = req.params.questionId.slice(1).toString();    
-    const question = await Question.findOne({ _id: questionId });    
+    const question = await QuestionSchema.findOne({ _id: questionId });    
     res.status(200).json(question);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -93,14 +89,14 @@ app.put('/addQuestion', async(req, res) => {
     var existingQuestion;
     if (data._id) {
       questionId = data._id;
-      existingQuestion = await Question.findOne({ _id: questionId });      
+      existingQuestion = await QuestionSchema.findOne({ _id: questionId });      
     }
 
     // If question already exists, update it not create a new one
     if (existingQuestion) {
       console.log("Updating question");
       var updatedParameters = { $set: { topic: data.topic, difficulty: data.difficulty, languages: data.languages } };
-      await Question.updateOne({ _id: questionId }, updatedParameters );
+      await QuestionSchema.updateOne({ _id: questionId }, updatedParameters );
       res.status(200).json({ message: 'Pregunta actualizada exitosamente.' });
     }
     else {
@@ -122,7 +118,7 @@ app.put('/addQuestion', async(req, res) => {
 // Delete all questions from the database
 app.delete('/deleteAllQuestions', async(req, res) => {
   try {
-    const question = await Question.deleteMany({});
+    const question = await QuestionSchema.deleteMany({});
     res.status(200).json({ message: 'Todas las preguntas han sido eliminadas exitosamente.' });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -130,13 +126,13 @@ app.delete('/deleteAllQuestions', async(req, res) => {
 });
 
 /*****************
- ** newQuestion **
+ ** Question **
  *****************/
 
 // Get the languages from the database
-app.get('/newQuestion/getLanguagesNames', async(req, res) => {
+app.get('/Question/getLanguagesNames', async(req, res) => {
   try {
-    const languages = await Question.find({}).distinct('languages.name');
+    const languages = await QuestionSchema.find({}).distinct('languages.name');
     res.status(200).json(languages);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -151,7 +147,7 @@ app.get('/newQuestion/getLanguagesNames', async(req, res) => {
 app.get('/questionary/getQuestionsByLanguage:languageName', async(req, res) => {
   try {
     var languageName = req.params.languageName.slice(1).toString();
-    const questions = await Question.find({ 'languages.name': languageName });
+    const questions = await QuestionSchema.find({ 'languages.name': languageName });
     res.status(200).json(questions);
   }
   catch (error) {
@@ -163,7 +159,7 @@ app.get('/questionary/getQuestionsByLanguage:languageName', async(req, res) => {
 app.delete('/questionary/deleteQuestionById:questionId', async(req, res) => {
   try {
     var questionId = req.params.questionId.slice(1).toString();
-    const question = await Question.deleteOne({ _id: questionId });
+    const question = await QuestionSchema.deleteOne({ _id: questionId });
     res.status(200).json({ message: 'Pregunta eliminada exitosamente.' });
   } catch (error) {
     res.status(500).json({ message: error.message });

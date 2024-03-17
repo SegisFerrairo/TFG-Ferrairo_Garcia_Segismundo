@@ -1,9 +1,9 @@
 body {
-    margin-bottom: 70px; /* Añade un margen en la parte inferior del cuerpo para que el footer no se superponga al contenido */
+    margin-bottom: 70px; /* Adds a margin at the bottom of the body so the footer doesn't overlap the content */
 }
 
 footer {
-    background-color: #f8f8f8; /* Color de fondo del footer */
+    background-color: #f8f8f8; /* Footer background color */
     border-top: 1px solid #e7e7e7;    
 }
 
@@ -15,15 +15,15 @@ footer .footer-container {
 }
 
 footer .banner {
-    max-width: 150px; /* Establece el ancho máximo de la imagen */
-    height: auto; /* Hace que la altura se ajuste automáticamente para mantener la proporción */
-    vertical-align: baseline; /* Alinea verticalmente la imagen con el texto */
+    max-width: 150px; /* Establishes the maximum width of the image */
+    height: auto; /* Makes the height adjust automatically to maintain the proportion */
+    vertical-align: baseline; /* Aligns the image vertically with the text */
 }
 
 footer .logo {
-    max-width: 75px; /* Establece el ancho máximo de la imagen */
-    height: 40px; /* Hace que la altura se ajuste automáticamente para mantener la proporción */
-    vertical-align: text-bottom ; /* Alinea verticalmente la imagen con el texto */
+    max-width: 75px;
+    height: 40px;
+    vertical-align: text-bottom ; /* Aligns the image vertically with the text */
 }
 
 footer span {

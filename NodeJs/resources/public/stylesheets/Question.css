@@ -45,8 +45,8 @@
 
 #addTabBar #newTabName {
     text-align: center;   
-    background-color: #f0f0f0; /* Gris muy tenue como fondo */
-    font-style: italic; /* Cursiva para el texto */
+    background-color: #f0f0f0;
+    font-style: italic;
     height: 35px;    
 }
 

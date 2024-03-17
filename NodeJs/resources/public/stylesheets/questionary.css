@@ -6,7 +6,7 @@
     width: 333px;
     padding: 20px;
     background-color: #f8f9fa;
-    border-right: 1px solid #dee2e6; /* Borde derecho de la barra lateral */
+    border-right: 1px solid #dee2e6;
 }
 
 .sidebar>.sidebar-header {
@@ -14,7 +14,7 @@
 }
 
 .main-content {
-    margin-left: 325px; /* Ancho de la barra lateral + espacio de margen */
+    margin-left: 325px; /* Sidebar width + margin space */
     padding: 20px;
 }
 
@@ -22,10 +22,10 @@
     min-height: 70vh;
     width: 80%;
     margin: 0 auto;
-    background-color: #ffffff; /* Color de fondo del folio */
-    border: 1px solid #dee2e6; /* Borde del folio */
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
     padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra del folio */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .single-choice {
@@ -37,12 +37,10 @@
 }
 
 .single-choice li {
-    /* list-style-image: url("/images/single-option.svg"); */
     list-style-image: url("/images/dash.svg");
 }
 
 .multiple-choice {
-    /* list-style-image: url("/images/multiple-option.svg"); */
     list-style-image: url("/images/empty_multiple-option.svg");
 }
 
@@ -140,9 +138,8 @@
   
 #randomizeQuestions::before {
     content: url("/images/shuffle.svg");
-    display: flex; /* make the div a flex container */
-    justify-content: center; /* horizontally center */
-    /* filter: invert(100%); */
+    display: flex;
+    justify-content: center; /* horizontally centered */
     padding-top: 3px;
 }
 
@@ -184,7 +181,6 @@
 
 .form-clasification label {
     font-size: 20px;
-    /* cursor: pointer; */
 }
 
 #resetDifficultyLabel {
@@ -235,7 +231,6 @@
     filter: invert(40%);
 }
 
-/* When hovering .btn-edit, filter: ivert(100%); just the img */
 .btn-edit:hover img {
     filter: invert(100%);
 }
@@ -247,7 +242,6 @@
 }
 
 .btn-delete img {
-    /* filter: invert(42%) sepia(59%) saturate(6348%) hue-rotate(338deg) brightness(100%) contrast(100%); */
     filter: invert(17%) sepia(63%) saturate(5659%) hue-rotate(347deg) brightness(90%) contrast(103%);
 }
 
