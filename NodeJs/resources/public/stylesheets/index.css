@@ -2,6 +2,14 @@ body {
     margin: 0;
 }
 
+.welcome-logo {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+    display: block;
+    filter: brightness(0);
+}
+
 .welcome {
     position: relative;
     padding-top: 90px; 
@@ -29,7 +37,7 @@ body {
     z-index:2;
 
     max-width: 80%;
-    margin: 150px auto;
+    /* margin: 150px auto; */
 }
 
 .container-title {

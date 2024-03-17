@@ -10,7 +10,7 @@ var QuestionSchema = database.Question;
 
 var index = require('./routes/index');
 var Question = require('./routes/Question'); // Change the import statement to use the correct casing
-var questionary = require('./routes/questionary');
+var Questionary = require('./routes/Questionary');
 var error404 = require('./routes/404');
 
 var app = express();
@@ -23,7 +23,7 @@ app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use('/', index);
-app.use('/', questionary);
+app.use('/', Questionary);
 app.use('/', Question);
 
 app.use(express.json());
@@ -141,10 +141,10 @@ app.get('/Question/getLanguagesNames', async(req, res) => {
 
 
 /*****************
- ** questionary **
+ ** Questionary **
  *****************/
 
-app.get('/questionary/getQuestionsByLanguage:languageName', async(req, res) => {
+app.get('/Questionary/getQuestionsByLanguage:languageName', async(req, res) => {
   try {
     var languageName = req.params.languageName.slice(1).toString();
     const questions = await QuestionSchema.find({ 'languages.name': languageName });
@@ -156,7 +156,7 @@ app.get('/questionary/getQuestionsByLanguage:languageName', async(req, res) => {
 });
 
 
-app.delete('/questionary/deleteQuestionById:questionId', async(req, res) => {
+app.delete('/Questionary/deleteQuestionById:questionId', async(req, res) => {
   try {
     var questionId = req.params.questionId.slice(1).toString();
     const question = await QuestionSchema.deleteOne({ _id: questionId });

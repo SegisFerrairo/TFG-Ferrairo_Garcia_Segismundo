@@ -1241,7 +1241,7 @@ async function getQuestionById(questionId) {
 
 async function getQuestionsByLanguage(language) {
     try {
-        const response = await fetch('/questionary/getQuestionsByLanguage:' + language, {
+        const response = await fetch('/Questionary/getQuestionsByLanguage:' + language, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -1294,7 +1294,7 @@ async function sendFormData(data) {
  *************/
 
 function dropQuestionById(questionId) {
-    fetch('/questionary/deleteQuestionById:' + questionId, {
+    fetch('/Questionary/deleteQuestionById:' + questionId, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'
