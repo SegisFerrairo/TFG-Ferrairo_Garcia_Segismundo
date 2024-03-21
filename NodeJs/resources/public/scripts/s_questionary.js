@@ -190,7 +190,7 @@ function addFolioHeader(folioHeaderId) {
 
     var div = document.createElement("div");
     div.className = "form-floating";
-    div.style.width = "400px";
+    div.style.width = "378px";
 
     var input = document.createElement("input");
     input.type = "input";
@@ -673,7 +673,7 @@ function addEmptyQuestion(folioId, question, language) {
 
     var li_q = document.createElement("li");
     li_q.id = "question-" + question._id;
-    li_q.className = "question empty-question";
+    li_q.className = "question mt-4 empty-question";
     var label = document.createElement("label");
     label.textContent = "Error: La pregunta no está en el idioma " + language;
     li_q.appendChild(label);
@@ -695,7 +695,7 @@ function addQuestion(folioId, question) {
     var li_q = document.createElement("li");
     li_q.id = "question-" + question._id;
     // Add topic and difficulty as classes to the li
-    li_q.className = "question topic-\"" + question.topic + "\" \"" + "difficulty-\"" + question.difficulty + "\"";
+    li_q.className = "mt-4 question topic-\"" + question.topic + "\" \"" + "difficulty-\"" + question.difficulty + "\"";
     var label = document.createElement("label");
     label.textContent = question.languages[CHOOSEN_LANGUAGE_ID].statement;
     li_q.appendChild(label);
@@ -1590,12 +1590,35 @@ function resetSearchQuestionContentListener()  {
     });
 }
 
+function resizeSidebarListener() {
+    var sidebar = document.getElementById("sidebar");
+    var header = document.getElementById("header");
+    var footer = document.getElementById("footer");
+    sidebar.style.height = window.innerHeight - header.offsetHeight - footer.offsetHeight - footer.offsetHeight/2 - 20 + "px";
+    window.addEventListener("resize", function() {        
+        sidebar.style.height = window.innerHeight - header.offsetHeight - footer.offsetHeight - footer.offsetHeight/2 - 20 + "px";
+    });
+}
+
+function resizeSidebarContentListener() {
+    var sidebarContent = document.getElementById("sidebarContent");
+    var sidebar = document.getElementById("sidebar");
+    var sidebarHeader = document.getElementById("sidebarHeader");
+    var footer = document.getElementById("footer");
+    sidebarContent.style.height = sidebar.offsetHeight - sidebarHeader.offsetHeight - footer.offsetHeight  + "px";
+    window.addEventListener("resize", function() {
+        sidebarContent.style.height = sidebar.offsetHeight - sidebarHeader.offsetHeight - footer.offsetHeight  + "px";
+    });
+}
 
 /****************
  ** DOM Loaded **
  ****************/
 
 document.addEventListener("DOMContentLoaded", function() {
+    resizeSidebarListener();
+    resizeSidebarContentListener();
+
     resetSearchQuestionContentListener();
     dropdownExportListener();
     resetDifficultyListener();

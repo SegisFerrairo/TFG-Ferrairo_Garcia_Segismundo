@@ -13,7 +13,7 @@
         
         <!-- Barra lateral -->
         <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
+            <div class="sidebar-header" id="sidebarHeader">
                 <div style="display: flex;">
                     <h5>Cuestiones</h5>
                     <button type="button" id="randomizeQuestions" class="btn btn-outline-primary ms-3"></button>
@@ -36,9 +36,7 @@
                           <a class="dropdown-item">LaTeX</a>
                         </div>
                     </div>
-                </div>   
-            </div>
-            <div class="sidebar-content">
+                </div>  
                 <ul class="list-unstyled ps-0">
                     <li class="border-top my-3"></li>
 
@@ -65,7 +63,9 @@
                         </p>
                     </form>
                     <li class="border-top"></li>
-                </ul>
+                </ul> 
+            </div>
+            <div class="sidebar-content" id="sidebarContent">                
                 <ul id="sidebarQuestionsList" class="list-unstyled ps-0">
                 </ul>
             </div>

@@ -83,6 +83,7 @@ app.post('/translate', async(req, res) => {
 // The above function but with app.put instead of app.post
 app.put('/addQuestion', async(req, res) => {
   try {
+    console.log("Adding question");
     const data = req.body;
     // var questionId = data._id;
     var questionId;
@@ -101,7 +102,7 @@ app.put('/addQuestion', async(req, res) => {
     }
     else {
       console.log("Creating question");
-      var question = new Question ({
+      var question = new QuestionSchema ({
         topic: data.topic,
         difficulty: data.difficulty,
         languages: data.languages

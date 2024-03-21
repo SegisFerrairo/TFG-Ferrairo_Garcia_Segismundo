@@ -488,6 +488,11 @@ function missingFieldsAlert(message) {
     button.addEventListener('click', function() {
         alert.remove();
     });
+
+    // Remove the alert after 5 seconds
+    setTimeout(function() {
+        alert.remove();
+    }, 3000);
 }
 
 function succesAlert(message) {
@@ -507,10 +512,16 @@ function succesAlert(message) {
     // Insert as the first child of the body
     document.body.insertBefore(alert, document.body.firstChild);
 
+
+    // Add the event listener to the button
+    button.addEventListener('click', function() {
+        alert.remove();
+    });
+
     // Remove the alert after 5 seconds
     setTimeout(function() {
         alert.remove();
-    }, 3000);
+    }, 5000);
 }
 
 function fillQuestionFields(questionId) {
@@ -858,12 +869,15 @@ function checkEmptyTopic() {
     if (topic == '') {
         missingFieldsAlert('Debes especificar un tema para la pregunta.');
         document.getElementById('floatingTopic').focus();
+        // Remove class border-blue from the input
+        document.getElementById('floatingTopic').classList.remove('border-blue');
         // Make field invalid to show the user that it is required
         document.getElementById('floatingTopic').classList.add('is-invalid');
         return true;
     }
     else {
         document.getElementById('floatingTopic').classList.remove('is-invalid');
+        document.getElementById('floatingTopic').classList.add('border-blue');
     }
     return false;
 }
