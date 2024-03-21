@@ -12,7 +12,7 @@
     /* Ambos elementos crecerán en la misma proporción */
     box-sizing: border-box;
     padding: 20px;
-    width: 50%; /* Ajuste para que ambos tengan el mismo ancho total */
+    width: 48%; /* Ajuste para que ambos tengan el mismo ancho total */
 }
 
 /* centralo verticalmente con la página */
@@ -39,7 +39,7 @@
 }
 
 #addTabBar {
-    max-width: 222px;
+    max-width: 239px;
     margin-bottom: 2px;
 }
 
@@ -70,8 +70,13 @@ select {
     margin-top: 50px;
 }
 
+#languages {
+    width: 102px;
+}
+
 #floatingTopic {
     width: 150px;
+    border: 2px solid #4582ec;
 }
 
 .translate {

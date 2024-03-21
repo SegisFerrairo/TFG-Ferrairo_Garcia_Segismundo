@@ -1,5 +1,5 @@
 body {
-    margin: 0;
+    margin: 51px auto 56px auto;
 }
 
 .welcome-logo {
@@ -11,9 +11,9 @@ body {
 }
 
 .welcome {
-    position: relative;
-    padding-top: 90px; 
-    min-height: 80vh;
+    position: relative;    
+    padding: 60px 0;
+    /* min-height: 80vh; */
 }
 
 .welcome-bg {
@@ -30,6 +30,10 @@ body {
 
 .welcome p {
     margin-bottom: 40px;
+}
+
+.welcome h1 {
+    color: black;
 }
 
 .container {
@@ -60,7 +64,7 @@ body {
 }
 
 .row {
-   margin-bottom: 80px;
+   margin-bottom: 100px;
 }
 
 .reverse-flex-direction {
