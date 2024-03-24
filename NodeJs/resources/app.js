@@ -4,8 +4,8 @@ const translate = require('@iamtraction/google-translate');
 const langs_supported = require('./public/other/langs.json');
 
 var database = require('./db/database');
+database.connectToDatabase;
 var QuestionSchema = database.Question;
-// var connectToDatabase = database.connectToDatabase;
 // var closeConnection = database.closeConnection;
 
 var index = require('./routes/index');
