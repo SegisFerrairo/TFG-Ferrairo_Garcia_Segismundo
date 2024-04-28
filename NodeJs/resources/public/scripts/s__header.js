@@ -265,7 +265,7 @@ function exportQuestionaryCSV() {
  *************/
 
 function dropAllDB() {
-    fetch('/deleteAllQuestions', {
+    fetch('/deleteAllDBQuestions', {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'

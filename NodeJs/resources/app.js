@@ -9,7 +9,7 @@ var QuestionSchema = database.Question;
 // var closeConnection = database.closeConnection;
 
 var index = require('./routes/index');
-var Question = require('./routes/Question'); // Change the import statement to use the correct casing
+var Question = require('./routes/Question');
 var Questionary = require('./routes/Questionary');
 var error404 = require('./routes/404');
 
@@ -42,7 +42,6 @@ app.get('/getAllQuestions', async(req, res) => {
   }
 });
 
-// Get the supported languages
 app.get('/getSupportedLanguages', async(req, res) => {
   try {
     res.status(200).json(langs_supported);
@@ -80,7 +79,6 @@ app.post('/translate', async(req, res) => {
   }
 });
 
-// The above function but with app.put instead of app.post
 app.put('/addQuestion', async(req, res) => {
   try {
     console.log("Adding question");
@@ -116,8 +114,7 @@ app.put('/addQuestion', async(req, res) => {
   }
 });
 
-// Delete all questions from the database
-app.delete('/deleteAllQuestions', async(req, res) => {
+app.delete('/deleteAllDBQuestions', async(req, res) => {
   try {
     const question = await QuestionSchema.deleteMany({});
     res.status(200).json({ message: 'Todas las preguntas han sido eliminadas exitosamente.' });
@@ -140,7 +137,6 @@ app.get('/Question/getLanguagesNames', async(req, res) => {
   }
 });
 
-
 /*****************
  ** Questionary **
  *****************/
@@ -155,7 +151,6 @@ app.get('/Questionary/getQuestionsByLanguage:languageName', async(req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
 
 app.delete('/Questionary/deleteQuestionById:questionId', async(req, res) => {
   try {

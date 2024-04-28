@@ -679,10 +679,9 @@ function translateButtonListener() {
         }
 
         var tabId = 'tab' + activeLinkTab;
-
-        // Replace the statement of the tab with the statement of the main form translated to the language of the tab
-        var to = activeLinkLangCode;
-
+        // Get the objective language code of the active tab
+        var to = activeLinkLangCode;        
+        // Replace the statement of the tab with the statement of the main form translated 
         try {
             var translation = await translate(mainformData.statement, FROM, to);
             document.getElementById(tabId+'_statement').value = translation;
