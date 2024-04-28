@@ -17,4 +17,4 @@ RUN npm install
 EXPOSE 3000
 
 # Comando para ejecutar la aplicación cuando el contenedor se inicie
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]

@@ -4,7 +4,7 @@
   "description": "Una aplicación Node.js con Express para Docker",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node /NodeApp/app.js",
     "dev": "nodemon -L --watch /NodeApp -e js,ejs,css,png /NodeApp/app.js"
   },
   "dependencies": {

@@ -5,6 +5,7 @@ var COUNTER_QUESTION = 1;
 var COUNTER_LANGUAGE = 0;
 var CHOOSEN_LANGUAGE = "Español";
 var CHOOSEN_LANGUAGE_ID = 0;
+var ONE_CLICK = true;
 
 /***********
  ** Utils **
@@ -1441,27 +1442,38 @@ function removeQuestionFromFolio(questionId) {
 function exportQuestionaryListener() {
     var button = document.getElementById("exportQuestionary");
     button.addEventListener("click", function() {
-        var content = button.getElementsByTagName("strong")[0].textContent;
-        var notEmptyFolios = getNotEmptyFoliosIds();
-        let seed = generateRandomSeed();
+        // Wait between clicks
+        button.disabled = true;
+        setTimeout(function() {
+            button.disabled = false;
+            ONE_CLICK = true;
+        }, 500);
 
-        notEmptyFolios.forEach(async function(folioId) {
-            var randomSeed = seed;
-            var questions = {};
-            try {
-                questions = await processData(catchQuestionary(folioId));
-            }
-            catch (error) {
-                console.error('Error en la solicitud:', error.message);
-            }
+        if (ONE_CLICK) {
+            ONE_CLICK = false;
+            console.log("Exportar cuestionario");
+            var content = button.getElementsByTagName("strong")[0].textContent;
+            var notEmptyFolios = getNotEmptyFoliosIds();
+            let seed = generateRandomSeed();
 
-            if (content == "Markdown") {
-                exportQuestionaryMarkdown(questions, randomSeed);
-            }
-            else if (content == "LaTeX") {
-                exportQuestionaryLaTex(questions);            
-            }
-        });
+            notEmptyFolios.forEach(async function(folioId) {
+                var randomSeed = seed;
+                var questions = {};
+                try {
+                    questions = await processData(catchQuestionary(folioId));
+                }
+                catch (error) {
+                    console.error('Error en la solicitud:', error.message);
+                }
+
+                if (content == "Markdown") {
+                    exportQuestionaryMarkdown(questions, randomSeed);
+                }
+                else if (content == "LaTeX") {
+                    exportQuestionaryLaTex(questions);            
+                }
+            });
+        }
     });
 }
 
