@@ -291,7 +291,7 @@ function dropAllDB() {
  ** Event Listeners **
  *********************/
 
-function importQuestionaryListener() {
+function importCSVQuestionaryListener() {
     var input = document.getElementById("csvFileInput");
     // Add an event listener to the input element to catch the file selected
     input.addEventListener("click", function(event) {
@@ -310,8 +310,8 @@ function importQuestionaryListener() {
     });
 }
 
-function exportQuestionaryListener() {
-    var label = document.getElementById("exportDB");
+function exportCSVQuestionaryListener() {
+    var label = document.getElementById("csvFileExport");
     label.addEventListener("click", function() {
         exportQuestionaryCSV();
     });
@@ -321,6 +321,6 @@ document.addEventListener('DOMContentLoaded', function() {
     lastClicked();
     dropdownNavBar();
     dropdownDB();
-    importQuestionaryListener();
-    exportQuestionaryListener();
+    importCSVQuestionaryListener();
+    exportCSVQuestionaryListener();
 });
