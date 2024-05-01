@@ -128,6 +128,7 @@ function importQuestionayCSV(input) {
 
         // Delete de \r character from each question
         questions = questions.map(q => q.replace(/\r/g, ""));
+
         // If the last element is empty, delete it
         if (questions[questions.length - 1] == "") {
             questions.pop();
@@ -136,10 +137,12 @@ function importQuestionayCSV(input) {
         // Remove the first element, the headers
         questions.shift();
         var resultData = [];
+
         try {
             questions.forEach(function(question) {
                 try {
-                    var questionData = question.split(",");
+                    // Use a regular expression to split the line respecting the quotes
+                    var questionData = question.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
 
                     var id = questionData[0].replace(/"/g, "");
                     var topic = questionData[1].replace(/"/g, "");
@@ -148,8 +151,7 @@ function importQuestionayCSV(input) {
                     var statement = questionData[4].replace(/"/g, "");
                     var options = questionData[5].replace(/"/g, "").split("|");
                     var answer = questionData[6].replace(/"/g, "").split("|").map(a => parseInt(a));
-                }
-                catch (error) {
+                } catch (error) {
                     throw new Error("Error al leer el archivo");
                 }
 
@@ -157,14 +159,12 @@ function importQuestionayCSV(input) {
                     id: id,
                     topic: topic,
                     difficulty: difficulty,
-                    languages: [
-                        {
-                            name: languageName,
-                            statement: statement,
-                            options: options,
-                            answer: answer
-                        }
-                    ]
+                    languages: [{
+                        name: languageName,
+                        statement: statement,
+                        options: options,
+                        answer: answer
+                    }]
                 };
                 resultData.push(question);
             });
@@ -173,7 +173,7 @@ function importQuestionayCSV(input) {
             alert(error.message);
             return;
         }
-        
+
         // Delete all the questions from the database
         dropAllDB();
 
@@ -241,7 +241,7 @@ function exportQuestionaryCSV() {
         var csv = "id,topic,difficulty,language,statement,options,answer\n";
         data.forEach(function(question) {
             question.languages.forEach(function(language) {
-                csv += `${question._id},${question.topic},${question.difficulty},${language.name},${language.statement},${language.options.join("|")},${language.answer.join("|")}\n`;
+                csv += `"${question._id}","${question.topic}","${question.difficulty}","${language.name}","${language.statement}","${language.options.join("|")}","${language.answer.join("|")}"\n`;
             });
         });
 
