@@ -116,6 +116,7 @@ app.put('/addQuestion', async(req, res) => {
 
 app.delete('/deleteAllDBQuestions', async(req, res) => {
   try {
+    console.log("Deleting DB");
     const question = await QuestionSchema.deleteMany({});
     res.status(200).json({ message: 'Todas las preguntas han sido eliminadas exitosamente.' });
   } catch (error) {
@@ -154,6 +155,7 @@ app.get('/Questionary/getQuestionsByLanguage:languageName', async(req, res) => {
 
 app.delete('/Questionary/deleteQuestionById:questionId', async(req, res) => {
   try {
+    console.log("Deleting question");
     var questionId = req.params.questionId.slice(1).toString();
     const question = await QuestionSchema.deleteOne({ _id: questionId });
     res.status(200).json({ message: 'Pregunta eliminada exitosamente.' });
